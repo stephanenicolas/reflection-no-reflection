@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/stephanenicolas/reflection-no-reflection/master/assets/prism.jpg">
+
 A proof on concept to create an API that is 100% compatible reflection API, but without any reflection. Performance stuff for Android and Java. 
 
 We hope to create a new technology that can improve all reflection based libraries for Android and Java.
