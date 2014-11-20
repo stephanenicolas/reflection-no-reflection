@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+repositories {
+       mavenCentral()
+       mavenLocal()
+}
+
+dependencies {
+   compile 'TODO JSR 305'
+}
