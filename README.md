@@ -1,4 +1,9 @@
+Reflection no reflection
+------------------------
+
 <img src="https://raw.githubusercontent.com/stephanenicolas/reflection-no-reflection/master/assets/prism.jpg">
+
+All credits of the library logo to [Tracey Sarsfield](http://www.traceysarsfield.com/gallery.html), we use this picture with her kind permission.
 
 A proof on concept to create an API that is 100% compatible reflection API, but without any reflection. Performance stuff for Android and Java. 
 
