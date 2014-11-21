@@ -5,7 +5,7 @@ Reflection no reflection
 
 All credits of the library logo to [Tracey Sarsfield](http://www.traceysarsfield.com/gallery.html), we use this picture with her kind permission.
 
-A proof on concept to create an API that is 100% compatible reflection API, but without any reflection. Performance stuff for Android and Java. 
+Reflection No Reflection is a proof of concept to create an API that is 100% compatible with the Java core reflection API, but without any reflection. 
 
 We hope to create a new technology that can improve all reflection based libraries for Android and Java.
 
