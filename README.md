@@ -1,4 +1,4 @@
-Reflection no reflection
+Reflection No Reflection
 ------------------------
 
 <img src="https://raw.githubusercontent.com/stephanenicolas/reflection-no-reflection/master/assets/prism.jpg">
