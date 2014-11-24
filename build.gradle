@@ -1,1 +1,10 @@
-allprojects { apply plugin: "idea" }
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+
+  group = GROUP
+
+  apply plugin: 'maven'
+  apply plugin: 'idea'
+}

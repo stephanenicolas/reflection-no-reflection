@@ -1,5 +1,23 @@
 apply plugin: 'java'
 
+
+
+buildscript {
+
+  repositories {
+    mavenCentral()
+
+    // NOTE: This is only needed when developing the plugin!
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath 'org.reflection_no_reflection:weaver:1.0.0-SNAPSHOT'
+  }
+}
+
+apply plugin: 'no_reflection'
+
 repositories {
        mavenCentral()
        mavenLocal()
