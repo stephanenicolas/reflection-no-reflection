@@ -1,5 +1,6 @@
 
 include "common-lib"
 include "annotation-processor"
+include "weaver"
 include "sample"
 include "sample-exploded"
