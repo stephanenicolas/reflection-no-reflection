@@ -1,6 +1,8 @@
 package com.groupon;
 
 import com.google.inject.blender.Field;
+import com.google.inject.blender.FieldFinder;
+import com.google.inject.blender.ReflectionFieldFinderImpl;
 import java.util.List;
 import javax.inject.Inject;
 

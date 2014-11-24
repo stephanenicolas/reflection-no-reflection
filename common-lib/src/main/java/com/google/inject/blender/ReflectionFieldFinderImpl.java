@@ -1,6 +1,5 @@
-package com.groupon;
+package com.google.inject.blender;
 
-import com.google.inject.blender.Field;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;

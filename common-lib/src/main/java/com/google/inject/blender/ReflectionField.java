@@ -1,6 +1,5 @@
-package com.groupon;
+package com.google.inject.blender;
 
-import com.google.inject.blender.Field;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -12,6 +11,7 @@ public class ReflectionField extends Field {
 
     public ReflectionField(java.lang.reflect.Field field) {
         this.field = field;
+        field.setAccessible(true);
     }
 
     @Override public Object get(Object object) throws IllegalAccessException {

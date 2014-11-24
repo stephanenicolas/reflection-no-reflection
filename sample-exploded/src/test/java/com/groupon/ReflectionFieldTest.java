@@ -1,5 +1,7 @@
 package com.groupon;
 
+import com.google.inject.blender.ReflectionField;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
