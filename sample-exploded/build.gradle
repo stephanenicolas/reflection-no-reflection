@@ -1,0 +1,11 @@
+apply plugin: 'java'
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+dependencies {
+  compile project(':common-lib')
+  compile 'javax.inject:javax.inject:1'
+}

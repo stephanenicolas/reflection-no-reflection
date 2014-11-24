@@ -6,5 +6,5 @@ repositories {
 }
 
 dependencies {
-   compile 'TODO JSR 305'
+   compile 'javax.inject:javax.inject:1'
 }

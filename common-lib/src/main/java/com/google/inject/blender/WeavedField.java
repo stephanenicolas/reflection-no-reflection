@@ -7,11 +7,19 @@ public class WeavedField extends Field {
 
     private Class declaringClass;
     private Class fieldType;
+    private int index;
     private String fieldName;
     private String declaringClassName;
     private String fieldTypeName;
 
     public WeavedField(String fieldName, String declaringClassName, String fieldTypeName) {
+      this.fieldName = fieldName;
+      this.declaringClassName = declaringClassName;
+      this.fieldTypeName = fieldTypeName;
+    }
+
+    public WeavedField(int index, String fieldName, String declaringClassName, String fieldTypeName) {
+      this.index = index;
       this.fieldName = fieldName;
       this.declaringClassName = declaringClassName;
       this.fieldTypeName = fieldTypeName;
@@ -33,12 +41,26 @@ public class WeavedField extends Field {
 
     @Override
     public Type getGenericType() {
-        return fieldType;
+        try {
+            return Class.forName(fieldTypeName);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public Class getType() {
-        return fieldType;
+        if (fieldTypeName.equals("int")) {
+            return int.class;
+        }
+
+        try {
+            return Class.forName(fieldTypeName);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     public String getTypeName() {
@@ -48,6 +70,10 @@ public class WeavedField extends Field {
     @Override
     public String getName() {
         return fieldName;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public String toString() {

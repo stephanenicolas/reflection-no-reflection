@@ -1,3 +1,5 @@
 
 include "common-lib"
 include "annotation-processor"
+include "sample"
+include "sample-exploded"
