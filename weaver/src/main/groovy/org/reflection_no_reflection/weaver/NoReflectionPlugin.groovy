@@ -11,28 +11,25 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
 
   @Override
   public IClassTransformer[] getTransformers(Project project) {
-    return new LogLifeCycleProcessor(project.loglifecycle.debug);
+    return new NoReflectionPlugin(project.noreflection.debug);
   }
 
   @Override
   protected void configure(Project project) {
-    project.dependencies {
-      provided 'com.github.stephanenicolas.loglifecycle:loglifecycle-annotations:1.0.1'
-    }
   }
 
   @Override
   protected Class getPluginExtension() {
-    LogLifeCyclePluginExtension
+    NoReflectionPluginExtension
   }
 
   @Override
   protected String getExtension() {
-    "loglifecycle"
+    "noreflection"
   }
 
   @Override
   public boolean skipVariant(def variant) {
-    return variant.name.contains('release')
+    return false
   }
 }

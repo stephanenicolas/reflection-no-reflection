@@ -12,6 +12,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
+import javassist.CtNewMethod;
 import javassist.NotFoundException;
 import javassist.build.IClassTransformer;
 import javassist.build.JavassistBuildException;
@@ -68,8 +69,13 @@ public class NoReflectionWeaver implements IClassTransformer {
     log.info("Transformation successful for " + classToTransformName);
   }
 
-  private void createPublicAccessorMethods(List<CtField> fieldList) {
-    //TODO
+  private void createPublicAccessorMethods(List<CtField> fieldList) throws CannotCompileException {
+    for (CtField ctField : fieldList) {
+      CtMethod setterMethod = CtNewMethod.setter("__access_"+ ctField.getName(), ctField);
+      ctField.getDeclaringClass().addMethod(setterMethod);
+      CtMethod getterMethod = CtNewMethod.getter("__access_" + ctField.getName(), ctField);
+      ctField.getDeclaringClass().addMethod(getterMethod);
+    }
   }
 
   private void logMoreIfDebug(String message, Exception e) {
