@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-   project ':common-lib'
+   compile project(':common-lib')
    compile 'org.apache.velocity:velocity:1.7'
    compile 'com.google.inject:blender:4.0-SNAPSHOT'
 }

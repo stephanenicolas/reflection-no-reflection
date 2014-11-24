@@ -5,6 +5,17 @@ repositories {
        mavenLocal()
 }
 
+configurations {
+  provided
+}
+
+sourceSets {
+  main.compileClasspath += configurations.provided
+  test.compileClasspath += configurations.provided
+  test.runtimeClasspath += configurations.provided
+}
+
 dependencies {
+   provided project(':annotation-processor')
    compile 'javax.inject:javax.inject:1'
 }

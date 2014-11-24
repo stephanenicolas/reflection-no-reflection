@@ -1,13 +1,29 @@
 package org.reflection_no_reflection.annotation_processor;
 
-
-import com.google.inject.blender.AnnotationDatabaseGenerator;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 
 import com.google.inject.blender.GuiceAnnotationProcessor;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.no_reflection.NoReflectionField;
 
 /**
  * An annotation processor that detects classes that need to receive injections.
@@ -18,24 +34,241 @@ import com.google.inject.blender.GuiceAnnotationProcessor;
  */
 @SupportedAnnotationTypes({"com.google.inject.Inject", "com.google.inject.Provides", "javax.inject.Inject", "roboguice.inject.InjectView", "roboguice.inject.InjectResource", "roboguice.inject.InjectPreference", "roboguice.inject.InjectExtra", "roboguice.inject.InjectFragment", "roboguice.event.Observes", "roboguice.inject.ContentView"})
 @SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector"})
-public class ReflectionNoReflectionAnnotationProcessor extends GuiceAnnotationProcessor {
+public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor {
 
     public static final String TEMPLATE_ANNOTATION_DATABASE_PATH = "templates/RGAnnotationDatabaseImpl.vm";
 
     private boolean isUsingFragmentUtil = true;
     private boolean isCommentingInjector = true;
+    //TODO add a HashMap<String, Set<String>>
+
+    /**
+     * Maps each annotation name to an inner map.
+     * The inner map maps classes (containing injection points) names to the list of injected field names.
+     */
+    private HashMap<String, Map<String, Set<Field>> > mapAnnotationToMapClassContainingInjectionToInjectedFieldSet;
+    /**
+     * Maps each annotation name to an inner map.
+     * The inner map maps classes (containing injection points) names to the list of injected method names and parameters classes.
+     */
+    private HashMap<String, Map<String, Set<String>> > mapAnnotationToMapClassContainingInjectionToInjectedMethodSet;
+    /**
+     * Maps each annotation name to an inner map.
+     * The inner map maps classes (containing injection points) names to the list of injected constructors parameters classes.
+     */
+    private HashMap<String, Map<String, Set<String>> > mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet;
+
+    /** Contains all classes that contain injection points. */
+    private HashSet<String> classesContainingInjectionPointsSet = new HashSet<String>();
+
+    /** Contains all classes that can be injected into a class with injection points.*/
+    private HashSet<String> bindableClasses;
+    /** Name of the package to generate the annotation database into.*/
+    private String annotationDatabasePackageName;
+    private ProcessingEnvironment processingEnv;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
+        this.processingEnv = processingEnv;
+        annotationDatabasePackageName = processingEnv.getOptions().get("guiceAnnotationDatabasePackageName");
+        mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = new HashMap<String, Map<String,Set<Field>> >();
+        mapAnnotationToMapClassContainingInjectionToInjectedMethodSet = new HashMap<String, Map<String,Set<String>> >();
+        mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet = new HashMap<String, Map<String,Set<String>> >();
+        bindableClasses = new HashSet<String>();
         String isUsingFragmentUtilString = processingEnv.getOptions().get("guiceUsesFragmentUtil");
         if (isUsingFragmentUtilString!=null) {
             isUsingFragmentUtil = Boolean.parseBoolean(isUsingFragmentUtilString);
         }
         String isCommentingInjectorString = processingEnv.getOptions().get("guiceCommentsInjector");
         if (isCommentingInjectorString!=null) {
-        	isCommentingInjector = Boolean.parseBoolean(isCommentingInjectorString);
+            isCommentingInjector = Boolean.parseBoolean(isCommentingInjectorString);
         }
+    }
+
+    @Override
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        // Not sure why, but sometimes we're getting called with an empty list of annotations.
+        if(annotations.isEmpty())
+            return true;
+
+        for( TypeElement annotation : annotations ) {
+            String annotationClassName = getTypeName(annotation);
+            //merge the 2 inject annotations
+            if( "javax.inject.Inject".equals(annotationClassName) ) {
+                annotationClassName = "com.google.inject.Inject";
+            }
+
+            for( Element injectionPoint : roundEnv.getElementsAnnotatedWith(annotation)) {
+                if( injectionPoint.getEnclosingElement() instanceof TypeElement && injectionPoint instanceof VariableElement) {
+                    addFieldToAnnotationDatabase(annotationClassName, injectionPoint);
+                } else if( injectionPoint.getEnclosingElement() instanceof ExecutableElement && injectionPoint instanceof VariableElement ) {
+                    addParameterToAnnotationDatabase(annotationClassName, injectionPoint);
+                } else if( injectionPoint instanceof ExecutableElement ) {
+                    addMethodOrConstructorToAnnotationDatabase(annotationClassName, injectionPoint);
+                } else if( injectionPoint instanceof TypeElement ) {
+                    addClassToAnnotationDatabase(injectionPoint);
+                }
+            }
+        }
+
+
+        for( Map<String, Set<Field>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedFieldSet.values() ) {
+            classesContainingInjectionPointsSet.addAll(entryAnnotationToclassesContainingInjectionPoints.keySet());
+        }
+
+        for( Map<String, Set<String>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedMethodSet.values() ) {
+            classesContainingInjectionPointsSet.addAll(entryAnnotationToclassesContainingInjectionPoints.keySet());
+        }
+
+        for( Map<String, Set<String>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet.values() ) {
+            classesContainingInjectionPointsSet.addAll(entryAnnotationToclassesContainingInjectionPoints.keySet());
+        }
+
+        JavaFileObject jfo;
+        try {
+            String className = "AnnotationDatabaseImpl";
+            if( annotationDatabasePackageName != null && !annotationDatabasePackageName.isEmpty() ) {
+                className = annotationDatabasePackageName+'.'+className;
+            }
+            jfo = processingEnv.getFiler().createSourceFile( className );
+            ReflectionNoReflectionAnnotationDatabaseGenerator annotationDatabaseGenerator = createAnnotationDatabaseGenerator();
+            configure(annotationDatabaseGenerator);
+            annotationDatabaseGenerator.generateAnnotationDatabase(jfo);
+        } catch (IOException e) {
+            e.printStackTrace();
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+        }
+
+        return true;
+    }
+
+    protected void configure(ReflectionNoReflectionAnnotationDatabaseGenerator annotationDatabaseGenerator) {
+        annotationDatabaseGenerator.setTemplatePath(TEMPLATE_ANNOTATION_DATABASE_PATH);
+        annotationDatabaseGenerator.setPackageName(annotationDatabasePackageName);
+        annotationDatabaseGenerator.setBindableClasses(bindableClasses);
+        annotationDatabaseGenerator.setClassesContainingInjectionPointsSet(classesContainingInjectionPointsSet);
+        annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToConstructorSet(mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet);
+        annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToMethodSet(mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
+        annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToFieldSet(mapAnnotationToMapClassContainingInjectionToInjectedFieldSet);
+        annotationDatabaseGenerator.setUsingFragmentUtil(isUsingFragmentUtil);
+        annotationDatabaseGenerator.setCommentingInjector(isCommentingInjector);
+    }
+
+    private void addClassToAnnotationDatabase(Element injectionPoint) {
+        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint;
+        String typeElementName = getTypeName(typeElementRequiringScanning);
+        //System.out.printf("Type: %s, is injected\n",typeElementName);
+        classesContainingInjectionPointsSet.add(typeElementName);
+    }
+
+    private void addFieldToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
+        String injectionPointName;
+        String injectedClassName = getTypeName(injectionPoint);
+        bindableClasses.add( injectedClassName );
+        injectionPointName = injectionPoint.getSimpleName().toString();
+
+        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
+        String typeElementName = getTypeName(typeElementRequiringScanning);
+        //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
+        addToInjectedFields(annotationClassName, typeElementName, injectionPointName);
+    }
+
+    private void addParameterToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
+        Element enclosing = injectionPoint.getEnclosingElement();
+        String injectionPointName = enclosing.getSimpleName().toString();
+        for( VariableElement variable : ((ExecutableElement)enclosing).getParameters() ) {
+            String parameterTypeName = getTypeName(variable);
+            bindableClasses.add( parameterTypeName );
+            injectionPointName += ":"+parameterTypeName;
+        }
+
+        TypeElement typeElementRequiringScanning = (TypeElement) ((ExecutableElement) injectionPoint.getEnclosingElement()).getEnclosingElement();
+        String typeElementName = getTypeName(typeElementRequiringScanning);
+        //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
+        if( injectionPointName.startsWith("<init>") ) {
+            addToInjectedConstructors(annotationClassName, typeElementName, injectionPointName );
+        } else {
+            addToInjectedMethods(annotationClassName, typeElementName, injectionPointName );
+        }
+    }
+
+    private void addMethodOrConstructorToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
+        String injectionPointName = injectionPoint.getSimpleName().toString();
+        for( VariableElement variable : ((ExecutableElement)injectionPoint).getParameters() ) {
+            String parameterTypeName = getTypeName((TypeElement)((DeclaredType)variable.asType()).asElement());
+            bindableClasses.add( parameterTypeName );
+            injectionPointName += ":"+parameterTypeName;
+        }
+
+        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
+        String typeElementName = getTypeName(typeElementRequiringScanning);
+
+        //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
+        if( injectionPointName.startsWith("<init>") ) {
+            addToInjectedConstructors(annotationClassName, typeElementName, injectionPointName );
+        } else {
+            addToInjectedMethods(annotationClassName, typeElementName, injectionPointName );
+        }
+    }
+
+    protected void addToInjectedConstructors(String annotationClassName, String typeElementName, String injectionPointName) {
+        addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet);
+    }
+
+    protected void addToInjectedMethods(String annotationClassName, String typeElementName, String injectionPointName) {
+        addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
+    }
+
+    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName) {
+        Map<String, Set<Field>> mapClassWithInjectionNameToMemberSet = ((HashMap<String, Map<String, Set<Field>>>) mapAnnotationToMapClassContainingInjectionToInjectedFieldSet)
+            .get(annotationClassName);
+        if( mapClassWithInjectionNameToMemberSet == null ) {
+            mapClassWithInjectionNameToMemberSet = new HashMap<String, Set<Field>>();
+            ((HashMap<String, Map<String, Set<Field>>>) mapAnnotationToMapClassContainingInjectionToInjectedFieldSet)
+                .put(annotationClassName, mapClassWithInjectionNameToMemberSet);
+        }
+
+        Set<Field> injectionPointNameSet = mapClassWithInjectionNameToMemberSet.get(typeElementName);
+        if( injectionPointNameSet == null ) {
+            injectionPointNameSet = new HashSet<Field>();
+            mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
+        }
+        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, typeElementName));
+    }
+
+
+    private String getTypeName(TypeElement typeElementRequiringScanning) {
+        if( typeElementRequiringScanning.getEnclosingElement() instanceof TypeElement ) {
+            return getTypeName(typeElementRequiringScanning.getEnclosingElement()) + "$" + typeElementRequiringScanning.getSimpleName().toString();
+        } else {
+            return typeElementRequiringScanning.getQualifiedName().toString();
+        }
+    }
+
+    private String getTypeName(Element injectionPoint) {
+        String injectedClassName = null;
+        final TypeMirror fieldTypeMirror = injectionPoint.asType();
+        if( fieldTypeMirror instanceof DeclaredType ) {
+            injectedClassName = getTypeName((TypeElement)((DeclaredType)fieldTypeMirror).asElement());
+        } else if( fieldTypeMirror instanceof PrimitiveType) {
+            injectedClassName = fieldTypeMirror.getKind().name();
+        }
+        return injectedClassName;
+    }
+
+    private void addToInjectedMembers(String annotationClassName, String typeElementName, String injectionPointName, HashMap<String, Map<String, Set<String>> > mapAnnotationToMapClassWithInjectionNameToMembersSet) {
+        Map<String, Set<String>> mapClassWithInjectionNameToMemberSet = mapAnnotationToMapClassWithInjectionNameToMembersSet.get( annotationClassName );
+        if( mapClassWithInjectionNameToMemberSet == null ) {
+            mapClassWithInjectionNameToMemberSet = new HashMap<String, Set<String>>();
+            mapAnnotationToMapClassWithInjectionNameToMembersSet.put(annotationClassName, mapClassWithInjectionNameToMemberSet);
+        }
+
+        Set<String> injectionPointNameSet = mapClassWithInjectionNameToMemberSet.get(typeElementName);
+        if( injectionPointNameSet == null ) {
+            injectionPointNameSet = new HashSet<String>();
+            mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
+        }
+        injectionPointNameSet.add(injectionPointName);
     }
 
 	@Override
@@ -44,17 +277,8 @@ public class ReflectionNoReflectionAnnotationProcessor extends GuiceAnnotationPr
 		return SourceVersion.latest();
 	}
 
-    @Override
-    protected AnnotationDatabaseGenerator createAnnotationDatabaseGenerator() {
+    protected ReflectionNoReflectionAnnotationDatabaseGenerator createAnnotationDatabaseGenerator() {
         return new ReflectionNoReflectionAnnotationDatabaseGenerator();
     }
     
-    @Override
-    protected void configure(AnnotationDatabaseGenerator annotationDatabaseGenerator) {
-        super.configure(annotationDatabaseGenerator);
-        annotationDatabaseGenerator.setTemplatePath(TEMPLATE_ANNOTATION_DATABASE_PATH);
-        ((ReflectionNoReflectionAnnotationDatabaseGenerator)annotationDatabaseGenerator).setUsingFragmentUtil(isUsingFragmentUtil);
-        ((ReflectionNoReflectionAnnotationDatabaseGenerator)annotationDatabaseGenerator).setCommentingInjector(isCommentingInjector);
-    }
-
 }
