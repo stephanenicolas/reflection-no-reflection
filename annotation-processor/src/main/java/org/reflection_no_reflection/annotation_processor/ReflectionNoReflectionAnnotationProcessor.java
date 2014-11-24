@@ -12,7 +12,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 
-import com.google.inject.blender.GuiceAnnotationProcessor;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -27,7 +26,7 @@ import org.reflection_no_reflection.no_reflection.NoReflectionField;
 
 /**
  * An annotation processor that detects classes that need to receive injections.
- * It is a {@link GuiceAnnotationProcessor} that is triggered for all the annotations
+ * It is a {@link AbstractProcessor} that is triggered for all the annotations
  * of both Guice and RoboGuice.
  * @author MikeBurton
  * @author SNI
@@ -170,7 +169,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
         String typeElementName = getTypeName(typeElementRequiringScanning);
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
-        addToInjectedFields(annotationClassName, typeElementName, injectionPointName);
+        addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectedClassName);
     }
 
     private void addParameterToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
@@ -219,7 +218,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
     }
 
-    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName) {
+    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, String injectedClassName) {
         Map<String, Set<Field>> mapClassWithInjectionNameToMemberSet = ((HashMap<String, Map<String, Set<Field>>>) mapAnnotationToMapClassContainingInjectionToInjectedFieldSet)
             .get(annotationClassName);
         if( mapClassWithInjectionNameToMemberSet == null ) {
@@ -233,7 +232,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
             injectionPointNameSet = new HashSet<Field>();
             mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
         }
-        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, typeElementName));
+        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, injectedClassName));
     }
 
 
