@@ -40,7 +40,7 @@ public class Main {
     private static void usingNoReflection(A a) throws IllegalAccessException {
         AnnotationDatabaseFinder fieldFinder;
         Set<Field> allFields;
-        fieldFinder = new AnnotationDatabaseFinder(null);
+        fieldFinder = new AnnotationDatabaseFinder(new String[0]);
         allFields = fieldFinder.getMapAnnotationToMapClassContainingInjectionToInjectedFieldSet().get(Inject.class).get(A.class);
         for (Field field : allFields) {
             //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.getAnnotation(Inject.class));
