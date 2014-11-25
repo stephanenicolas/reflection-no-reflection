@@ -92,10 +92,6 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
 
         for( TypeElement annotation : annotations ) {
             String annotationClassName = getTypeName(annotation);
-            //merge the 2 inject annotations
-            if( "javax.inject.Inject".equals(annotationClassName) ) {
-                annotationClassName = "com.google.inject.Inject";
-            }
 
             for( Element injectionPoint : roundEnv.getElementsAnnotatedWith(annotation)) {
                 if( injectionPoint.getEnclosingElement() instanceof TypeElement && injectionPoint instanceof VariableElement) {
