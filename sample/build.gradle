@@ -8,7 +8,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.reflection_no_reflection:weaver:1.0.0-SNAPSHOT'
+    classpath 'org.reflection_no_reflection:gradle-plugin:1.0.0-SNAPSHOT'
   }
 }
 
