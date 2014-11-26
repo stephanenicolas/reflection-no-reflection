@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'no_reflection'
+//apply plugin: 'no_reflection'
 
 mainClassName = "org.reflection_no_reflection.sample.Main"
 
@@ -38,3 +38,4 @@ dependencies {
   compile project(':common-lib')
   compile 'javax.inject:javax.inject:1'
 }
+

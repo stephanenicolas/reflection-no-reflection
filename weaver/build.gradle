@@ -11,7 +11,6 @@ buildscript {
   }
 }
 
-apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'nexus'
 apply plugin: 'cobertura'
@@ -36,47 +35,15 @@ dependencies {
 
   //compile 'com.android.tools.build:gradle:0.12.2'
   compile 'com.github.stephanenicolas.javassist:javassist-build-plugin-api:1.0.0'
-  //needed to create a processor based on afterburner
-  compile 'com.github.stephanenicolas.afterburner:afterburner-library:1.0.1'
 
-  //only needed to create a plugin
-  compile 'com.github.stephanenicolas.morpheus:morpheus-plugin:1.0.9-SNAPSHOT'
+  //only needed to use Javassist helpers
   compile 'com.github.stephanenicolas.morpheus:morpheus-commons:1.0.9-SNAPSHOT'
-  compile gradleApi()
-  compile localGroovy()
 
   compile 'org.projectlombok:lombok:1.14.2'
-  compile "com.google.android:android:${ANDROID_VERSION}"
+  compile 'org.slf4j:slf4j-api:1.7.7'
 
   //--TESTS
   testCompile "junit:junit:$JUNIT_VERSION"
-  testCompile "org.bouncycastle:bcprov-jdk15:$BOUNCYCASTLE_VERSION"
-
-  testCompile("org.robolectric:robolectric:$ROBOLECTRIC_VERSION") {
-    exclude module: 'classworlds'
-    exclude module: 'maven-artifact'
-    exclude module: 'maven-artifact-manager'
-    exclude module: 'maven-error-diagnostics'
-    exclude module: 'maven-model'
-    exclude module: 'maven-plugin-registry'
-    exclude module: 'maven-profile'
-    exclude module: 'maven-project'
-    exclude module: 'maven-settings'
-    exclude module: 'nekohtml'
-    exclude module: 'plexus-container-default'
-    exclude module: 'plexus-interpolation'
-    exclude module: 'plexus-utils'
-    exclude module: 'wagon-file'
-    exclude module: 'wagon-http-lightweight'
-    exclude module: 'wagon-http-shared'
-    exclude module: 'wagon-provider-api'
-    exclude module: 'commons-logging'
-    exclude module: 'httpclient'
-    exclude group: 'com.google.android'
-  }
-  testCompile("org.apache.httpcomponents:httpclient:$HTTP_CLIENT_VERSION")
-  testCompile("commons-logging:commons-logging:$COMMONS_LOGGING_VERSION")
-  testCompile("com.google.android:android-test:$ANDROID_VERSION")
   testCompile "org.easymock:easymock:$EASY_MOCK_VERSION"
 }
 
@@ -120,5 +87,6 @@ tasks.withType(Test) {
 }
 
 cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
+//TODO customize
 cobertura.auxiliaryClasspath += project.files('../loglifecycle-annotations/build/classes/')
 cobertura.coverageIncludes = ['.*com.github.stephanenicolas.loglifecycle.LogLifeCycleProcessor']

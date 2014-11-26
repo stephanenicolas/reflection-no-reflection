@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.no_reflection.AnnotationDatabaseFinder;
 import org.reflection_no_reflection.no_reflection.FieldGetterAndSetter;
 import org.reflection_no_reflection.no_reflection.NoReflectionFieldFinder;
 
@@ -16,6 +17,14 @@ import org.reflection_no_reflection.no_reflection.NoReflectionFieldFinder;
 public class NoReflectionFieldFinderImpl extends NoReflectionFieldFinder {
     static {
         fieldGetterAndSetter = new FieldGetterAndSetterImpl();
+    }
+
+    public NoReflectionFieldFinderImpl(AnnotationDatabaseFinder annotationDatabaseFinder) {
+        super(annotationDatabaseFinder);
+    }
+
+    public NoReflectionFieldFinderImpl(String[] annotationDatabasePackages) {
+        super(annotationDatabasePackages);
     }
 
     @Override

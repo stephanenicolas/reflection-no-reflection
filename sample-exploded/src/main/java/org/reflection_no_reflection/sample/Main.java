@@ -1,9 +1,10 @@
 package org.reflection_no_reflection.sample;
 
-import java.util.List;
+import java.util.Collection;
 import javax.inject.Inject;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.FieldFinder;
+import org.reflection_no_reflection.no_reflection.AnnotationDatabaseFinder;
 import org.reflection_no_reflection.reflection.ReflectionFieldFinder;
 
 public class Main {
@@ -36,8 +37,8 @@ public class Main {
 
     private static void usingNoReflection(A a) throws IllegalAccessException {
         FieldFinder fieldFinder;
-        List<Field> allFields;
-        fieldFinder = new NoReflectionFieldFinderImpl();
+        Collection<Field> allFields;
+        fieldFinder = new NoReflectionFieldFinderImpl((AnnotationDatabaseFinder)null);
         allFields = fieldFinder.getAllFields(Inject.class, A.class);
         for (Field field : allFields) {
             //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.getAnnotation(Inject.class));
@@ -48,7 +49,7 @@ public class Main {
 
     private static void usingReflection(A a) throws IllegalAccessException {
         FieldFinder fieldFinder = new ReflectionFieldFinder();
-        List<Field> allFields = fieldFinder.getAllFields(Inject.class, A.class);
+        Collection<Field> allFields = fieldFinder.getAllFields(Inject.class, A.class);
         for (Field field : allFields) {
             //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.getAnnotation(Inject.class));
             //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.get(a));

@@ -1,7 +1,7 @@
 package org.reflection_no_reflection.weaver;
 
-import com.github.stephanenicolas.afterburner.AfterBurner;
 import com.github.stephanenicolas.morpheus.commons.JavassistUtils;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import javassist.CannotCompileException;
@@ -21,17 +21,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NoReflectionWeaver implements IClassTransformer {
 
-    private AfterBurner afterBurner = new AfterBurner();
     private boolean debug;
+    private String[] annotationClasses;
 
-    public NoReflectionWeaver(boolean debug) {
+    public NoReflectionWeaver(boolean debug, String[] annotationClasses) {
         this.debug = debug;
+        this.annotationClasses = annotationClasses;
     }
 
     @Override
     public boolean shouldTransform(CtClass candidateClass) throws JavassistBuildException {
         try {
-            return !JavassistUtils.getAllInjectedFieldsForAnnotation(candidateClass, javax.inject.Inject.class).isEmpty() || !JavassistUtils.getAllInjectedFieldsForAnnotation(candidateClass, com.google.inject.Inject.class).isEmpty();
+            for (String annotationClass : annotationClasses) {
+                if (!JavassistUtils.getAllInjectedFieldsForAnnotation(candidateClass, (Class<? extends Annotation>)Class.forName(annotationClass)).isEmpty()) {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             logMoreIfDebug("Should transform filter failed for class " + candidateClass.getName(), e);
             throw new JavassistBuildException(e);
@@ -44,8 +50,9 @@ public class NoReflectionWeaver implements IClassTransformer {
         try {
             log.info("Transforming " + classToTransformName);
             List<CtField> fieldList = new ArrayList<CtField>();
-            fieldList.addAll(JavassistUtils.getAllInjectedFieldsForAnnotation(classToTransform, javax.inject.Inject.class));
-            fieldList.addAll(JavassistUtils.getAllInjectedFieldsForAnnotation(classToTransform, com.google.inject.Inject.class));
+            for (String annotationClass : annotationClasses) {
+                fieldList.addAll(JavassistUtils.getAllInjectedFieldsForAnnotation(classToTransform, (Class<? extends Annotation>)Class.forName(annotationClass)));
+            }
             createPublicAccessorMethods(fieldList);
         } catch (Exception e) {
             logMoreIfDebug("Transformation failed for class " + classToTransformName, e);

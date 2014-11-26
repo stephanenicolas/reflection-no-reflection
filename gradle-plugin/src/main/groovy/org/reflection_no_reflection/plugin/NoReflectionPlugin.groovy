@@ -130,7 +130,7 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
 
   @Override
   public IClassTransformer[] getTransformers(Project project) {
-    return new NoReflectionWeaver(project.noreflection.debug);
+    return new NoReflectionWeaver(project.noreflection.debug, project.noreflection.annotationClasses);
   }
 
   @Override
