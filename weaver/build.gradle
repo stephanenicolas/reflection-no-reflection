@@ -49,7 +49,7 @@ dependencies {
 
 modifyPom {
   project {
-    name "Loglifecycle Gradle Plugin"
+    name "No Reflection byte code weaver"
     description POM_DESCRIPTION
     url POM_URL
 

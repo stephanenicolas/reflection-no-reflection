@@ -11,6 +11,7 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.build.IClassTransformer;
 import javassist.build.JavassistBuildException;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 public class NoReflectionWeaver implements IClassTransformer {
 
     private boolean debug;
-    private String[] annotationClasses;
+    private List<String> annotationClasses;
 
-    public NoReflectionWeaver(boolean debug, String[] annotationClasses) {
+    public NoReflectionWeaver(boolean debug, @NonNull List<String> annotationClasses) {
         this.debug = debug;
         this.annotationClasses = annotationClasses;
     }

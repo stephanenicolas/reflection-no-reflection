@@ -6,5 +6,5 @@ package org.reflection_no_reflection.plugin
 public class NoReflectionPluginExtension {
   /** Enable to debug the lib's errors. */
   boolean debug;
-  String[] annotationClasses
+  List<String> annotationClasses
 }

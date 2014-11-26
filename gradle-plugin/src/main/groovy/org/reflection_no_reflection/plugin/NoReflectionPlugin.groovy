@@ -130,6 +130,8 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
 
   @Override
   public IClassTransformer[] getTransformers(Project project) {
+    project.noreflection.annotationClasses = ['javax.inject.Inject']
+    System.out.println("No reflection extension : " + project.extensions.getByName('noreflection').getProperties())
     return new NoReflectionWeaver(project.noreflection.debug, project.noreflection.annotationClasses);
   }
 
@@ -143,7 +145,7 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
 
   @Override
   protected String getExtension() {
-    "noreflection"
+    'noreflection'
   }
 
   @Override

@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'no_reflection'
+apply plugin: 'org.reflection_no_reflection.plugin'
 
 mainClassName = "org.reflection_no_reflection.sample.Main"
 
@@ -40,5 +40,6 @@ dependencies {
 }
 
 noreflection {
-  annotationClasses = ["javax.inject.Inject"]
+  debug true
+  annotationClasses = ['javax.inject.Inject']
 }
