@@ -9,5 +9,4 @@ public interface FieldGetterAndSetter {
     public Object get(int index, Object object) throws IllegalAccessException;
 
     public int getInt(int index, Object object) throws IllegalAccessException;
-
 }

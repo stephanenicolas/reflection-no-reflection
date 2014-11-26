@@ -1,25 +1,27 @@
-package org.reflection_no_reflection;
+package org.reflection_no_reflection.no_reflection;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.reflection_no_reflection.Field;
 
 /**
  * Finds all annotation databases. AnnotationDatabase can be generated using RoboGuice annotation compiler.
  * By default the roboguice annotation database is taken into account, and this can't be modified.
  * <br/>
- * You can add custom annotation databases by adding them to your manifest : 
- * <pre> 
+ * You can add custom annotation databases by adding them to your manifest :
+ * <pre>
  *  &lt;meta-data android:name="roboguice.annotations.packages"
  *    android:value="myPackage" /&gt;
  * </pre>
  * In that case, RoboGuice will load both <code>roboguice.AnnotationDatabaseImpl</code> and <code>myPackage.AnnotationDatabaseImpl</code>.
- * More packages containing AnnotationDatabases can be added, separated by commas. 
+ * More packages containing AnnotationDatabases can be added, separated by commas.
+ *
  * @author SNI
  */
 public class AnnotationDatabaseFinder {
-    
+
     private HashSet<String> classesContainingInjectionPointsSet = new HashSet<String>();
     private HashMap<String, Map<String, Set<Field>>> mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = new HashMap<String, Map<String, Set<Field>>>();
     private HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassContainingInjectionToInjectedMethodSet = new HashMap<String, Map<String, Set<String>>>();
@@ -28,9 +30,9 @@ public class AnnotationDatabaseFinder {
 
     public AnnotationDatabaseFinder(String[] additionalPackageNames) {
         try {
-            for( String pkg : additionalPackageNames ) {
+            for (String pkg : additionalPackageNames) {
                 String annotationDatabaseClassName = "AnnotationDatabaseImpl";
-                if( pkg != null && !"".equals(pkg) ) {
+                if (pkg != null && !"".equals(pkg)) {
                     annotationDatabaseClassName = pkg + "." + annotationDatabaseClassName;
                 }
                 AnnotationDatabase annotationDatabase = getAnnotationDatabaseInstance(annotationDatabaseClassName);
@@ -51,7 +53,7 @@ public class AnnotationDatabaseFinder {
     public HashSet<String> getClassesContainingInjectionPointsSet() {
         return classesContainingInjectionPointsSet;
     }
-    
+
     public HashMap<String, Map<String, Set<Field>>> getMapAnnotationToMapClassContainingInjectionToInjectedFieldSet() {
         return mapAnnotationToMapClassContainingInjectionToInjectedFieldSet;
     }
@@ -59,18 +61,18 @@ public class AnnotationDatabaseFinder {
     public HashMap<String, Map<String, Set<String>>> getMapAnnotationToMapClassContainingInjectionToInjectedMethodSet() {
         return mapAnnotationToMapClassContainingInjectionToInjectedMethodSet;
     }
-    
+
     public HashMap<String, Map<String, Set<String>>> getMapAnnotationToMapClassContainingInjectionToInjectedConstructorSet() {
         return mapAnnotationToMapClassContainingInjectionToInjectedConstructorSet;
     }
-    
+
     public Set<String> getBindableClassesSet() {
         return bindableClassesSet;
     }
 
     private AnnotationDatabase getAnnotationDatabaseInstance(String annotationDatabaseClassName) throws ClassNotFoundException, InstantiationException,
-    IllegalAccessException {
-        Class<?> annotationDatabaseClass = Class.forName( annotationDatabaseClassName);
+        IllegalAccessException {
+        Class<?> annotationDatabaseClass = Class.forName(annotationDatabaseClassName);
         AnnotationDatabase annotationDatabase = (AnnotationDatabase) annotationDatabaseClass.newInstance();
         return annotationDatabase;
     }
@@ -83,5 +85,4 @@ public class AnnotationDatabaseFinder {
         annotationDatabase.fillBindableClasses(bindableClassesSet);
         //System.out.println(mapAnnotationToMapClassWithInjectionNameToMethodSet.toString());
     }
-
 }

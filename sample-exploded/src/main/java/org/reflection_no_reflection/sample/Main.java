@@ -4,7 +4,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.FieldFinder;
-import org.reflection_no_reflection.reflection.ReflectionFieldFinderImpl;
+import org.reflection_no_reflection.reflection.ReflectionFieldFinder;
 
 public class Main {
 
@@ -18,15 +18,14 @@ public class Main {
 
         System.out.println("--- Via Reflection");
         long startTime = System.currentTimeMillis();
-        for (int i=0;i< ITERATIONS;i++)
+        for (int i = 0; i < ITERATIONS; i++)
             usingReflection(a);
         long endTime = System.currentTimeMillis();
         timeWithReflection = endTime - startTime;
 
-
         System.out.println("--- Via No Reflection");
         startTime = System.currentTimeMillis();
-        for (int i=0;i<ITERATIONS;i++)
+        for (int i = 0; i < ITERATIONS; i++)
             usingNoReflection(a);
         endTime = System.currentTimeMillis();
         timeWithoutReflection = endTime - startTime;
@@ -47,7 +46,8 @@ public class Main {
         }
     }
 
-    private static void usingReflection(A a) throws IllegalAccessException {FieldFinder fieldFinder = new ReflectionFieldFinderImpl();
+    private static void usingReflection(A a) throws IllegalAccessException {
+        FieldFinder fieldFinder = new ReflectionFieldFinder();
         List<Field> allFields = fieldFinder.getAllFields(Inject.class, A.class);
         for (Field field : allFields) {
             //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.getAnnotation(Inject.class));

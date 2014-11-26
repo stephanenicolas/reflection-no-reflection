@@ -1,14 +1,11 @@
 package org.reflection_no_reflection.sample;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
 import javax.inject.Inject;
-import org.reflection_no_reflection.AnnotationDatabaseFinder;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.FieldFinder;
-import org.reflection_no_reflection.reflection.ReflectionFieldFinderImpl;
+import org.reflection_no_reflection.no_reflection.NoReflectionFieldFinder;
+import org.reflection_no_reflection.reflection.ReflectionFieldFinder;
 
 public class Main {
 
@@ -26,7 +23,6 @@ public class Main {
         long endTime = System.currentTimeMillis();
         timeWithReflection = endTime - startTime;
 
-
         System.out.println("--- Via No Reflection");
         startTime = System.currentTimeMillis();
         usingNoReflection(a);
@@ -38,13 +34,9 @@ public class Main {
     }
 
     private static void usingNoReflection(A a) throws IllegalAccessException {
-        AnnotationDatabaseFinder fieldFinder;
-        Set<Field> allFields;
-        fieldFinder = new AnnotationDatabaseFinder(new String[] {""});
-        for (int i=0;i<ITERATIONS;i++) {
-            HashMap<String, Map<String, Set<Field>>> mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = fieldFinder.getMapAnnotationToMapClassContainingInjectionToInjectedFieldSet();
-            Map<String, Set<Field>> stringSetMap = mapAnnotationToMapClassContainingInjectionToInjectedFieldSet.get(Inject.class.getName());
-            allFields = stringSetMap.get(A.class.getName());
+        FieldFinder fieldFinder = new NoReflectionFieldFinder(new String[] {""});
+        for (int i = 0; i < ITERATIONS; i++) {
+            Collection<Field> allFields = fieldFinder.getAllFields(Inject.class, A.class);
             for (Field field : allFields) {
                 //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.getAnnotation(Inject.class));
                 //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.get(a));
@@ -54,9 +46,9 @@ public class Main {
     }
 
     private static void usingReflection(A a) throws IllegalAccessException {
-        FieldFinder fieldFinder = new ReflectionFieldFinderImpl();
-        for (int i=0;i<ITERATIONS;i++) {
-            List<Field> allFields = fieldFinder.getAllFields(Inject.class, A.class);
+        FieldFinder fieldFinder = new ReflectionFieldFinder();
+        for (int i = 0; i < ITERATIONS; i++) {
+            Collection<Field> allFields = fieldFinder.getAllFields(Inject.class, A.class);
             for (Field field : allFields) {
                 //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.getAnnotation(Inject.class));
                 //System.out.println("Field: " + field.getName() + ":" + field.getType().getName() + " -- " + field.get(a));

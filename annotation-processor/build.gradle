@@ -1,12 +1,12 @@
 apply plugin: 'java'
 
 repositories {
-       mavenCentral()
-       mavenLocal()
+  mavenCentral()
+  mavenLocal()
 }
 
 dependencies {
-   compile project(':common-lib')
-   compile 'org.apache.velocity:velocity:1.7'
-   compile 'com.google.inject:blender:4.0-SNAPSHOT'
+  compile project(':common-lib')
+  compile 'org.apache.velocity:velocity:1.7'
+  compile 'com.google.inject:blender:4.0-SNAPSHOT'
 }

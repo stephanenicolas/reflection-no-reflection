@@ -19,8 +19,8 @@ apply plugin: 'no_reflection'
 mainClassName = "org.reflection_no_reflection.sample.Main"
 
 repositories {
-       mavenCentral()
-       mavenLocal()
+  mavenCentral()
+  mavenLocal()
 }
 
 configurations {

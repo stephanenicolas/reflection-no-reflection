@@ -2,16 +2,14 @@ package org.reflection_no_reflection.weaver
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
-import com.darylteo.gradle.javassist.tasks.TransformationTask;
-import com.github.stephanenicolas.morpheus.AbstractMorpheusPlugin;
-import javassist.build.IClassTransformer;
+import com.darylteo.gradle.javassist.tasks.TransformationTask
+import com.github.stephanenicolas.morpheus.AbstractMorpheusPlugin
+import javassist.build.IClassTransformer
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.compile.JavaCompile
-
-import java.util.logging.Logger;
 
 /**
  * @author SNI
@@ -125,7 +123,7 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
       project.tasks.getByName('compileJavaAfterWeave').dependsOn('compileJava')
       project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName('compileJava'))
       project.tasks.getByName(copyCompiledAnnotationProcessorTask).mustRunAfter(project.tasks.getByName('compileJavaAfterWeave'))
-      project.tasks.getByName('classes').dependsOn(copyTransformedTask,'compileJavaAfterWeave', copyCompiledAnnotationProcessorTask)
+      project.tasks.getByName('classes').dependsOn(copyTransformedTask, 'compileJavaAfterWeave', copyCompiledAnnotationProcessorTask)
     }
   }
 

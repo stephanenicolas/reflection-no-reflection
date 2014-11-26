@@ -2,14 +2,37 @@ package org.reflection_no_reflection.no_reflection;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.FieldFinder;
 
 /**
  * Created by administrateur on 14-11-23.
  */
-public abstract class NoReflectionFieldFinder implements FieldFinder {
+public class NoReflectionFieldFinder implements FieldFinder {
     protected static FieldGetterAndSetter fieldGetterAndSetter;
+    protected AnnotationDatabaseFinder annotationDatabaseFinder;
+
+    public NoReflectionFieldFinder(AnnotationDatabaseFinder annotationDatabaseFinder) {
+        this.annotationDatabaseFinder = annotationDatabaseFinder;
+    }
+
+    public NoReflectionFieldFinder(String[] annotationDatabasePackages) {
+        this.annotationDatabaseFinder = new AnnotationDatabaseFinder(annotationDatabasePackages);
+    }
+
+    @Override
+    public Collection<Field> getAllFields(Class<? extends Annotation> annotationClass, Class clazz) {
+        Set<Field> allFields;
+
+        HashMap<String, Map<String, Set<Field>>> mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = annotationDatabaseFinder.getMapAnnotationToMapClassContainingInjectionToInjectedFieldSet();
+        Map<String, Set<Field>> stringSetMap = mapAnnotationToMapClassContainingInjectionToInjectedFieldSet.get(annotationClass.getName());
+        allFields = stringSetMap.get(clazz.getName());
+        return allFields;
+    }
 
     protected class LocalNoReflectionField extends NoReflectionField {
 
@@ -23,7 +46,7 @@ public abstract class NoReflectionFieldFinder implements FieldFinder {
         }
 
         @Override
-        public <A extends Annotation> A getAnnotation (Class<A> annotationType) {
+        public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
             return (A) mapAnnotation.get(annotationType);
         }
 

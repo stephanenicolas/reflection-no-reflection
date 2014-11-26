@@ -1,6 +1,5 @@
 package org.reflection_no_reflection.no_reflection;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import org.reflection_no_reflection.Field;
 
@@ -14,24 +13,24 @@ public class NoReflectionField extends Field {
     private String fieldTypeName;
 
     public NoReflectionField(String fieldName, String declaringClassName, String fieldTypeName) {
-      this.fieldName = fieldName;
-      this.declaringClassName = declaringClassName;
-      this.fieldTypeName = fieldTypeName;
+        this.fieldName = fieldName;
+        this.declaringClassName = declaringClassName;
+        this.fieldTypeName = fieldTypeName;
     }
 
     public NoReflectionField(int index, String fieldName, String declaringClassName, String fieldTypeName) {
-      this.index = index;
-      this.fieldName = fieldName;
-      this.declaringClassName = declaringClassName;
-      this.fieldTypeName = fieldTypeName;
+        this.index = index;
+        this.fieldName = fieldName;
+        this.declaringClassName = declaringClassName;
+        this.fieldTypeName = fieldTypeName;
     }
 
     @Override
     public Class<?> getDeclaringClass() {
         try {
-          return Class.forName(declaringClassName);
-        } catch(Exception ex) {
-          ex.printStackTrace();
+            return Class.forName(declaringClassName);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -44,7 +43,7 @@ public class NoReflectionField extends Field {
     public Type getGenericType() {
         try {
             return Class.forName(fieldTypeName);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
@@ -58,7 +57,7 @@ public class NoReflectionField extends Field {
 
         try {
             return Class.forName(fieldTypeName);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;

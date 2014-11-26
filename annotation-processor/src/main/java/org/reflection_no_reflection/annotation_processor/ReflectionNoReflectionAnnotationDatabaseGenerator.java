@@ -2,15 +2,12 @@ package org.reflection_no_reflection.annotation_processor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.String;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.tools.JavaFileObject;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -18,13 +15,14 @@ import org.reflection_no_reflection.Field;
 
 /**
  * Generates a AnnotationDatabase + reflection database.
+ *
  * @author Mike Burton
  * @author SNI
  */
 public class ReflectionNoReflectionAnnotationDatabaseGenerator {
 
     private boolean isUsingFragmentUtil;
-	private boolean isCommentingInjector;
+    private boolean isCommentingInjector;
     private String templatePath;
     private String packageName;
     private HashMap<String, Map<String, Set<Field>>> mapAnnotationToMapClassWithInjectionNameToFieldSet;
@@ -44,7 +42,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
 
         Template template = null;
 
-        PrintWriter w =  null;
+        PrintWriter w = null;
         try {
             template = Velocity.getTemplate(templatePath);
             w = new PrintWriter(jfo.openWriter());
@@ -53,10 +51,10 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
             ex.printStackTrace();
             throw new IOException("Impossible to generate annotation database.", ex);
         } finally {
-            if( w != null ) {
+            if (w != null) {
                 try {
                     w.close();
-                } catch( Exception ex ) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     throw new IOException("Impossible to close annotation database.", ex);
                 }
@@ -137,16 +135,16 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
     public boolean isUsingFragmentUtil() {
         return isUsingFragmentUtil;
     }
-    
+
     public boolean isCommentingInjector() {
-		return isCommentingInjector;
-	}
+        return isCommentingInjector;
+    }
 
     public void setUsingFragmentUtil(boolean isUsingFragmentUtil) {
         this.isUsingFragmentUtil = isUsingFragmentUtil;
     }
 
-	public void setCommentingInjector(boolean isCommentingInjector) {
-		this.isCommentingInjector = isCommentingInjector;
-	}
+    public void setCommentingInjector(boolean isCommentingInjector) {
+        this.isCommentingInjector = isCommentingInjector;
+    }
 }

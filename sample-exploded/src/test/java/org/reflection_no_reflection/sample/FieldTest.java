@@ -8,8 +8,6 @@ import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.reflection_no_reflection.Field;
-import org.reflection_no_reflection.sample.A;
-import org.reflection_no_reflection.sample.B;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

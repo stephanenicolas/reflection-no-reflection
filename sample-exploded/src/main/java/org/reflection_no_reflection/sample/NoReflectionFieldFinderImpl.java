@@ -47,35 +47,49 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 
     public void set(int index, Object object, Object value) throws IllegalAccessException {
         switch (index) {
-            case 0: ((A)object).b = (B) value; break;
-            case 1: ((A)object).c = (int) value; break;
-            default: throw new IllegalAccessException("No setter for this index:" + index);
+            case 0:
+                ((A) object).b = (B) value;
+                break;
+            case 1:
+                ((A) object).c = (int) value;
+                break;
+            default:
+                throw new IllegalAccessException("No setter for this index:" + index);
         }
     }
 
     public void setInt(int index, Object object, int value) throws IllegalAccessException {
         switch (index) {
-            case 0: throw new IllegalAccessException("Not an int");
-            case 1: ((A)object).c = value; break;
-            default: throw new IllegalAccessException("No setter for this index:" + index);
+            case 0:
+                throw new IllegalAccessException("Not an int");
+            case 1:
+                ((A) object).c = value;
+                break;
+            default:
+                throw new IllegalAccessException("No setter for this index:" + index);
         }
     }
 
     public Object get(int index, Object object) throws IllegalAccessException {
         switch (index) {
-            case 0: return ((A)object).b;
-            case 1: return ((A)object).c;
-            default: throw new IllegalAccessException("Not an Object");
+            case 0:
+                return ((A) object).b;
+            case 1:
+                return ((A) object).c;
+            default:
+                throw new IllegalAccessException("Not an Object");
         }
     }
 
     public int getInt(int index, Object object) throws IllegalAccessException {
         switch (index) {
-            case 0: throw new IllegalAccessException("Not an int");
-            case 1: return ((A)object).c;
-            default: throw new IllegalAccessException("Not an int");
+            case 0:
+                throw new IllegalAccessException("Not an int");
+            case 1:
+                return ((A) object).c;
+            default:
+                throw new IllegalAccessException("Not an int");
         }
     }
-
 }
 
