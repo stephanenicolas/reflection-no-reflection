@@ -159,13 +159,32 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
     private void addFieldToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
         String injectionPointName;
         String injectedClassName = getTypeName(injectionPoint);
-        bindableClasses.add(injectedClassName);
+        if (isPrimitiveType(injectedClassName)) {
+            bindableClasses.add(injectedClassName + ".class");
+        } else  {
+            bindableClasses.add(injectedClassName);
+        }
         injectionPointName = injectionPoint.getSimpleName().toString();
 
         TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
         String typeElementName = getTypeName(typeElementRequiringScanning);
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectedClassName);
+    }
+
+    private boolean isPrimitiveType(String injectedClassName) {
+        switch (injectedClassName) {
+            case "byte":
+            case "short":
+            case "int":
+            case "long":
+            case "float":
+            case "double":
+            case "boolean":
+            case "char":
+                return true;
+        }
+        return false;
     }
 
     private void addParameterToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
@@ -245,7 +264,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         if (fieldTypeMirror instanceof DeclaredType) {
             injectedClassName = getTypeName((TypeElement) ((DeclaredType) fieldTypeMirror).asElement());
         } else if (fieldTypeMirror instanceof PrimitiveType) {
-            injectedClassName = fieldTypeMirror.getKind().name();
+            injectedClassName = fieldTypeMirror.toString();
         }
         return injectedClassName;
     }

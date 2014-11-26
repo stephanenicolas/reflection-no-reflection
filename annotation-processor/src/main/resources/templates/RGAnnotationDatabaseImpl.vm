@@ -25,7 +25,7 @@ public void fillAnnotationClassesAndFieldsNames(HashMap
       String annotationClassName = null;
       Map
       <String
-      , Set
+              , Set
   <Field>> mapClassWithInjectionNameToFieldSet = null;
       Set
   <Field> fieldNameSet = null;
@@ -56,16 +56,16 @@ public void fillAnnotationClassesAndFieldsNames(HashMap
 
     public void fillAnnotationClassesAndMethods(HashMap
     <String
-    , Map
+            , Map
     <String
-    , Set
+            , Set
     <String>>> mapAnnotationToMapClassWithInjectionNameToMethodsSet) {
       #if( !$mapAnnotationToMapClassWithInjectionNameToMethodSet.isEmpty() )
 
           String annotationClassName = null;
           Map
           <String
-          , Set
+                  , Set
       <String>> mapClassWithInjectionNameToMethodSet = null;
           Set
       <String> methodSet = null;
@@ -96,16 +96,16 @@ public void fillAnnotationClassesAndFieldsNames(HashMap
 
         public void fillAnnotationClassesAndConstructors(HashMap
         <String
-        , Map
+                , Map
         <String
-        , Set
+                , Set
         <String>>> mapAnnotationToMapClassWithInjectionNameToConstructorsSet) {
           #if( !$mapAnnotationToMapClassWithInjectionNameToConstructorSet.isEmpty() )
 
               String annotationClassName = null;
               Map
               <String
-              , Set
+                      , Set
           <String>> mapClassWithInjectionNameToConstructorSet = null;
               Set
           <String> constructorSet = null;
