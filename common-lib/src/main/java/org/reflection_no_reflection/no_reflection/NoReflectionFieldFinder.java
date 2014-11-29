@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.reflection_no_reflection.Field;
@@ -37,12 +38,14 @@ public class NoReflectionFieldFinder implements FieldFinder {
     protected class LocalNoReflectionField extends NoReflectionField {
 
         private int modifiers = Modifier.PUBLIC;
-        private final Map<Class<? extends Annotation>, Annotation> mapAnnotation;
+        private final Map<String, Annotation> mapAnnotation;
 
-        public LocalNoReflectionField(int index, String fieldName, String declaringClassName, String fieldTypeName, int modifiers, Map<Class<? extends Annotation>, Annotation> mapAnnotation) {
-            super(index, fieldName, declaringClassName, fieldTypeName);
-            this.modifiers = modifiers;
-            this.mapAnnotation = mapAnnotation;
+        public LocalNoReflectionField(int index, String fieldName, String declaringClassName, String fieldTypeName, int modifiers, List<? extends Annotation> annotationList) {
+            super(index, fieldName, declaringClassName, fieldTypeName, modifiers, annotationList);
+            mapAnnotation = new HashMap<>();
+            for(Annotation annotation : annotationList) {
+                mapAnnotation.put(((org.reflection_no_reflection.Annotation) annotation).getAnnotationTypeName(), annotation);
+            }
         }
 
         @Override

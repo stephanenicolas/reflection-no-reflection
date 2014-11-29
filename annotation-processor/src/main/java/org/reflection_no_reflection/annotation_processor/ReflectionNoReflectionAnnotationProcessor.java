@@ -1,8 +1,10 @@
 package org.reflection_no_reflection.annotation_processor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
@@ -11,6 +13,8 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -20,6 +24,7 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.no_reflection.NoReflectionField;
 
@@ -35,7 +40,7 @@ import org.reflection_no_reflection.no_reflection.NoReflectionField;
 @SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector"})
 public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor {
 
-    public static final String TEMPLATE_ANNOTATION_DATABASE_PATH = "templates/RGAnnotationDatabaseImpl.vm";
+    public static final String TEMPLATE_ANNOTATION_DATABASE_PATH = "templates/AnnotationDatabaseImpl.vm";
 
     private boolean isUsingFragmentUtil = true;
     private boolean isCommentingInjector = true;
@@ -56,6 +61,11 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
      * The inner map maps classes (containing injection points) names to the list of injected constructors parameters classes.
      */
     private HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet;
+
+    /**
+     * Maps each annotation name to a list of Annotation.
+     */
+    private HashMap<String, Annotation> mapAnnotationNameToAnnotation = new HashMap<>();
 
     /** Contains all classes that contain injection points. */
     private HashSet<String> classesContainingInjectionPointsSet = new HashSet<String>();
@@ -145,6 +155,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToConstructorSet(mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet);
         annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToMethodSet(mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
         annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToFieldSet(mapAnnotationToMapClassContainingInjectionToInjectedFieldSet);
+        annotationDatabaseGenerator.setMapAnnotationNameToAnnotation(mapAnnotationNameToAnnotation);
         annotationDatabaseGenerator.setUsingFragmentUtil(isUsingFragmentUtil);
         annotationDatabaseGenerator.setCommentingInjector(isCommentingInjector);
     }
@@ -168,8 +179,9 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
 
         TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
         String typeElementName = getTypeName(typeElementRequiringScanning);
+
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
-        addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectedClassName);
+        addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectedClassName, injectionPoint.getAnnotationMirrors());
     }
 
     private boolean isPrimitiveType(String injectedClassName) {
@@ -233,12 +245,12 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
     }
 
-    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, String injectedClassName) {
+    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, String injectedClassName, List<? extends AnnotationMirror> annotationMirrors) {
         Map<String, Set<Field>> mapClassWithInjectionNameToMemberSet = ((HashMap<String, Map<String, Set<Field>>>) mapAnnotationToMapClassContainingInjectionToInjectedFieldSet)
             .get(annotationClassName);
         if (mapClassWithInjectionNameToMemberSet == null) {
             mapClassWithInjectionNameToMemberSet = new HashMap<String, Set<Field>>();
-            ((HashMap<String, Map<String, Set<Field>>>) mapAnnotationToMapClassContainingInjectionToInjectedFieldSet)
+            mapAnnotationToMapClassContainingInjectionToInjectedFieldSet
                 .put(annotationClassName, mapClassWithInjectionNameToMemberSet);
         }
 
@@ -247,7 +259,22 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
             injectionPointNameSet = new HashSet<Field>();
             mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
         }
-        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, injectedClassName));
+
+        List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
+        for (AnnotationMirror annotationMirror : annotationMirrors) {
+            Map<String,Object> mapMethodToValue = new HashMap<>();
+            Map<String,String> mapMethodToReturnType = new HashMap<>();
+
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                String methodName = entry.getKey().getSimpleName().toString();
+                mapMethodToValue.put(methodName, entry.getValue().getValue());
+                mapMethodToReturnType.put(methodName, entry.getKey().getReturnType().toString());
+            }
+            org.reflection_no_reflection.Annotation annotationInstance = new Annotation(annotationMirror.getAnnotationType().toString(), mapMethodToValue, mapMethodToReturnType);
+            annotationList.add(annotationInstance);
+            mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
+        }
+        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, injectedClassName, annotationList));
     }
 
     private String getTypeName(TypeElement typeElementRequiringScanning) {

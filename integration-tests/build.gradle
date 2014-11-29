@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'application'
-//apply plugin: 'no_reflection'
+apply plugin: 'org.reflection_no_reflection.plugin'
 
 repositories {
   mavenCentral()
@@ -39,3 +39,7 @@ dependencies {
   testCompile 'junit:junit:4.11'
 }
 
+noreflection {
+  debug true
+  annotationClasses = ['javax.inject.Inject']
+}

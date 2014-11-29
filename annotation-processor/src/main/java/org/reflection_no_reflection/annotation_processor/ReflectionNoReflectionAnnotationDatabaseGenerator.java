@@ -11,6 +11,7 @@ import javax.tools.JavaFileObject;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Field;
 
 /**
@@ -28,6 +29,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
     private HashMap<String, Map<String, Set<Field>>> mapAnnotationToMapClassWithInjectionNameToFieldSet;
     private HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassWithInjectionNameToMethodSet;
     private HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassWithInjectionNameToConstructorSet;
+    private HashMap<String, Annotation> mapAnnotationNameToAnnotation;
     private HashSet<String> classesContainingInjectionPointsSet;
     private HashSet<String> bindableClasses;
 
@@ -68,6 +70,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         context.put("mapAnnotationToMapClassWithInjectionNameToFieldSet", mapAnnotationToMapClassWithInjectionNameToFieldSet);
         context.put("mapAnnotationToMapClassWithInjectionNameToMethodSet", mapAnnotationToMapClassWithInjectionNameToMethodSet);
         context.put("mapAnnotationToMapClassWithInjectionNameToConstructorSet", mapAnnotationToMapClassWithInjectionNameToConstructorSet);
+        context.put("mapAnnotationNameToAnnotation", mapAnnotationNameToAnnotation);
         context.put("classesContainingInjectionPointsSet", classesContainingInjectionPointsSet);
         context.put("injectedClasses", bindableClasses);
         context.put("isUsingFragmentUtil", isUsingFragmentUtil);
@@ -122,6 +125,14 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
 
     public void setClassesContainingInjectionPointsSet(HashSet<String> classesContainingInjectionPointsSet) {
         this.classesContainingInjectionPointsSet = classesContainingInjectionPointsSet;
+    }
+
+    public void setMapAnnotationNameToAnnotation(HashMap<String, Annotation> mapAnnotationNameToAnnotation) {
+        this.mapAnnotationNameToAnnotation = mapAnnotationNameToAnnotation;
+    }
+
+    public HashMap<String, Annotation> getMapAnnotationNameToAnnotation() {
+        return mapAnnotationNameToAnnotation;
     }
 
     public HashSet<String> getBindableClasses() {

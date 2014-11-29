@@ -1,7 +1,10 @@
 package org.reflection_no_reflection.no_reflection;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.reflection_no_reflection.Field;
@@ -23,4 +26,33 @@ public abstract class AnnotationDatabase {
     public abstract void fillClassesContainingInjectionPointSet(HashSet<String> classesContainingInjectionPointsSet);
 
     public abstract void fillBindableClasses(HashSet<String> injectedClasses);
+
+    protected static class LocalNoReflectionField extends NoReflectionField {
+
+        private int modifiers = Modifier.PUBLIC;
+
+        public LocalNoReflectionField(int index, String fieldName, String declaringClassName, String fieldTypeName, int modifiers, List<? extends Annotation> annotationList) {
+            super(index, fieldName, declaringClassName, fieldTypeName, modifiers, annotationList);
+        }
+
+        @Override
+        public void set(Object object, Object value) throws IllegalAccessException {
+            fieldGetterAndSetter.set(getIndex(), object, value);
+        }
+
+        @Override
+        public Object get(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.get(getIndex(), object);
+        }
+
+        @Override
+        public int getInt(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.getInt(getIndex(), object);
+        }
+
+        @Override
+        public void setInt(Object object, int value) throws IllegalAccessException {
+            fieldGetterAndSetter.setInt(getIndex(), object, value);
+        }
+    }
 }
