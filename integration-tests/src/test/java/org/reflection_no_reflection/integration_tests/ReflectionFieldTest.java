@@ -19,6 +19,10 @@ public class ReflectionFieldTest extends FieldTest {
                 return new ReflectionField(getTrueReflectionFieldPublicPrimitiveIntField());
             case "publicPrimitiveByteField":
                 return new ReflectionField(getTrueReflectionFieldPublicPrimitiveByteField());
+            case "publicPrimitiveShortField":
+                return new ReflectionField(getTrueReflectionFieldPublicPrimitiveShortField());
+            case "publicPrimitiveLongField":
+                return new ReflectionField(getTrueReflectionFieldPublicPrimitiveLongField());
         }
         throw new RuntimeException("No such field:" + fieldName);
     }

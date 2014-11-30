@@ -6,4 +6,6 @@ public class A {
     @Inject public B publicObjectField;
     @Inject public int publicPrimitiveIntField;
     @Inject public byte publicPrimitiveByteField;
+    @Inject public short publicPrimitiveShortField;
+    @Inject public long publicPrimitiveLongField;
 }

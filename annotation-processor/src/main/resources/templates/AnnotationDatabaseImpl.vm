@@ -271,6 +271,97 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #end
     }
   }
+
+  public void setShort(int index, Object object, short value) throws IllegalAccessException {
+#if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
+#set( $id = 0 )
+    switch(index) {
+#foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
+#foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
+#foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
+      case $id:
+#if( ${field.TypeName} == "short.class" || ${field.TypeName} == "Short.class" )
+        ((${field.DeclaringClassName}) object).${field.Name} = value; break;
+#else
+        throw new IllegalAccessException("Not a short");
+#end
+#set( $id = $id + 1 )
+#end
+      default: throw new IllegalAccessException("No setter for this index:" + index);
+#end
+#end
+#end
+    }
+  }
+
+  public short getShort(int index, Object object) throws IllegalAccessException {
+#if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
+#set( $id = 0 )
+    switch(index) {
+#foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
+#foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
+#foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
+      case $id:
+#if( ${field.TypeName} == "short" || ${field.TypeName} == "Short" )
+        return ((${field.DeclaringClassName}) object).${field.Name};
+#else
+        throw new IllegalAccessException("Not a short");
+#end
+
+#set( $id = $id + 1 )
+#end
+        default: throw new IllegalAccessException("No a short at this index:" + index);
+#end
+#end
+#end
+    }
+  }
+
+  public void setLong(int index, Object object, long value) throws IllegalAccessException {
+#if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
+#set( $id = 0 )
+    switch(index) {
+#foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
+#foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
+#foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
+      case $id:
+#if( ${field.TypeName} == "long.class" || ${field.TypeName} == "Long.class" )
+        ((${field.DeclaringClassName}) object).${field.Name} = value; break;
+#else
+        throw new IllegalAccessException("Not a long");
+#end
+#set( $id = $id + 1 )
+#end
+      default: throw new IllegalAccessException("No setter for this index:" + index);
+#end
+#end
+#end
+    }
+  }
+
+  public long getLong(int index, Object object) throws IllegalAccessException {
+#if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
+#set( $id = 0 )
+    switch(index) {
+#foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
+#foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
+#foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
+      case $id:
+#if( ${field.TypeName} == "long" || ${field.TypeName} == "Long" )
+        return ((${field.DeclaringClassName}) object).${field.Name};
+#else
+        throw new IllegalAccessException("Not a long");
+#end
+
+#set( $id = $id + 1 )
+#end
+        default: throw new IllegalAccessException("No a long at this index:" + index);
+#end
+#end
+#end
+    }
+  }
+
 }
 
  

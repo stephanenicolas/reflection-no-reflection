@@ -21,18 +21,26 @@ public abstract class FieldTest {
     private java.lang.reflect.Field trueReflectionFieldPublicObjectField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveIntField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveByteField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveShortField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveLongField;
     private Field publicObjectField;
     private Field publicPrimitiveIntField;
     private Field publicPrimitiveByteField;
+    private Field publicPrimitiveShortField;
+    private Field publicPrimitiveLongField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
         trueReflectionFieldPublicObjectField = A.class.getDeclaredField("publicObjectField");
         trueReflectionFieldPublicPrimitiveIntField = A.class.getDeclaredField("publicPrimitiveIntField");
         trueReflectionFieldPublicPrimitiveByteField = A.class.getDeclaredField("publicPrimitiveByteField");
+        trueReflectionFieldPublicPrimitiveShortField = A.class.getDeclaredField("publicPrimitiveShortField");
+        trueReflectionFieldPublicPrimitiveLongField = A.class.getDeclaredField("publicPrimitiveLongField");
         publicObjectField = getField(A.class, "publicObjectField");
         publicPrimitiveIntField = getField(A.class, "publicPrimitiveIntField");
         publicPrimitiveByteField = getField(A.class, "publicPrimitiveByteField");
+        publicPrimitiveShortField = getField(A.class, "publicPrimitiveShortField");
+        publicPrimitiveLongField = getField(A.class, "publicPrimitiveLongField");
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
@@ -44,8 +52,17 @@ public abstract class FieldTest {
     public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveIntField() {
         return trueReflectionFieldPublicPrimitiveIntField;
     }
+
     public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveByteField() {
         return trueReflectionFieldPublicPrimitiveByteField;
+    }
+
+    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveShortField() {
+        return trueReflectionFieldPublicPrimitiveShortField;
+    }
+
+    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveLongField() {
+        return trueReflectionFieldPublicPrimitiveLongField;
     }
 
     @Test
@@ -188,7 +205,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetShort() throws NoSuchFieldException, IllegalAccessException {
+    public void testGetByte() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -199,5 +216,33 @@ public abstract class FieldTest {
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveByteField.getByte(a)));
         assertThat(b, Is.is(a.publicPrimitiveByteField));
+    }
+
+    @Test
+    public void testGetShort() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveShortField = 5;
+        short b = publicPrimitiveShortField.getShort(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveShortField.getShort(a)));
+        assertThat(b, Is.is(a.publicPrimitiveShortField));
+    }
+
+    @Test
+    public void testGetLong() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveLongField = 5;
+        long b = publicPrimitiveLongField.getLong(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveLongField.getLong(a)));
+        assertThat(b, Is.is(a.publicPrimitiveLongField));
     }
 }

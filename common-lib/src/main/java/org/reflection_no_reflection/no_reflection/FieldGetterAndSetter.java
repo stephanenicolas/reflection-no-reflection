@@ -9,4 +9,10 @@ public interface FieldGetterAndSetter {
 
     public byte getByte(int index, Object object) throws IllegalAccessException;
     public void setByte(int index, Object object, byte value) throws IllegalAccessException;
+
+    public short getShort(int index, Object object) throws IllegalAccessException;
+    public void setShort(int index, Object object, short value) throws IllegalAccessException;
+
+    public long getLong(int index, Object object) throws IllegalAccessException;
+    public void setLong(int index, Object object, long value) throws IllegalAccessException;
 }
