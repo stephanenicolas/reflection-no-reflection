@@ -27,7 +27,7 @@ public abstract class AnnotationDatabase {
 
     public abstract void fillBindableClasses(HashSet<String> injectedClasses);
 
-    protected static class LocalNoReflectionField extends NoReflectionField {
+    public static class LocalNoReflectionField extends NoReflectionField {
 
         private int modifiers = Modifier.PUBLIC;
 

@@ -30,12 +30,14 @@ import org.reflection_no_reflection.no_reflection.NoReflectionField;
 
 /**
  * An annotation processor that detects classes that need to receive injections.
- * It is a {@link AbstractProcessor} that is triggered for all the annotations
- * of both Guice and RoboGuice.
- *
- * @author MikeBurton
+ * It is a {@link AbstractProcessor} that can be triggered for all kinds of annotations.
+ * It will create a RNR database of annotated fields, methods and constuctors.
  * @author SNI
  */
+//TODO MUST REMOVE THIS. ANNOTATION TYPES SHOULD BE DYNAMIC
+//getSupportedAnnotationType must be triggered
+//chances are that the processor must be called in a different way by the gradle
+//plugin. We have to get full control over annotation processor instance creation.
 @SupportedAnnotationTypes({"com.google.inject.Inject", "com.google.inject.Provides", "javax.inject.Inject", "roboguice.inject.InjectView", "roboguice.inject.InjectResource", "roboguice.inject.InjectPreference", "roboguice.inject.InjectExtra", "roboguice.inject.InjectFragment", "roboguice.event.Observes", "roboguice.inject.ContentView"})
 @SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector"})
 public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor {

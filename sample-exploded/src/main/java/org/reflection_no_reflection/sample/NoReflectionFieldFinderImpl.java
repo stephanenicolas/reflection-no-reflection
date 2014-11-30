@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.no_reflection.AnnotationDatabase;
 import org.reflection_no_reflection.no_reflection.AnnotationDatabaseFinder;
 import org.reflection_no_reflection.no_reflection.FieldGetterAndSetter;
 import org.reflection_no_reflection.no_reflection.NoReflectionFieldFinder;
@@ -32,13 +33,12 @@ public class NoReflectionFieldFinderImpl extends NoReflectionFieldFinder {
     public List<Field> getAllFields(Class<? extends Annotation> annotationClass, Class clazz) {
         List<Field> fieldList = new ArrayList<Field>();
         if (clazz == A.class) {
-            HashMap<Class<? extends Annotation>, Annotation> mapAnnotation = new HashMap<Class<? extends Annotation>, Annotation>();
-            mapAnnotation.put(Inject.class, new NoReflectionInjectAnnotation());
-            Field fieldB = new LocalNoReflectionField(0, "b", A.class.getName(), B.class.getName(), Modifier.PUBLIC, mapAnnotation);
+            List annotationList = new ArrayList<>();
+            annotationList.add(new NoReflectionInjectAnnotation());
+            Field fieldB = new AnnotationDatabase.LocalNoReflectionField(0, "b", A.class.getName(), B.class.getName(), Modifier.PUBLIC, annotationList);
 
-            mapAnnotation = new HashMap<Class<? extends Annotation>, Annotation>();
-            mapAnnotation.put(Inject.class, new NoReflectionInjectAnnotation());
-            Field fieldC = new LocalNoReflectionField(1, "c", A.class.getName(), int.class.getName(), 0, mapAnnotation);
+            annotationList.add(new NoReflectionInjectAnnotation());
+            Field fieldC = new AnnotationDatabase.LocalNoReflectionField(1, "c", A.class.getName(), int.class.getName(), 0, annotationList);
             fieldList.add(fieldB);
             fieldList.add(fieldC);
         }
