@@ -23,11 +23,11 @@ public abstract class FieldTest {
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveByteField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveShortField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveLongField;
-    private Field publicObjectField;
-    private Field publicPrimitiveIntField;
-    private Field publicPrimitiveByteField;
-    private Field publicPrimitiveShortField;
-    private Field publicPrimitiveLongField;
+    private Field rnrPublicObjectField;
+    private Field rnrPublicPrimitiveIntField;
+    private Field rnrPublicPrimitiveByteField;
+    private Field rnrPublicPrimitiveShortField;
+    private Field rnrPublicPrimitiveLongField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
@@ -36,41 +36,21 @@ public abstract class FieldTest {
         trueReflectionFieldPublicPrimitiveByteField = A.class.getDeclaredField("publicPrimitiveByteField");
         trueReflectionFieldPublicPrimitiveShortField = A.class.getDeclaredField("publicPrimitiveShortField");
         trueReflectionFieldPublicPrimitiveLongField = A.class.getDeclaredField("publicPrimitiveLongField");
-        publicObjectField = getField(A.class, "publicObjectField");
-        publicPrimitiveIntField = getField(A.class, "publicPrimitiveIntField");
-        publicPrimitiveByteField = getField(A.class, "publicPrimitiveByteField");
-        publicPrimitiveShortField = getField(A.class, "publicPrimitiveShortField");
-        publicPrimitiveLongField = getField(A.class, "publicPrimitiveLongField");
+        rnrPublicObjectField = getField(A.class, "publicObjectField");
+        rnrPublicPrimitiveIntField = getField(A.class, "publicPrimitiveIntField");
+        rnrPublicPrimitiveByteField = getField(A.class, "publicPrimitiveByteField");
+        rnrPublicPrimitiveShortField = getField(A.class, "publicPrimitiveShortField");
+        rnrPublicPrimitiveLongField = getField(A.class, "publicPrimitiveLongField");
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
-
-    public java.lang.reflect.Field getTrueReflectionFieldPublicObjectField() {
-        return trueReflectionFieldPublicObjectField;
-    }
-
-    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveIntField() {
-        return trueReflectionFieldPublicPrimitiveIntField;
-    }
-
-    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveByteField() {
-        return trueReflectionFieldPublicPrimitiveByteField;
-    }
-
-    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveShortField() {
-        return trueReflectionFieldPublicPrimitiveShortField;
-    }
-
-    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveLongField() {
-        return trueReflectionFieldPublicPrimitiveLongField;
-    }
 
     @Test
     public void testGetName() throws NoSuchFieldException {
         //GIVEN
 
         //WHEN
-        String fieldName = publicObjectField.getName();
+        String fieldName = rnrPublicObjectField.getName();
 
         //THEN
         assertThat(fieldName, is(trueReflectionFieldPublicObjectField.getName()));
@@ -82,7 +62,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Class fieldType = publicObjectField.getType();
+        Class fieldType = rnrPublicObjectField.getType();
 
         //THEN
         assertThat(fieldType, Is.<Class>is(trueReflectionFieldPublicObjectField.getType()));
@@ -94,7 +74,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Type type = publicObjectField.getGenericType();
+        Type type = rnrPublicObjectField.getGenericType();
 
         //THEN
         assertThat(type, Is.<Type>is(trueReflectionFieldPublicObjectField.getType()));
@@ -106,7 +86,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Class fieldType = publicObjectField.getDeclaringClass();
+        Class fieldType = rnrPublicObjectField.getDeclaringClass();
 
         //THEN
         assertThat(fieldType, Is.<Class>is(trueReflectionFieldPublicObjectField.getDeclaringClass()));
@@ -118,7 +98,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        int fieldModifiers = publicObjectField.getModifiers();
+        int fieldModifiers = rnrPublicObjectField.getModifiers();
 
         //THEN
         assertThat(fieldModifiers, is(trueReflectionFieldPublicObjectField.getModifiers()));
@@ -130,7 +110,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Inject fieldAnnotationInject = publicObjectField.getAnnotation(Inject.class);
+        Inject fieldAnnotationInject = rnrPublicObjectField.getAnnotation(Inject.class);
 
         //THEN
         assertThat(fieldAnnotationInject, Is.<Inject>isA(Inject.class));
@@ -141,7 +121,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Annotation[] annotations = publicObjectField.getDeclaredAnnotations();
+        Annotation[] annotations = rnrPublicObjectField.getDeclaredAnnotations();
 
         //THEN
         assertThat(annotations.length, is(1));
@@ -155,7 +135,7 @@ public abstract class FieldTest {
         //WHEN
         A a = new A();
         a.publicObjectField = new B();
-        boolean isInjectpresent = publicObjectField.isAnnotationPresent(Inject.class);
+        boolean isInjectpresent = rnrPublicObjectField.isAnnotationPresent(Inject.class);
 
         //THEN
         assertThat(isInjectpresent, Is.is(trueReflectionFieldPublicObjectField.isAnnotationPresent(Inject.class)));
@@ -169,7 +149,7 @@ public abstract class FieldTest {
         //WHEN
         B newB = new B();
         A a = new A();
-        publicObjectField.set(a, newB);
+        rnrPublicObjectField.set(a, newB);
 
         //THEN
         assertThat(a.publicObjectField, Is.<B>is((B) trueReflectionFieldPublicObjectField.get(a)));
@@ -183,7 +163,7 @@ public abstract class FieldTest {
         //WHEN
         A a = new A();
         a.publicObjectField = new B();
-        B b = (B) publicObjectField.get(a);
+        B b = (B) rnrPublicObjectField.get(a);
 
         //THEN
         assertThat(b, Is.<B>is((B) trueReflectionFieldPublicObjectField.get(a)));
@@ -197,7 +177,7 @@ public abstract class FieldTest {
         //WHEN
         A a = new A();
         a.publicPrimitiveIntField = 5;
-        int b = publicPrimitiveIntField.getInt(a);
+        int b = rnrPublicPrimitiveIntField.getInt(a);
 
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveIntField.getInt(a)));
@@ -210,7 +190,7 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        publicPrimitiveIntField.setInt(a, 5);
+        rnrPublicPrimitiveIntField.setInt(a, 5);
         int b = a.publicPrimitiveIntField;
 
         //THEN
@@ -225,7 +205,7 @@ public abstract class FieldTest {
         //WHEN
         A a = new A();
         a.publicPrimitiveByteField = 5;
-        byte b = publicPrimitiveByteField.getByte(a);
+        byte b = rnrPublicPrimitiveByteField.getByte(a);
 
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveByteField.getByte(a)));
@@ -238,7 +218,7 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        publicPrimitiveByteField.setByte(a, (byte) 5);
+        rnrPublicPrimitiveByteField.setByte(a, (byte) 5);
         byte b = a.publicPrimitiveByteField;
 
         //THEN
@@ -253,7 +233,7 @@ public abstract class FieldTest {
         //WHEN
         A a = new A();
         a.publicPrimitiveShortField = 5;
-        short b = publicPrimitiveShortField.getShort(a);
+        short b = rnrPublicPrimitiveShortField.getShort(a);
 
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveShortField.getShort(a)));
@@ -266,7 +246,7 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        publicPrimitiveShortField.setShort(a, (short) 5);
+        rnrPublicPrimitiveShortField.setShort(a, (short) 5);
         short b = a.publicPrimitiveShortField;
 
         //THEN
@@ -281,7 +261,7 @@ public abstract class FieldTest {
         //WHEN
         A a = new A();
         a.publicPrimitiveLongField = 5;
-        long b = publicPrimitiveLongField.getLong(a);
+        long b = rnrPublicPrimitiveLongField.getLong(a);
 
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveLongField.getLong(a)));
@@ -294,7 +274,7 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        publicPrimitiveLongField.setLong(a, (long) 5);
+        rnrPublicPrimitiveLongField.setLong(a, (long) 5);
         long b = a.publicPrimitiveLongField;
 
         //THEN

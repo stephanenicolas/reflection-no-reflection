@@ -79,6 +79,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         return context;
     }
 
+    @SuppressWarnings("unused")
     public String getTemplatePath() {
         return templatePath;
     }
@@ -87,6 +88,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         this.templatePath = templatePath;
     }
 
+    @SuppressWarnings("unused")
     public String getPackageName() {
         return packageName;
     }
@@ -95,6 +97,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         this.packageName = packageName;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Map<String, Set<Field>>> getMapAnnotationToMapClassWithInjectionNameToFieldSet() {
         return mapAnnotationToMapClassWithInjectionNameToFieldSet;
     }
@@ -103,6 +106,7 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         this.mapAnnotationToMapClassWithInjectionNameToFieldSet = mapAnnotationToMapClassWithInjectionNameToFieldSet;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Map<String, Set<String>>> getMapAnnotationToMapClassWithInjectionNameToMethodSet() {
         return mapAnnotationToMapClassWithInjectionNameToMethodSet;
     }
@@ -111,14 +115,17 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         this.mapAnnotationToMapClassWithInjectionNameToMethodSet = mapAnnotationToMapClassWithInjectionNameToMethodSet;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Map<String, Set<String>>> getMapAnnotationToMapClassWithInjectionNameToConstructorSet() {
         return mapAnnotationToMapClassWithInjectionNameToConstructorSet;
     }
 
+    @SuppressWarnings("unused")
     public void setMapAnnotationToMapClassWithInjectionNameToConstructorSet(HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassWithInjectionNameToConstructorSet) {
         this.mapAnnotationToMapClassWithInjectionNameToConstructorSet = mapAnnotationToMapClassWithInjectionNameToConstructorSet;
     }
 
+    @SuppressWarnings("unused")
     public HashSet<String> getClassesContainingInjectionPointsSet() {
         return classesContainingInjectionPointsSet;
     }
@@ -131,10 +138,12 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         this.mapAnnotationNameToAnnotation = mapAnnotationNameToAnnotation;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Annotation> getMapAnnotationNameToAnnotation() {
         return mapAnnotationNameToAnnotation;
     }
 
+    @SuppressWarnings("unused")
     public HashSet<String> getBindableClasses() {
         return bindableClasses;
     }
@@ -143,10 +152,12 @@ public class ReflectionNoReflectionAnnotationDatabaseGenerator {
         this.bindableClasses = bindableClasses;
     }
 
+    @SuppressWarnings("unused")
     public boolean isUsingFragmentUtil() {
         return isUsingFragmentUtil;
     }
 
+    @SuppressWarnings("unused")
     public boolean isCommentingInjector() {
         return isCommentingInjector;
     }

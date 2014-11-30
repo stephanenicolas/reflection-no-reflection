@@ -50,22 +50,27 @@ public class AnnotationDatabaseFinder {
         }
     }
 
+    @SuppressWarnings("unused")
     public HashSet<String> getClassesContainingInjectionPointsSet() {
         return classesContainingInjectionPointsSet;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Map<String, Set<Field>>> getMapAnnotationToMapClassContainingInjectionToInjectedFieldSet() {
         return mapAnnotationToMapClassContainingInjectionToInjectedFieldSet;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Map<String, Set<String>>> getMapAnnotationToMapClassContainingInjectionToInjectedMethodSet() {
         return mapAnnotationToMapClassContainingInjectionToInjectedMethodSet;
     }
 
+    @SuppressWarnings("unused")
     public HashMap<String, Map<String, Set<String>>> getMapAnnotationToMapClassContainingInjectionToInjectedConstructorSet() {
         return mapAnnotationToMapClassContainingInjectionToInjectedConstructorSet;
     }
 
+    @SuppressWarnings("unused")
     public Set<String> getBindableClassesSet() {
         return bindableClassesSet;
     }
@@ -83,6 +88,5 @@ public class AnnotationDatabaseFinder {
         annotationDatabase.fillAnnotationClassesAndConstructors(mapAnnotationToMapClassContainingInjectionToInjectedConstructorSet);
         annotationDatabase.fillClassesContainingInjectionPointSet(classesContainingInjectionPointsSet);
         annotationDatabase.fillBindableClasses(bindableClassesSet);
-        //System.out.println(mapAnnotationToMapClassWithInjectionNameToMethodSet.toString());
     }
 }

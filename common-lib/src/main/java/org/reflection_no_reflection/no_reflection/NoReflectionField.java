@@ -9,7 +9,9 @@ import org.reflection_no_reflection.Field;
 
 public class NoReflectionField extends Field {
 
+    @SuppressWarnings("unused")
     private Class declaringClass;
+    @SuppressWarnings("unused")
     private Class fieldType;
     private int index;
     private String fieldName;
@@ -56,6 +58,7 @@ public class NoReflectionField extends Field {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public String getDeclaringClassName() {
         return declaringClassName;
     }
@@ -84,6 +87,7 @@ public class NoReflectionField extends Field {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public String getTypeName() {
         return fieldTypeName;
     }
@@ -101,6 +105,7 @@ public class NoReflectionField extends Field {
         return "Field " + fieldName + " in " + getDeclaringClass();
     }
 
+    @SuppressWarnings("unused")
     public List<? extends java.lang.annotation.Annotation> getAnnotationList() {
         return annotationList;
     }
