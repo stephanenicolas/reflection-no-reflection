@@ -2,6 +2,7 @@ package org.reflection_no_reflection.annotation_processor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,14 +39,14 @@ import org.reflection_no_reflection.no_reflection.NoReflectionField;
 //getSupportedAnnotationType must be triggered
 //chances are that the processor must be called in a different way by the gradle
 //plugin. We have to get full control over annotation processor instance creation.
-@SupportedAnnotationTypes({"com.google.inject.Inject", "com.google.inject.Provides", "javax.inject.Inject", "roboguice.inject.InjectView", "roboguice.inject.InjectResource", "roboguice.inject.InjectPreference", "roboguice.inject.InjectExtra", "roboguice.inject.InjectFragment", "roboguice.event.Observes", "roboguice.inject.ContentView"})
-@SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector"})
+@SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector", "annotatedClasses"})
 public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor {
 
     public static final String TEMPLATE_ANNOTATION_DATABASE_PATH = "templates/AnnotationDatabaseImpl.vm";
 
     private boolean isUsingFragmentUtil = true;
     private boolean isCommentingInjector = true;
+    private Set<String> annotatedClasses = new HashSet<>();
     //TODO add a HashMap<String, Set<String>>
 
     /**
@@ -93,6 +94,10 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         String isCommentingInjectorString = processingEnv.getOptions().get("guiceCommentsInjector");
         if (isCommentingInjectorString != null) {
             isCommentingInjector = Boolean.parseBoolean(isCommentingInjectorString);
+        }
+        String annotatedClassesString = processingEnv.getOptions().get("annotatedClasses");
+        if (annotatedClassesString != null) {
+            annotatedClasses.addAll(Arrays.asList(annotatedClassesString.split(",")));
         }
     }
 
@@ -317,6 +322,10 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
     public SourceVersion getSupportedSourceVersion() {
         //http://stackoverflow.com/a/8188860/693752
         return SourceVersion.latest();
+    }
+
+    @Override public Set<String> getSupportedAnnotationTypes() {
+        return annotatedClasses;
     }
 
     protected ReflectionNoReflectionAnnotationDatabaseGenerator createAnnotationDatabaseGenerator() {

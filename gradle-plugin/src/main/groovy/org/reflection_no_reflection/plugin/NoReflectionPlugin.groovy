@@ -116,6 +116,7 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
 
         println "destdir " + project.files(generatedAnnotationProcessorDirName).asPath
         javaCompile.options.compilerArgs += '-proc:only'
+        javaCompile.options.compilerArgs += ['-AannotatedClasses=' + project.noreflection.annotationClasses.join(',')]
         javaCompile.options.compilerArgs += ['-s', project.file(generatedAnnotationProcessorDirName)]
 
         project.tasks.getByName(transformTask).mustRunAfter(javaCompileBeforeWeave)
