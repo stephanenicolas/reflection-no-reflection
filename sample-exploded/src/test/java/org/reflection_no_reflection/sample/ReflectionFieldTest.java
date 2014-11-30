@@ -4,7 +4,9 @@ import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.reflection.ReflectionField;
 
 /**
- * Created by administrateur on 14-11-23.
+ * A proof of concept to retrieve core java reflection fields
+ * and test them via the RNR framework.
+ * @author SNI
  */
 public class ReflectionFieldTest extends FieldTest {
 

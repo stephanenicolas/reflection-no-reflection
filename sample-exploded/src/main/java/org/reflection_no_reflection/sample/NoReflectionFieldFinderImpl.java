@@ -12,7 +12,8 @@ import org.reflection_no_reflection.no_reflection.FieldGetterAndSetter;
 import org.reflection_no_reflection.no_reflection.NoReflectionFieldFinder;
 
 /**
- * Created by administrateur on 14-11-23.
+ * A Proof of Concept for finding fields based on RNR.
+ * @author SNI
  */
 public class NoReflectionFieldFinderImpl extends NoReflectionFieldFinder {
     static {

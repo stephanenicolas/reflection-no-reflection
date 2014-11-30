@@ -5,7 +5,8 @@ import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.no_reflection.AnnotationDatabaseFinder;
 
 /**
- * Created by administrateur on 14-11-23.
+ * Proof of Concept of RNR field testings.
+ * @author SNI
  */
 public class NoReflectionFieldTest extends FieldTest {
 

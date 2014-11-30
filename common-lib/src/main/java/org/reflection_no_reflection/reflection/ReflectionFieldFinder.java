@@ -8,9 +8,11 @@ import java.util.Comparator;
 import java.util.List;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.FieldFinder;
+import org.reflection_no_reflection.no_reflection.AnnotationDatabaseFinder;
 
 /**
- * Created by administrateur on 14-11-23.
+ * Provides a high level API to access core java reflection fields via the RNR API.
+ * @author SNI
  */
 public class ReflectionFieldFinder implements FieldFinder {
     @Override public Collection<Field> getAllFields(Class<? extends Annotation> annotationClass, Class clazz) {

@@ -4,7 +4,9 @@ import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.reflection.ReflectionField;
 
 /**
- * Created by administrateur on 14-11-23.
+ * Test for core java reflection fields.
+ * Allows to get a benchmark for testing all the reflection field API.
+ * @author SNI
  */
 public class ReflectionFieldTest extends FieldTest {
 

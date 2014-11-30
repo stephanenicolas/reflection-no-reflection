@@ -3,6 +3,12 @@ package org.reflection_no_reflection;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+/**
+ * This is the base class for all RNR implementation of fields.
+ * It has the exact same API as Java core reflection fields, and
+ * can contain extra methods if required.
+ * Subclass will provide their own implementations of the various field methods.
+ */
 public class Field {
 
     public Object get(Object object) throws IllegalAccessException {

@@ -4,7 +4,8 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 
 /**
- * Created by administrateur on 14-11-23.
+ * Defines the behaviour of member finders.
+ * @author SNI
  */
 public interface FieldFinder {
 

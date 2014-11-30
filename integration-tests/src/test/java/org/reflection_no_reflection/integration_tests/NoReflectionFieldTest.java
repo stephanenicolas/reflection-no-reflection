@@ -6,7 +6,8 @@ import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.no_reflection.NoReflectionFieldFinder;
 
 /**
- * Created by administrateur on 14-11-23.
+ * Test for RNR fields.
+ * @author SNI
  */
 public class NoReflectionFieldTest extends FieldTest {
 

@@ -13,7 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Created by administrateur on 14-11-23.
+ * Base class for both RNR and core java reflection fields.
+ * @author SNI
  */
 public abstract class FieldTest {
 
