@@ -205,6 +205,20 @@ public abstract class FieldTest {
     }
 
     @Test
+    public void testSetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        publicPrimitiveIntField.setInt(a, 5);
+        int b = a.publicPrimitiveIntField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveIntField.getInt(a)));
+        assertThat(b, Is.is(5));
+    }
+
+    @Test
     public void testGetByte() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
@@ -216,6 +230,20 @@ public abstract class FieldTest {
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveByteField.getByte(a)));
         assertThat(b, Is.is(a.publicPrimitiveByteField));
+    }
+    
+    @Test
+    public void testSetByte() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        publicPrimitiveByteField.setByte(a, (byte) 5);
+        byte b = a.publicPrimitiveByteField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveByteField.getByte(a)));
+        assertThat(b, Is.is( (byte) 5));
     }
 
     @Test
@@ -231,6 +259,20 @@ public abstract class FieldTest {
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveShortField.getShort(a)));
         assertThat(b, Is.is(a.publicPrimitiveShortField));
     }
+    
+    @Test
+    public void testSetShort() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        publicPrimitiveShortField.setShort(a, (short) 5);
+        short b = a.publicPrimitiveShortField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveShortField.getShort(a)));
+        assertThat(b, Is.is( (short) 5));
+    }
 
     @Test
     public void testGetLong() throws NoSuchFieldException, IllegalAccessException {
@@ -244,5 +286,19 @@ public abstract class FieldTest {
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveLongField.getLong(a)));
         assertThat(b, Is.is(a.publicPrimitiveLongField));
+    }
+    
+    @Test
+    public void testSetLong() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        publicPrimitiveLongField.setLong(a, (long) 5);
+        long b = a.publicPrimitiveLongField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveLongField.getLong(a)));
+        assertThat(b, Is.is( (long) 5));
     }
 }
