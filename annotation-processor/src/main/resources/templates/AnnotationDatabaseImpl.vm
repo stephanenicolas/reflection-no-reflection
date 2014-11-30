@@ -158,7 +158,7 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
       case $id: return ((${field.DeclaringClassName}) object).${field.Name};
 #set( $id = $id + 1 )
 #end
-      default: throw new IllegalAccessException("No setter for this index:" + index);
+      default: throw new IllegalArgumentException("No setter for this index:" + index);
 #end
 #end
 #end
@@ -175,7 +175,7 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
       case $id: ((${field.DeclaringClassName}) object).${field.Name} = (${field.TypeName}) value; break;
 #set( $id = $id + 1 )
 #end
-      default: throw new IllegalAccessException("No setter for this index:" + index);
+      default: throw new IllegalArgumentException("No setter for this index:" + index);
 #end
 #end
 #end
@@ -194,15 +194,15 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
 #foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
       case $id:
-#if( ${field.TypeName} == "$low" || ${field.TypeName} == "$up" )
+#if( ${field.TypeName} == "$low" )
         return ((${field.DeclaringClassName}) object).${field.Name};
 #else
-        throw new IllegalAccessException("Not a $low");
+        throw new IllegalArgumentException("Not a $low");
 #end
 
 #set( $id = $id + 1 )
 #end
-        default: throw new IllegalAccessException("No a $low at this index:" + index);
+        default: throw new IllegalArgumentException("No a $low at this index:" + index);
 #end
 #end
 #end
@@ -217,14 +217,14 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
 #foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
       case $id:
-#if( ${field.TypeName} == "$low" || ${field.TypeName} == "$up" )
+#if( ${field.TypeName} == "$low" )
         ((${field.DeclaringClassName}) object).${field.Name} = value; break;
 #else
-        throw new IllegalAccessException("Not a $low");
+        throw new IllegalArgumentException("Not a $low");
 #end
 #set( $id = $id + 1 )
 #end
-      default: throw new IllegalAccessException("No setter for this index:" + index);
+      default: throw new IllegalArgumentException("No setter for this index:" + index);
 #end
 #end
 #end

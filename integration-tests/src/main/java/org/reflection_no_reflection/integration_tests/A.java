@@ -12,4 +12,6 @@ public class A {
     @Inject public double publicPrimitiveDoubleField;
     @Inject public boolean publicPrimitiveBooleanField;
     @Inject public char publicPrimitiveCharField;
+
+    @Inject public Integer publicWrapperIntegerField;
 }

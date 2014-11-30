@@ -11,13 +11,17 @@ import org.reflection_no_reflection.Field;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.fail;
 
 /**
  * Base class of both all RNR fields implementations.
+ * This class tests if a given implementation of RNR will provide both correct results
+ * and identical results to pure java core reflection.
  * @author SNI.
  */
 public abstract class FieldTest {
 
+    //pure java reflection fields
     private java.lang.reflect.Field trueReflectionFieldPublicObjectField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveIntField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveByteField;
@@ -27,6 +31,10 @@ public abstract class FieldTest {
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveDoubleField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveBooleanField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveCharField;
+
+    private java.lang.reflect.Field trueReflectionFieldPublicWrapperIntegerField;
+
+    //fields obtained via RNR
     private Field rnrPublicObjectField;
     private Field rnrPublicPrimitiveIntField;
     private Field rnrPublicPrimitiveByteField;
@@ -37,8 +45,12 @@ public abstract class FieldTest {
     private Field rnrPublicPrimitiveBooleanField;
     private Field rnrPublicPrimitiveCharField;
 
+    private Field rnrPublicWrapperIntegerField;
+
     @Before
     public void setUp() throws NoSuchFieldException {
+        //pure java reflection fields
+        //primitives
         trueReflectionFieldPublicObjectField = A.class.getDeclaredField("publicObjectField");
         trueReflectionFieldPublicPrimitiveIntField = A.class.getDeclaredField("publicPrimitiveIntField");
         trueReflectionFieldPublicPrimitiveByteField = A.class.getDeclaredField("publicPrimitiveByteField");
@@ -48,6 +60,12 @@ public abstract class FieldTest {
         trueReflectionFieldPublicPrimitiveDoubleField = A.class.getDeclaredField("publicPrimitiveDoubleField");
         trueReflectionFieldPublicPrimitiveBooleanField = A.class.getDeclaredField("publicPrimitiveBooleanField");
         trueReflectionFieldPublicPrimitiveCharField = A.class.getDeclaredField("publicPrimitiveCharField");
+
+        //wrappers
+        trueReflectionFieldPublicWrapperIntegerField = A.class.getDeclaredField("publicWrapperIntegerField");
+
+        //fields obtained via RNR
+        //primitives
         rnrPublicObjectField = getField(A.class, "publicObjectField");
         rnrPublicPrimitiveIntField = getField(A.class, "publicPrimitiveIntField");
         rnrPublicPrimitiveByteField = getField(A.class, "publicPrimitiveByteField");
@@ -57,6 +75,9 @@ public abstract class FieldTest {
         rnrPublicPrimitiveDoubleField = getField(A.class, "publicPrimitiveDoubleField");
         rnrPublicPrimitiveBooleanField = getField(A.class, "publicPrimitiveBooleanField");
         rnrPublicPrimitiveCharField = getField(A.class, "publicPrimitiveCharField");
+
+        //wrappers
+        rnrPublicWrapperIntegerField = getField(A.class, "publicWrapperIntegerField");
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
@@ -411,4 +432,55 @@ public abstract class FieldTest {
         assertThat(b, Is.is('c'));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetInteger_whenUsingPrimitveGetter() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicWrapperIntegerField.getInt(a);
+
+        //THEN
+        fail("Should throw an exception");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetInteger_whenUsingPrimitveSetter() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicWrapperIntegerField.setInt(a, 5);
+
+        //THEN
+        fail("Should throw an exception");
+    }
+
+    @Test
+    public void testGetInteger_whenUsingObjectGetter() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicWrapperIntegerField = 5;
+        Integer b = (Integer) rnrPublicWrapperIntegerField.get(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicWrapperIntegerField.get(a)));
+        assertThat(b, Is.is(a.publicWrapperIntegerField));
+    }
+
+    @Test
+    public void testSetInteger_whenUsingObjectSetter() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicWrapperIntegerField.set(a, 5);
+        Integer b = a.publicWrapperIntegerField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicWrapperIntegerField.get(a)));
+        assertThat(b, Is.is(5));
+    }
 }
