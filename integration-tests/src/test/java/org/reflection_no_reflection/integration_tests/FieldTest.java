@@ -18,27 +18,34 @@ import static org.hamcrest.core.Is.is;
  */
 public abstract class FieldTest {
 
-    private java.lang.reflect.Field originalFieldB;
-    private java.lang.reflect.Field originalFieldC;
-    private Field fieldB;
-    private Field fieldC;
+    private java.lang.reflect.Field trueReflectionFieldPublicObjectField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveIntField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveByteField;
+    private Field publicObjectField;
+    private Field publicPrimitiveIntField;
+    private Field publicPrimitiveByteField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
-        originalFieldB = A.class.getDeclaredField("b");
-        fieldB = getField(A.class, "b");
-        originalFieldC = A.class.getDeclaredField("c");
-        fieldC = getField(A.class, "c");
+        trueReflectionFieldPublicObjectField = A.class.getDeclaredField("publicObjectField");
+        trueReflectionFieldPublicPrimitiveIntField = A.class.getDeclaredField("publicPrimitiveIntField");
+        trueReflectionFieldPublicPrimitiveByteField = A.class.getDeclaredField("publicPrimitiveByteField");
+        publicObjectField = getField(A.class, "publicObjectField");
+        publicPrimitiveIntField = getField(A.class, "publicPrimitiveIntField");
+        publicPrimitiveByteField = getField(A.class, "publicPrimitiveByteField");
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
 
-    public java.lang.reflect.Field getOriginalFieldB() {
-        return originalFieldB;
+    public java.lang.reflect.Field getTrueReflectionFieldPublicObjectField() {
+        return trueReflectionFieldPublicObjectField;
     }
 
-    public java.lang.reflect.Field getOriginalFieldC() {
-        return originalFieldC;
+    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveIntField() {
+        return trueReflectionFieldPublicPrimitiveIntField;
+    }
+    public java.lang.reflect.Field getTrueReflectionFieldPublicPrimitiveByteField() {
+        return trueReflectionFieldPublicPrimitiveByteField;
     }
 
     @Test
@@ -46,11 +53,11 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        String fieldName = fieldB.getName();
+        String fieldName = publicObjectField.getName();
 
         //THEN
-        assertThat(fieldName, is(originalFieldB.getName()));
-        assertThat(fieldName, is("b"));
+        assertThat(fieldName, is(trueReflectionFieldPublicObjectField.getName()));
+        assertThat(fieldName, is("publicObjectField"));
     }
 
     @Test
@@ -58,10 +65,10 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Class fieldType = fieldB.getType();
+        Class fieldType = publicObjectField.getType();
 
         //THEN
-        assertThat(fieldType, Is.<Class>is(originalFieldB.getType()));
+        assertThat(fieldType, Is.<Class>is(trueReflectionFieldPublicObjectField.getType()));
         assertThat(fieldType, Is.<Class>is(B.class));
     }
 
@@ -70,10 +77,10 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Type type = fieldB.getGenericType();
+        Type type = publicObjectField.getGenericType();
 
         //THEN
-        assertThat(type, Is.<Type>is(originalFieldB.getType()));
+        assertThat(type, Is.<Type>is(trueReflectionFieldPublicObjectField.getType()));
         assertThat(type, Is.<Type>is(B.class));
     }
 
@@ -82,10 +89,10 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Class fieldType = fieldB.getDeclaringClass();
+        Class fieldType = publicObjectField.getDeclaringClass();
 
         //THEN
-        assertThat(fieldType, Is.<Class>is(originalFieldB.getDeclaringClass()));
+        assertThat(fieldType, Is.<Class>is(trueReflectionFieldPublicObjectField.getDeclaringClass()));
         assertThat(fieldType, Is.<Class>is(A.class));
     }
 
@@ -94,10 +101,10 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        int fieldModifiers = fieldB.getModifiers();
+        int fieldModifiers = publicObjectField.getModifiers();
 
         //THEN
-        assertThat(fieldModifiers, is(originalFieldB.getModifiers()));
+        assertThat(fieldModifiers, is(trueReflectionFieldPublicObjectField.getModifiers()));
         assertThat(fieldModifiers, is(Modifier.PUBLIC));
     }
 
@@ -106,7 +113,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Inject fieldAnnotationInject = fieldB.getAnnotation(Inject.class);
+        Inject fieldAnnotationInject = publicObjectField.getAnnotation(Inject.class);
 
         //THEN
         assertThat(fieldAnnotationInject, Is.<Inject>isA(Inject.class));
@@ -117,7 +124,7 @@ public abstract class FieldTest {
         //GIVEN
 
         //WHEN
-        Annotation[] annotations = fieldB.getDeclaredAnnotations();
+        Annotation[] annotations = publicObjectField.getDeclaredAnnotations();
 
         //THEN
         assertThat(annotations.length, is(1));
@@ -130,11 +137,11 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        a.b = new B();
-        boolean isInjectpresent = fieldB.isAnnotationPresent(Inject.class);
+        a.publicObjectField = new B();
+        boolean isInjectpresent = publicObjectField.isAnnotationPresent(Inject.class);
 
         //THEN
-        assertThat(isInjectpresent, Is.is(originalFieldB.isAnnotationPresent(Inject.class)));
+        assertThat(isInjectpresent, Is.is(trueReflectionFieldPublicObjectField.isAnnotationPresent(Inject.class)));
         assertThat(isInjectpresent, Is.is(true));
     }
 
@@ -145,11 +152,11 @@ public abstract class FieldTest {
         //WHEN
         B newB = new B();
         A a = new A();
-        fieldB.set(a, newB);
+        publicObjectField.set(a, newB);
 
         //THEN
-        assertThat(a.b, Is.<B>is((B) originalFieldB.get(a)));
-        assertThat(a.b, Is.<B>is(newB));
+        assertThat(a.publicObjectField, Is.<B>is((B) trueReflectionFieldPublicObjectField.get(a)));
+        assertThat(a.publicObjectField, Is.<B>is(newB));
     }
 
     @Test
@@ -158,12 +165,12 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        a.b = new B();
-        B b = (B) fieldB.get(a);
+        a.publicObjectField = new B();
+        B b = (B) publicObjectField.get(a);
 
         //THEN
-        assertThat(b, Is.<B>is((B) originalFieldB.get(a)));
-        assertThat(b, Is.<B>is(a.b));
+        assertThat(b, Is.<B>is((B) trueReflectionFieldPublicObjectField.get(a)));
+        assertThat(b, Is.<B>is(a.publicObjectField));
     }
 
     @Test
@@ -172,11 +179,25 @@ public abstract class FieldTest {
 
         //WHEN
         A a = new A();
-        a.c = 5;
-        int b = (int) fieldC.getInt(a);
+        a.publicPrimitiveIntField = 5;
+        int b = publicPrimitiveIntField.getInt(a);
 
         //THEN
-        assertThat(b, Is.is(originalFieldC.getInt(a)));
-        assertThat(b, Is.is(a.c));
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveIntField.getInt(a)));
+        assertThat(b, Is.is(a.publicPrimitiveIntField));
+    }
+
+    @Test
+    public void testGetShort() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveByteField = 5;
+        byte b = publicPrimitiveByteField.getByte(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveByteField.getByte(a)));
+        assertThat(b, Is.is(a.publicPrimitiveByteField));
     }
 }

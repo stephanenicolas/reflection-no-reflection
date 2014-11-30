@@ -41,5 +41,7 @@ dependencies {
 
 noreflection {
   debug true
+  //TODO add multiple annotations
+  //TODO add annotations that have methods
   annotationClasses = ['javax.inject.Inject']
 }

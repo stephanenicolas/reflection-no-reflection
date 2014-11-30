@@ -54,5 +54,14 @@ public abstract class AnnotationDatabase {
         public void setInt(Object object, int value) throws IllegalAccessException {
             fieldGetterAndSetter.setInt(getIndex(), object, value);
         }
+        @Override
+        public byte getByte(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.getByte(getIndex(), object);
+        }
+
+        @Override
+        public void setByte(Object object, byte value) throws IllegalAccessException {
+            fieldGetterAndSetter.setByte(getIndex(), object, value);
+        }
     }
 }

@@ -184,7 +184,7 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #end
 #end
     }
-}
+  }
 
   public Object get(int index, Object object) throws IllegalAccessException {
 #if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
@@ -221,6 +221,51 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #set( $id = $id + 1 )
 #end
         default: throw new IllegalAccessException("No an int at this index:" + index);
+#end
+#end
+#end
+    }
+  }
+
+  public void setByte(int index, Object object, byte value) throws IllegalAccessException {
+#if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
+#set( $id = 0 )
+    switch(index) {
+#foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
+#foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
+#foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
+      case $id:
+#if( ${field.TypeName} == "byte.class" || ${field.TypeName} == "Byte.class" )
+        ((${field.DeclaringClassName}) object).${field.Name} = value; break;
+#else
+        throw new IllegalAccessException("Not a byte");
+#end
+#set( $id = $id + 1 )
+#end
+      default: throw new IllegalAccessException("No setter for this index:" + index);
+#end
+#end
+#end
+    }
+  }
+
+  public byte getByte(int index, Object object) throws IllegalAccessException {
+#if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
+#set( $id = 0 )
+    switch(index) {
+#foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
+#foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
+#foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
+      case $id:
+#if( ${field.TypeName} == "byte" || ${field.TypeName} == "Byte" )
+        return ((${field.DeclaringClassName}) object).${field.Name};
+#else
+        throw new IllegalAccessException("Not a byte");
+#end
+
+#set( $id = $id + 1 )
+#end
+        default: throw new IllegalAccessException("No a byte at this index:" + index);
 #end
 #end
 #end

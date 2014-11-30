@@ -13,10 +13,12 @@ public class ReflectionFieldTest extends FieldTest {
     @Override
     public Field getField(Class<?> clazz, String fieldName) {
         switch (fieldName) {
-            case "b":
-                return new ReflectionField(getOriginalFieldB());
-            case "c":
-                return new ReflectionField(getOriginalFieldC());
+            case "publicObjectField":
+                return new ReflectionField(getTrueReflectionFieldPublicObjectField());
+            case "publicPrimitiveIntField":
+                return new ReflectionField(getTrueReflectionFieldPublicPrimitiveIntField());
+            case "publicPrimitiveByteField":
+                return new ReflectionField(getTrueReflectionFieldPublicPrimitiveByteField());
         }
         throw new RuntimeException("No such field:" + fieldName);
     }
