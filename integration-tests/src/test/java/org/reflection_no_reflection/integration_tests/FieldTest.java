@@ -23,11 +23,19 @@ public abstract class FieldTest {
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveByteField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveShortField;
     private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveLongField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveFloatField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveDoubleField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveBooleanField;
+    private java.lang.reflect.Field trueReflectionFieldPublicPrimitiveCharField;
     private Field rnrPublicObjectField;
     private Field rnrPublicPrimitiveIntField;
     private Field rnrPublicPrimitiveByteField;
     private Field rnrPublicPrimitiveShortField;
     private Field rnrPublicPrimitiveLongField;
+    private Field rnrPublicPrimitiveFloatField;
+    private Field rnrPublicPrimitiveDoubleField;
+    private Field rnrPublicPrimitiveBooleanField;
+    private Field rnrPublicPrimitiveCharField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
@@ -36,11 +44,19 @@ public abstract class FieldTest {
         trueReflectionFieldPublicPrimitiveByteField = A.class.getDeclaredField("publicPrimitiveByteField");
         trueReflectionFieldPublicPrimitiveShortField = A.class.getDeclaredField("publicPrimitiveShortField");
         trueReflectionFieldPublicPrimitiveLongField = A.class.getDeclaredField("publicPrimitiveLongField");
+        trueReflectionFieldPublicPrimitiveFloatField = A.class.getDeclaredField("publicPrimitiveFloatField");
+        trueReflectionFieldPublicPrimitiveDoubleField = A.class.getDeclaredField("publicPrimitiveDoubleField");
+        trueReflectionFieldPublicPrimitiveBooleanField = A.class.getDeclaredField("publicPrimitiveBooleanField");
+        trueReflectionFieldPublicPrimitiveCharField = A.class.getDeclaredField("publicPrimitiveCharField");
         rnrPublicObjectField = getField(A.class, "publicObjectField");
         rnrPublicPrimitiveIntField = getField(A.class, "publicPrimitiveIntField");
         rnrPublicPrimitiveByteField = getField(A.class, "publicPrimitiveByteField");
         rnrPublicPrimitiveShortField = getField(A.class, "publicPrimitiveShortField");
         rnrPublicPrimitiveLongField = getField(A.class, "publicPrimitiveLongField");
+        rnrPublicPrimitiveFloatField = getField(A.class, "publicPrimitiveFloatField");
+        rnrPublicPrimitiveDoubleField = getField(A.class, "publicPrimitiveDoubleField");
+        rnrPublicPrimitiveBooleanField = getField(A.class, "publicPrimitiveBooleanField");
+        rnrPublicPrimitiveCharField = getField(A.class, "publicPrimitiveCharField");
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
@@ -281,4 +297,118 @@ public abstract class FieldTest {
         assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveLongField.getLong(a)));
         assertThat(b, Is.is( (long) 5));
     }
+
+
+    @Test
+    public void testGetFloat() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveFloatField = 5;
+        float b = rnrPublicPrimitiveFloatField.getFloat(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveFloatField.getFloat(a)));
+        assertThat(b, Is.is(a.publicPrimitiveFloatField));
+    }
+
+    @Test
+    public void testSetFloat() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicPrimitiveFloatField.setFloat(a, (float) 5);
+        float b = a.publicPrimitiveFloatField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveFloatField.getFloat(a)));
+        assertThat(b, Is.is( (float) 5));
+    }
+    
+    @Test
+    public void testGetDouble() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveDoubleField = 5;
+        double b = rnrPublicPrimitiveDoubleField.getDouble(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveDoubleField.getDouble(a)));
+        assertThat(b, Is.is(a.publicPrimitiveDoubleField));
+    }
+
+    @Test
+    public void testSetDouble() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicPrimitiveDoubleField.setDouble(a, (double) 5);
+        double b = a.publicPrimitiveDoubleField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveDoubleField.getDouble(a)));
+        assertThat(b, Is.is( (double) 5));
+    }
+
+    @Test
+    public void testGetBoolean() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveBooleanField = true;
+        boolean b = rnrPublicPrimitiveBooleanField.getBoolean(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveBooleanField.getBoolean(a)));
+        assertThat(b, Is.is(a.publicPrimitiveBooleanField));
+    }
+
+    @Test
+    public void testSetBoolean() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicPrimitiveBooleanField.setBoolean(a, true);
+        boolean b = a.publicPrimitiveBooleanField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveBooleanField.getBoolean(a)));
+        assertThat(b, Is.is(true));
+    }
+
+    @Test
+    public void testGetChar() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.publicPrimitiveCharField = 'c';
+        char b = rnrPublicPrimitiveCharField.getChar(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveCharField.getChar(a)));
+        assertThat(b, Is.is(a.publicPrimitiveCharField));
+    }
+
+    @Test
+    public void testSetChar() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPublicPrimitiveCharField.setChar(a, 'c');
+        char b = a.publicPrimitiveCharField;
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicPrimitiveCharField.getChar(a)));
+        assertThat(b, Is.is('c'));
+    }
+
 }

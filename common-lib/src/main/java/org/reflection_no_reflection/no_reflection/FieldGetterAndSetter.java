@@ -15,4 +15,16 @@ public interface FieldGetterAndSetter {
 
     public long getLong(int index, Object object) throws IllegalAccessException;
     public void setLong(int index, Object object, long value) throws IllegalAccessException;
+
+    public float getFloat(int index, Object object) throws IllegalAccessException;
+    public void setFloat(int index, Object object, float value) throws IllegalAccessException;
+
+    public double getDouble(int index, Object object) throws IllegalAccessException;
+    public void setDouble(int index, Object object, double value) throws IllegalAccessException;
+
+    public boolean getBoolean(int index, Object object) throws IllegalAccessException;
+    public void setBoolean(int index, Object object, boolean value) throws IllegalAccessException;
+
+    public char getChar(int index, Object object) throws IllegalAccessException;
+    public void setChar(int index, Object object, char value) throws IllegalAccessException;
 }

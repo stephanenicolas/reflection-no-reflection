@@ -84,5 +84,46 @@ public abstract class AnnotationDatabase {
         public void setLong(Object object, long value) throws IllegalAccessException {
             fieldGetterAndSetter.setLong(getIndex(), object, value);
         }
+
+        @Override
+        public float getFloat(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.getFloat(getIndex(), object);
+        }
+
+        @Override
+        public void setFloat(Object object, float value) throws IllegalAccessException {
+            fieldGetterAndSetter.setFloat(getIndex(), object, value);
+        }
+
+        @Override
+        public double getDouble(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.getDouble(getIndex(), object);
+        }
+
+        @Override
+        public void setDouble(Object object, double value) throws IllegalAccessException {
+            fieldGetterAndSetter.setDouble(getIndex(), object, value);
+        }
+
+        @Override
+        public boolean getBoolean(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.getBoolean(getIndex(), object);
+        }
+
+        @Override
+        public void setBoolean(Object object, boolean value) throws IllegalAccessException {
+            fieldGetterAndSetter.setBoolean(getIndex(), object, value);
+        }
+
+        @Override
+        public char getChar(Object object) throws IllegalAccessException {
+            return fieldGetterAndSetter.getChar(getIndex(), object);
+        }
+
+        @Override
+        public void setChar(Object object, char value) throws IllegalAccessException {
+            fieldGetterAndSetter.setChar(getIndex(), object, value);
+        }
+
     }
 }

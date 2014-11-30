@@ -182,7 +182,7 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
     }
   }
 
-#set( $primitiveTypes = { "byte" : "Byte", "short" : "Short", "int" : "Int", "long" : "Long" } )
+#set( $primitiveTypes = { "byte" : "Byte", "short" : "Short", "int" : "Int", "long" : "Long", "float" : "Float", "double" : "Double", "boolean" : "Boolean", "char" : "Char" } )
 #foreach( $entry in $primitiveTypes.entrySet() )
 #set( $low = $entry.getKey() )
 #set( $up = $entry.getValue() )
