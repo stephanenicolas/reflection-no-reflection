@@ -155,10 +155,19 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
 #foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
 #set ($isPublic = ${field.Modifiers} % 2)
+#set ($isStatic = ${field.Modifiers} % 16)
 #if( $isPublic == 1 )
+#if( $isStatic >= 8 )
+      case $id: return ${field.DeclaringClassName}.${field.Name};
+#else
       case $id: return ((${field.DeclaringClassName}) object).${field.Name};
+#end
+#else
+#if( $isStatic >= 8 )
+      case $id: return ${field.DeclaringClassName}.__access_${field.Name}();
 #else
       case $id: return ((${field.DeclaringClassName}) object).__access_${field.Name}();
+#end
 #end
 #set( $id = $id + 1 )
 #end
@@ -177,10 +186,19 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
 #foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
 #set ($isPublic = ${field.Modifiers} % 2)
+#set ($isStatic = ${field.Modifiers} % 16)
 #if( $isPublic == 1 )
+#if( $isStatic >= 8 )
+      case $id: ${field.DeclaringClassName}.${field.Name} = (${field.TypeName}) value; break;
+#else
       case $id: ((${field.DeclaringClassName}) object).${field.Name} = (${field.TypeName}) value; break;
+#end
+#else
+#if( $isStatic >= 8 )
+      case $id: ${field.DeclaringClassName}.__access_${field.Name}((${field.TypeName}) value); break;
 #else
       case $id: ((${field.DeclaringClassName}) object).__access_${field.Name}((${field.TypeName}) value); break;
+#end
 #end
 #set( $id = $id + 1 )
 #end

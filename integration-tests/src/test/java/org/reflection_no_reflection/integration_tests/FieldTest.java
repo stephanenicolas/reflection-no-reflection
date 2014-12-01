@@ -43,7 +43,10 @@ public abstract class FieldTest {
     private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveDoubleField;
     private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveBooleanField;
     private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveCharField;
-    
+
+    private java.lang.reflect.Field trueReflectionFieldPublicStaticObjectField;
+    private java.lang.reflect.Field trueReflectionFieldPrivateStaticObjectField;
+
     //fields obtained via RNR
     private Field rnrPublicObjectField;
     private Field rnrPublicPrimitiveIntField;
@@ -66,6 +69,9 @@ public abstract class FieldTest {
     private Field rnrPrivatePrimitiveDoubleField;
     private Field rnrPrivatePrimitiveBooleanField;
     private Field rnrPrivatePrimitiveCharField;
+
+    private Field rnrPublicStaticObjectField;
+    private Field rnrPrivateStaticObjectField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
@@ -103,6 +109,11 @@ public abstract class FieldTest {
         trueReflectionFieldPrivatePrimitiveCharField = A.class.getDeclaredField("privatePrimitiveCharField");
         trueReflectionFieldPrivatePrimitiveCharField.setAccessible(true);
 
+        //statics
+        trueReflectionFieldPublicStaticObjectField = A.class.getDeclaredField("publicStaticObjectField");
+        trueReflectionFieldPrivateStaticObjectField = A.class.getDeclaredField("privateStaticObjectField");
+        trueReflectionFieldPrivateStaticObjectField.setAccessible(true);
+
         //fields obtained via RNR
         //primitives
         rnrPublicObjectField = getField(A.class, "publicObjectField");
@@ -118,6 +129,9 @@ public abstract class FieldTest {
         //wrappers
         rnrPublicWrapperIntegerField = getField(A.class, "publicWrapperIntegerField");
 
+        //private fields
+        //indeed we can test both protected and private fields here,
+        //everything non-public is processed in the same way
         rnrPrivateObjectField = getField(A.class, "privateObjectField");
         rnrPrivatePrimitiveIntField = getField(A.class, "privatePrimitiveIntField");
         rnrPrivatePrimitiveByteField = getField(A.class, "privatePrimitiveByteField");
@@ -127,6 +141,11 @@ public abstract class FieldTest {
         rnrPrivatePrimitiveDoubleField = getField(A.class, "privatePrimitiveDoubleField");
         rnrPrivatePrimitiveBooleanField = getField(A.class, "privatePrimitiveBooleanField");
         rnrPrivatePrimitiveCharField = getField(A.class, "privatePrimitiveCharField");
+
+        //statics
+        rnrPublicStaticObjectField = getField(A.class, "publicStaticObjectField");
+        rnrPrivateStaticObjectField = getField(A.class, "privateStaticObjectField");
+
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
@@ -785,4 +804,31 @@ public abstract class FieldTest {
         assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveCharField.getChar(a)));
         assertThat(b, Is.is('c'));
     }
+
+    @Test
+    public void testStaticPublicGet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A.publicStaticObjectField = new B();
+        B b = (B) rnrPublicStaticObjectField.get(null);
+
+        //THEN
+        assertThat(b, Is.<B>is((B) trueReflectionFieldPublicStaticObjectField.get(null)));
+        assertThat(b, Is.<B>is(A.publicStaticObjectField));
+    }
+
+    @Test
+    public void testStaticPublicSet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        B newB = new B();
+        rnrPublicStaticObjectField.set(null, newB);
+
+        //THEN
+        assertThat(A.publicStaticObjectField, Is.<B>is((B) trueReflectionFieldPublicStaticObjectField.get(null)));
+        assertThat(A.publicStaticObjectField, Is.<B>is(newB));
+    }
+
 }

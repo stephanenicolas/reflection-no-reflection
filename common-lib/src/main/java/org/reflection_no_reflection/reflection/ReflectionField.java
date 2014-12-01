@@ -1,6 +1,7 @@
 package org.reflection_no_reflection.reflection;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import org.reflection_no_reflection.Field;
 

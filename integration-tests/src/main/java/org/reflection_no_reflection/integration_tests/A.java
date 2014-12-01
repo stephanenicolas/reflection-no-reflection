@@ -25,6 +25,9 @@ public class A {
     @Inject private boolean privatePrimitiveBooleanField;
     @Inject private char privatePrimitiveCharField;
 
+    @Inject public static B publicStaticObjectField;
+    @Inject private static B privateStaticObjectField;
+
     //to make all private fields accessible to tests 
     //we make them protected not to interfere with a call to a setter when weaving 
     // (which is not appropriate as we don't know what a setter does, we must generate our own setter)
@@ -99,5 +102,13 @@ public class A {
 
     protected void setPrivatePrimitiveCharField(char privatePrimitiveCharField) {
         this.privatePrimitiveCharField = privatePrimitiveCharField;
+    }
+
+    public static B getPrivateStaticObjectField() {
+        return privateStaticObjectField;
+    }
+
+    public static void setPrivateStaticObjectField(B privateStaticObjectField) {
+        A.privateStaticObjectField = privateStaticObjectField;
     }
 }

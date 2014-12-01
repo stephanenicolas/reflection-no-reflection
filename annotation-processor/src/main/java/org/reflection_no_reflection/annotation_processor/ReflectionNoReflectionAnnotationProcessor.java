@@ -290,11 +290,11 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         int result = 0;
         for (Modifier modifier : modifiers) {
             switch (modifier) {
-                case ABSTRACT: result += java.lang.reflect.Modifier.ABSTRACT;
-                case PUBLIC: result += java.lang.reflect.Modifier.PUBLIC;
-                case PRIVATE: result += java.lang.reflect.Modifier.PRIVATE;
-                case STATIC: result += java.lang.reflect.Modifier.STATIC;
-                case PROTECTED: result += java.lang.reflect.Modifier.PROTECTED;
+                case ABSTRACT: result |= java.lang.reflect.Modifier.ABSTRACT;break;
+                case PUBLIC: result |= java.lang.reflect.Modifier.PUBLIC;break;
+                case PRIVATE: result |= java.lang.reflect.Modifier.PRIVATE;break;
+                case STATIC: result |= java.lang.reflect.Modifier.STATIC;break;
+                case PROTECTED: result |= java.lang.reflect.Modifier.PROTECTED;break;
                 default:
             }
         }
