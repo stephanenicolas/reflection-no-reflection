@@ -46,6 +46,8 @@ public abstract class FieldTest {
 
     private java.lang.reflect.Field trueReflectionFieldPublicStaticObjectField;
     private java.lang.reflect.Field trueReflectionFieldPrivateStaticObjectField;
+    private java.lang.reflect.Field trueReflectionFieldPublicStaticPrimitiveIntField;
+    private java.lang.reflect.Field trueReflectionFieldPrivateStaticPrimitiveIntField;
 
     //fields obtained via RNR
     private Field rnrPublicObjectField;
@@ -72,6 +74,8 @@ public abstract class FieldTest {
 
     private Field rnrPublicStaticObjectField;
     private Field rnrPrivateStaticObjectField;
+    private Field rnrPublicStaticPrimitiveIntField;
+    private Field rnrPrivateStaticPrimitiveIntField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
@@ -113,6 +117,9 @@ public abstract class FieldTest {
         trueReflectionFieldPublicStaticObjectField = A.class.getDeclaredField("publicStaticObjectField");
         trueReflectionFieldPrivateStaticObjectField = A.class.getDeclaredField("privateStaticObjectField");
         trueReflectionFieldPrivateStaticObjectField.setAccessible(true);
+        trueReflectionFieldPublicStaticPrimitiveIntField = A.class.getDeclaredField("publicStaticPrimitiveIntField");
+        trueReflectionFieldPrivateStaticPrimitiveIntField = A.class.getDeclaredField("privateStaticPrimitiveIntField");
+        trueReflectionFieldPrivateStaticPrimitiveIntField.setAccessible(true);
 
         //fields obtained via RNR
         //primitives
@@ -145,6 +152,8 @@ public abstract class FieldTest {
         //statics
         rnrPublicStaticObjectField = getField(A.class, "publicStaticObjectField");
         rnrPrivateStaticObjectField = getField(A.class, "privateStaticObjectField");
+        rnrPublicStaticPrimitiveIntField = getField(A.class, "publicStaticPrimitiveIntField");
+        rnrPrivateStaticPrimitiveIntField = getField(A.class, "privateStaticPrimitiveIntField");
 
     }
 
@@ -829,6 +838,85 @@ public abstract class FieldTest {
         //THEN
         assertThat(A.publicStaticObjectField, Is.<B>is((B) trueReflectionFieldPublicStaticObjectField.get(null)));
         assertThat(A.publicStaticObjectField, Is.<B>is(newB));
+    }
+
+    @Test
+    public void testStaticPrivateGet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A.setPrivateStaticObjectField(new B());
+        B b = (B) rnrPrivateStaticObjectField.get(null);
+
+        //THEN
+        assertThat(b, Is.<B>is((B) trueReflectionFieldPrivateStaticObjectField.get(null)));
+        assertThat(b, Is.<B>is(A.getPrivateStaticObjectField()));
+    }
+
+    @Test
+    public void testStaticPrivateSet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        B newB = new B();
+        rnrPrivateStaticObjectField.set(null, newB);
+
+        //THEN
+        assertThat(A.getPrivateStaticObjectField(), Is.<B>is((B) trueReflectionFieldPrivateStaticObjectField.get(null)));
+        assertThat(A.getPrivateStaticObjectField(), Is.<B>is(newB));
+    }
+
+    //Note : tests must increment the testing values of static fields.
+    //it avoids side effects between tests.
+
+    @Test
+    public void testStaticPublicGetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A.publicStaticPrimitiveIntField = 1;
+        int b = rnrPublicStaticPrimitiveIntField.getInt(null);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPublicStaticPrimitiveIntField.getInt(null)));
+        assertThat(b, Is.is(A.publicStaticPrimitiveIntField));
+    }
+
+    @Test
+    public void testStaticPublicSetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        rnrPublicStaticPrimitiveIntField.set(null, 2);
+
+        //THEN
+        assertThat(A.publicStaticPrimitiveIntField, Is.is(trueReflectionFieldPublicStaticPrimitiveIntField.getInt(null)));
+        assertThat(A.publicStaticPrimitiveIntField, Is.is(2));
+    }
+
+    @Test
+    public void testStaticPrivateGetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A.setPrivateStaticPrimitiveIntField(3);
+        int b = rnrPrivateStaticPrimitiveIntField.getInt(null);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivateStaticPrimitiveIntField.getInt(null)));
+        assertThat(b, Is.is(A.getPrivateStaticPrimitiveIntField()));
+    }
+
+    @Test
+    public void testStaticPrivateSetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        rnrPrivateStaticPrimitiveIntField.set(null, 4);
+
+        //THEN
+        assertThat(A.getPrivateStaticPrimitiveIntField(), Is.is(trueReflectionFieldPrivateStaticPrimitiveIntField.getInt(null)));
+        assertThat(A.getPrivateStaticPrimitiveIntField(), Is.is(4));
     }
 
 }

@@ -223,10 +223,19 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
       case $id:
 #if( ${field.TypeName} == "$low" )
 #set ($isPublic = ${field.Modifiers} % 2)
+#set ($isStatic = ${field.Modifiers} % 16)
 #if( $isPublic == 1 )
+#if( $isStatic >= 8 )
+      return ${field.DeclaringClassName}.${field.Name};
+#else
       return ((${field.DeclaringClassName}) object).${field.Name};
+#end
+#else
+#if( $isStatic >= 8 )
+      return ${field.DeclaringClassName}.__access_${field.Name}();
 #else
       return ((${field.DeclaringClassName}) object).__access_${field.Name}();
+#end
 #end
 #else
         throw new IllegalArgumentException("Not a $low");
@@ -251,6 +260,7 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
       case $id:
 #if( ${field.TypeName} == "$low" )
 #set ($isPublic = ${field.Modifiers} % 2)
+#set ($isStatic = ${field.Modifiers} % 16)
 #if( $isPublic == 1 )
         ((${field.DeclaringClassName}) object).${field.Name} = value; break;
 #else
