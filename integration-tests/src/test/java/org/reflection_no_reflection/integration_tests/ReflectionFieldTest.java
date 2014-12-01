@@ -17,7 +17,7 @@ public class ReflectionFieldTest extends FieldTest {
 
     @Override
     public Field getField(Class<?> clazz, String fieldName) {
-        List<java.lang.reflect.Field> allFields = Arrays.asList(clazz.getFields());
+        List<java.lang.reflect.Field> allFields = Arrays.asList(clazz.getDeclaredFields());
         for (java.lang.reflect.Field field : allFields) {
             if( field.getName().equals(fieldName)) {
                 return new ReflectionField(field);

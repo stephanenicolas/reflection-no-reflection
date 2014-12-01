@@ -205,7 +205,12 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
       case $id:
 #if( ${field.TypeName} == "$low" )
-        return ((${field.DeclaringClassName}) object).${field.Name};
+#set ($isPublic = ${field.Modifiers} % 2)
+#if( $isPublic == 1 )
+      return ((${field.DeclaringClassName}) object).${field.Name};
+#else
+      return ((${field.DeclaringClassName}) object).__access_${field.Name}();
+#end
 #else
         throw new IllegalArgumentException("Not a $low");
 #end
@@ -228,7 +233,13 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
 #foreach( $field in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).get($className) )
       case $id:
 #if( ${field.TypeName} == "$low" )
+#set ($isPublic = ${field.Modifiers} % 2)
+#if( $isPublic == 1 )
         ((${field.DeclaringClassName}) object).${field.Name} = value; break;
+#else
+        ((${field.DeclaringClassName}) object).__access_${field.Name}((${field.TypeName}) value); break;
+#end
+
 #else
         throw new IllegalArgumentException("Not a $low");
 #end

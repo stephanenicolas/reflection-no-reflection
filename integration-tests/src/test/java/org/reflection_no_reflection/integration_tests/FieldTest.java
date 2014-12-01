@@ -34,6 +34,16 @@ public abstract class FieldTest {
 
     private java.lang.reflect.Field trueReflectionFieldPublicWrapperIntegerField;
 
+    private java.lang.reflect.Field trueReflectionFieldPrivateObjectField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveIntField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveByteField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveShortField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveLongField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveFloatField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveDoubleField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveBooleanField;
+    private java.lang.reflect.Field trueReflectionFieldPrivatePrimitiveCharField;
+    
     //fields obtained via RNR
     private Field rnrPublicObjectField;
     private Field rnrPublicPrimitiveIntField;
@@ -46,6 +56,16 @@ public abstract class FieldTest {
     private Field rnrPublicPrimitiveCharField;
 
     private Field rnrPublicWrapperIntegerField;
+
+    private Field rnrPrivateObjectField;
+    private Field rnrPrivatePrimitiveIntField;
+    private Field rnrPrivatePrimitiveByteField;
+    private Field rnrPrivatePrimitiveShortField;
+    private Field rnrPrivatePrimitiveLongField;
+    private Field rnrPrivatePrimitiveFloatField;
+    private Field rnrPrivatePrimitiveDoubleField;
+    private Field rnrPrivatePrimitiveBooleanField;
+    private Field rnrPrivatePrimitiveCharField;
 
     @Before
     public void setUp() throws NoSuchFieldException {
@@ -64,6 +84,25 @@ public abstract class FieldTest {
         //wrappers
         trueReflectionFieldPublicWrapperIntegerField = A.class.getDeclaredField("publicWrapperIntegerField");
 
+        trueReflectionFieldPrivateObjectField = A.class.getDeclaredField("privateObjectField");
+        trueReflectionFieldPrivateObjectField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveIntField = A.class.getDeclaredField("privatePrimitiveIntField");
+        trueReflectionFieldPrivatePrimitiveIntField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveByteField = A.class.getDeclaredField("privatePrimitiveByteField");
+        trueReflectionFieldPrivatePrimitiveByteField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveShortField = A.class.getDeclaredField("privatePrimitiveShortField");
+        trueReflectionFieldPrivatePrimitiveShortField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveLongField = A.class.getDeclaredField("privatePrimitiveLongField");
+        trueReflectionFieldPrivatePrimitiveLongField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveFloatField = A.class.getDeclaredField("privatePrimitiveFloatField");
+        trueReflectionFieldPrivatePrimitiveFloatField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveDoubleField = A.class.getDeclaredField("privatePrimitiveDoubleField");
+        trueReflectionFieldPrivatePrimitiveDoubleField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveBooleanField = A.class.getDeclaredField("privatePrimitiveBooleanField");
+        trueReflectionFieldPrivatePrimitiveBooleanField.setAccessible(true);
+        trueReflectionFieldPrivatePrimitiveCharField = A.class.getDeclaredField("privatePrimitiveCharField");
+        trueReflectionFieldPrivatePrimitiveCharField.setAccessible(true);
+
         //fields obtained via RNR
         //primitives
         rnrPublicObjectField = getField(A.class, "publicObjectField");
@@ -78,6 +117,16 @@ public abstract class FieldTest {
 
         //wrappers
         rnrPublicWrapperIntegerField = getField(A.class, "publicWrapperIntegerField");
+
+        rnrPrivateObjectField = getField(A.class, "privateObjectField");
+        rnrPrivatePrimitiveIntField = getField(A.class, "privatePrimitiveIntField");
+        rnrPrivatePrimitiveByteField = getField(A.class, "privatePrimitiveByteField");
+        rnrPrivatePrimitiveShortField = getField(A.class, "privatePrimitiveShortField");
+        rnrPrivatePrimitiveLongField = getField(A.class, "privatePrimitiveLongField");
+        rnrPrivatePrimitiveFloatField = getField(A.class, "privatePrimitiveFloatField");
+        rnrPrivatePrimitiveDoubleField = getField(A.class, "privatePrimitiveDoubleField");
+        rnrPrivatePrimitiveBooleanField = getField(A.class, "privatePrimitiveBooleanField");
+        rnrPrivatePrimitiveCharField = getField(A.class, "privatePrimitiveCharField");
     }
 
     public abstract Field getField(Class<?> clazz, String fieldName);
@@ -180,21 +229,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testSet() throws NoSuchFieldException, IllegalAccessException {
-        //GIVEN
-
-        //WHEN
-        B newB = new B();
-        A a = new A();
-        rnrPublicObjectField.set(a, newB);
-
-        //THEN
-        assertThat(a.publicObjectField, Is.<B>is((B) trueReflectionFieldPublicObjectField.get(a)));
-        assertThat(a.publicObjectField, Is.<B>is(newB));
-    }
-
-    @Test
-    public void testGet() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGet() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -208,7 +243,21 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetInt() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        B newB = new B();
+        A a = new A();
+        rnrPublicObjectField.set(a, newB);
+
+        //THEN
+        assertThat(a.publicObjectField, Is.<B>is((B) trueReflectionFieldPublicObjectField.get(a)));
+        assertThat(a.publicObjectField, Is.<B>is(newB));
+    }
+    
+    @Test
+    public void testPublicGetInt() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -222,7 +271,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testSetInt() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetInt() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -236,7 +285,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetByte() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetByte() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -250,7 +299,7 @@ public abstract class FieldTest {
     }
     
     @Test
-    public void testSetByte() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetByte() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -264,7 +313,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetShort() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetShort() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -278,7 +327,7 @@ public abstract class FieldTest {
     }
     
     @Test
-    public void testSetShort() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetShort() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -292,7 +341,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetLong() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetLong() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -306,7 +355,7 @@ public abstract class FieldTest {
     }
     
     @Test
-    public void testSetLong() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetLong() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -321,7 +370,7 @@ public abstract class FieldTest {
 
 
     @Test
-    public void testGetFloat() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetFloat() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -335,7 +384,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testSetFloat() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetFloat() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -349,7 +398,7 @@ public abstract class FieldTest {
     }
     
     @Test
-    public void testGetDouble() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetDouble() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -363,7 +412,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testSetDouble() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetDouble() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -377,7 +426,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetBoolean() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetBoolean() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -391,7 +440,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testSetBoolean() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetBoolean() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -405,7 +454,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testGetChar() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicGetChar() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -419,7 +468,7 @@ public abstract class FieldTest {
     }
 
     @Test
-    public void testSetChar() throws NoSuchFieldException, IllegalAccessException {
+    public void testPublicSetChar() throws NoSuchFieldException, IllegalAccessException {
         //GIVEN
 
         //WHEN
@@ -482,5 +531,258 @@ public abstract class FieldTest {
         //THEN
         assertThat(b, Is.is(trueReflectionFieldPublicWrapperIntegerField.get(a)));
         assertThat(b, Is.is(5));
+    }
+
+    @Test
+    public void testPrivateGet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivateObjectField(new B());
+        B b = (B) rnrPrivateObjectField.get(a);
+
+        //THEN
+        assertThat(b, Is.<B>is((B) trueReflectionFieldPrivateObjectField.get(a)));
+        assertThat(b, Is.<B>is(a.getPrivateObjectField()));
+    }
+
+    @Test
+    public void testPrivateSet() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        B newB = new B();
+        A a = new A();
+        rnrPrivateObjectField.set(a, newB);
+
+        //THEN
+        assertThat(a.getPrivateObjectField(), Is.<B>is((B) trueReflectionFieldPrivateObjectField.get(a)));
+        assertThat(a.getPrivateObjectField(), Is.<B>is(newB));
+    }
+
+    @Test
+    public void testPrivateGetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveIntField(5);
+        int b = rnrPrivatePrimitiveIntField.getInt(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveIntField.getInt(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveIntField()));
+    }
+
+    @Test
+    public void testPrivateSetInt() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveIntField.setInt(a, 5);
+        int b = a.getPrivatePrimitiveIntField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveIntField.getInt(a)));
+        assertThat(b, Is.is(5));
+    }
+
+    @Test
+    public void testPrivateGetByte() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveByteField((byte)5);
+        byte b = rnrPrivatePrimitiveByteField.getByte(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveByteField.getByte(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveByteField()));
+    }
+
+    @Test
+    public void testPrivateSetByte() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveByteField.setByte(a, (byte) 5);
+        byte b = a.getPrivatePrimitiveByteField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveByteField.getByte(a)));
+        assertThat(b, Is.is( (byte) 5));
+    }
+
+    @Test
+    public void testPrivateGetShort() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveShortField((short)5);
+        short b = rnrPrivatePrimitiveShortField.getShort(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveShortField.getShort(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveShortField()));
+    }
+
+    @Test
+    public void testPrivateSetShort() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveShortField.setShort(a, (short) 5);
+        short b = a.getPrivatePrimitiveShortField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveShortField.getShort(a)));
+        assertThat(b, Is.is( (short) 5));
+    }
+
+    @Test
+    public void testPrivateGetLong() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveLongField(5);
+        long b = rnrPrivatePrimitiveLongField.getLong(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveLongField.getLong(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveLongField()));
+    }
+
+    @Test
+    public void testPrivateSetLong() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveLongField.setLong(a, (long) 5);
+        long b = a.getPrivatePrimitiveLongField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveLongField.getLong(a)));
+        assertThat(b, Is.is( (long) 5));
+    }
+
+
+    @Test
+    public void testPrivateGetFloat() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveFloatField(5);
+        float b = rnrPrivatePrimitiveFloatField.getFloat(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveFloatField.getFloat(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveFloatField()));
+    }
+
+    @Test
+    public void testPrivateSetFloat() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveFloatField.setFloat(a, (float) 5);
+        float b = a.getPrivatePrimitiveFloatField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveFloatField.getFloat(a)));
+        assertThat(b, Is.is( (float) 5));
+    }
+
+    @Test
+    public void testPrivateGetDouble() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveDoubleField(5);
+        double b = rnrPrivatePrimitiveDoubleField.getDouble(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveDoubleField.getDouble(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveDoubleField()));
+    }
+
+    @Test
+    public void testPrivateSetDouble() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveDoubleField.setDouble(a, (double) 5);
+        double b = a.getPrivatePrimitiveDoubleField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveDoubleField.getDouble(a)));
+        assertThat(b, Is.is( (double) 5));
+    }
+
+    @Test
+    public void testPrivateGetBoolean() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveBooleanField(true);
+        boolean b = rnrPrivatePrimitiveBooleanField.getBoolean(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveBooleanField.getBoolean(a)));
+        assertThat(b, Is.is(a.isPrivatePrimitiveBooleanField()));
+    }
+
+    @Test
+    public void testPrivateSetBoolean() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveBooleanField.setBoolean(a, true);
+        boolean b = a.isPrivatePrimitiveBooleanField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveBooleanField.getBoolean(a)));
+        assertThat(b, Is.is(true));
+    }
+
+    @Test
+    public void testPrivateGetChar() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        a.setPrivatePrimitiveCharField('c');
+        char b = rnrPrivatePrimitiveCharField.getChar(a);
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveCharField.getChar(a)));
+        assertThat(b, Is.is(a.getPrivatePrimitiveCharField()));
+    }
+
+    @Test
+    public void testPrivateSetChar() throws NoSuchFieldException, IllegalAccessException {
+        //GIVEN
+
+        //WHEN
+        A a = new A();
+        rnrPrivatePrimitiveCharField.setChar(a, 'c');
+        char b = a.getPrivatePrimitiveCharField();
+
+        //THEN
+        assertThat(b, Is.is(trueReflectionFieldPrivatePrimitiveCharField.getChar(a)));
+        assertThat(b, Is.is('c'));
     }
 }
