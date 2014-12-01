@@ -150,7 +150,6 @@ class FieldGetterAndSetterImpl implements FieldGetterAndSetter {
   public Object get(int index, Object object) throws IllegalAccessException {
 #if( !$mapAnnotationToMapClassWithInjectionNameToFieldSet.isEmpty() )
 #set( $id = 0 )
-    System.out.println("get on " + object.toString() + " field index " + index);
     switch(index) {
 #foreach( $annotationName in $mapAnnotationToMapClassWithInjectionNameToFieldSet.keySet() )
 #foreach( $className in $mapAnnotationToMapClassWithInjectionNameToFieldSet.get($annotationName).keySet() )
