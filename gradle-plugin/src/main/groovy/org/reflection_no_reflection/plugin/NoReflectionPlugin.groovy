@@ -111,6 +111,8 @@ public class NoReflectionPlugin extends AbstractMorpheusPlugin {
         javaCompileAfterWeave.source = project.fileTree(generatedAnnotationProcessorDirName)
         javaCompileAfterWeave.destinationDir = project.file("${project.buildDir}/intermediates/annotation-processor-only-classes/")
         javaCompileAfterWeave.classpath = javaCompile.classpath
+        //weaved classes have priority
+        javaCompileAfterWeave.classpath += project.files("${project.buildDir}/intermediates/transformations/transformNoReflectionWeaver/")
         javaCompileAfterWeave.classpath += project.files("${project.buildDir}/classes/main/")
         javaCompileAfterWeave.options.compilerArgs += '-proc:none'
 

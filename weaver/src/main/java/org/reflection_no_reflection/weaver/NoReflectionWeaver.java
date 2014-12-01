@@ -9,6 +9,8 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
 import javassist.build.IClassTransformer;
 import javassist.build.JavassistBuildException;
 import lombok.NonNull;
@@ -62,12 +64,28 @@ public class NoReflectionWeaver implements IClassTransformer {
         log.info("Transformation successful for " + classToTransformName);
     }
 
-    private void createPublicAccessorMethods(List<CtField> fieldList) throws CannotCompileException {
+    private void createPublicAccessorMethods(List<CtField> fieldList) throws CannotCompileException, NotFoundException {
         for (CtField ctField : fieldList) {
-            CtMethod setterMethod = CtNewMethod.setter("__access_" + ctField.getName(), ctField);
-            ctField.getDeclaringClass().addMethod(setterMethod);
-            CtMethod getterMethod = CtNewMethod.getter("__access_" + ctField.getName(), ctField);
-            ctField.getDeclaringClass().addMethod(getterMethod);
+            if ((ctField.getModifiers() & Modifier.PUBLIC) == 0 ) {
+                boolean isStatic = (ctField.getModifiers() & Modifier.STATIC) != 0;
+                String nonStaticAssignStatement = "this." + ctField.getName() + " = " + ctField.getName() + ";";
+                String staticAssignStatement = ctField.getDeclaringClass() + "." + ctField.getName() + " = " + ctField.getName() + ";";
+                String assignStatement = isStatic ? staticAssignStatement : nonStaticAssignStatement;
+                String staticModifierString = "static";
+                String modifierString = isStatic ? staticModifierString : "" ;
+                CtMethod setterMethod = CtNewMethod.make("public " + modifierString + " void __access_" + ctField.getName() + "("
+                                                             + ctField.getType().getName() + " " + ctField.getName() + ") {\n"
+                                                             + assignStatement
+                                                             + "}\n", ctField.getDeclaringClass());
+                ctField.getDeclaringClass().addMethod(setterMethod);
+                String nonStaticAccessStatement = "return this." + ctField.getName() + ";";
+                String staticAccessStatement = "return " + ctField.getDeclaringClass() + "." + ctField.getName() + ";";
+                String accessStatement = isStatic ? staticAccessStatement : nonStaticAccessStatement;
+                CtMethod getterMethod = CtNewMethod.make("public " + modifierString + " " + ctField.getType().getName() +" __access_" + ctField.getName() + "() {\n"
+                                                             + accessStatement
+                                                             + "}\n", ctField.getDeclaringClass());
+                ctField.getDeclaringClass().addMethod(getterMethod);
+            }
         }
     }
 

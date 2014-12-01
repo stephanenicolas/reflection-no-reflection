@@ -22,10 +22,11 @@ public class NoReflectionField extends Field {
     private Map<String, java.lang.annotation.Annotation> mapAnnotation;
 
 
-    public NoReflectionField(String fieldName, String declaringClassName, String fieldTypeName, List<? extends java.lang.annotation.Annotation> annotationList) {
+    public NoReflectionField(String fieldName, String declaringClassName, String fieldTypeName, int modifiers, List<? extends java.lang.annotation.Annotation> annotationList) {
         this.fieldName = fieldName;
         this.declaringClassName = declaringClassName;
         this.fieldTypeName = fieldTypeName;
+        this.modifiers = modifiers;
         this.annotationList = annotationList;
         mapAnnotation = new HashMap<>();
         for(java.lang.annotation.Annotation annotation : annotationList) {

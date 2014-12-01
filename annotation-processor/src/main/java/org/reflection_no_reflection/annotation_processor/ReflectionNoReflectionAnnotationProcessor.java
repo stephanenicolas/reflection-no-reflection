@@ -18,6 +18,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -83,10 +84,10 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
     public synchronized void init(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
         annotationDatabasePackageName = processingEnv.getOptions().get("guiceAnnotationDatabasePackageName");
-        mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = new HashMap<String, Map<String, Set<Field>>>();
-        mapAnnotationToMapClassContainingInjectionToInjectedMethodSet = new HashMap<String, Map<String, Set<String>>>();
-        mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet = new HashMap<String, Map<String, Set<String>>>();
-        bindableClasses = new HashSet<String>();
+        mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = new HashMap<>();
+        mapAnnotationToMapClassContainingInjectionToInjectedMethodSet = new HashMap<>();
+        mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet = new HashMap<>();
+        bindableClasses = new HashSet<>();
         String isUsingFragmentUtilString = processingEnv.getOptions().get("guiceUsesFragmentUtil");
         if (isUsingFragmentUtilString != null) {
             isUsingFragmentUtil = Boolean.parseBoolean(isUsingFragmentUtilString);
@@ -188,7 +189,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         String typeElementName = getTypeName(typeElementRequiringScanning);
 
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
-        addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectedClassName, injectionPoint.getAnnotationMirrors());
+        addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectionPoint.getModifiers(), injectedClassName, injectionPoint.getAnnotationMirrors());
     }
 
     private boolean isPrimitiveType(String injectedClassName) {
@@ -215,7 +216,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
             injectionPointName += ":" + parameterTypeName;
         }
 
-        TypeElement typeElementRequiringScanning = (TypeElement) ((ExecutableElement) injectionPoint.getEnclosingElement()).getEnclosingElement();
+        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement().getEnclosingElement();
         String typeElementName = getTypeName(typeElementRequiringScanning);
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
@@ -252,18 +253,18 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
     }
 
-    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, String injectedClassName, List<? extends AnnotationMirror> annotationMirrors) {
-        Map<String, Set<Field>> mapClassWithInjectionNameToMemberSet = ((HashMap<String, Map<String, Set<Field>>>) mapAnnotationToMapClassContainingInjectionToInjectedFieldSet)
+    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, Set<Modifier> modifiers, String injectedClassName, List<? extends AnnotationMirror> annotationMirrors) {
+        Map<String, Set<Field>> mapClassWithInjectionNameToMemberSet = mapAnnotationToMapClassContainingInjectionToInjectedFieldSet
             .get(annotationClassName);
         if (mapClassWithInjectionNameToMemberSet == null) {
-            mapClassWithInjectionNameToMemberSet = new HashMap<String, Set<Field>>();
+            mapClassWithInjectionNameToMemberSet = new HashMap<>();
             mapAnnotationToMapClassContainingInjectionToInjectedFieldSet
                 .put(annotationClassName, mapClassWithInjectionNameToMemberSet);
         }
 
         Set<Field> injectionPointNameSet = mapClassWithInjectionNameToMemberSet.get(typeElementName);
         if (injectionPointNameSet == null) {
-            injectionPointNameSet = new HashSet<Field>();
+            injectionPointNameSet = new HashSet<>();
             mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
         }
 
@@ -281,7 +282,23 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
             annotationList.add(annotationInstance);
             mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
         }
-        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, injectedClassName, annotationList));
+        int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
+        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, injectedClassName, modifiersInt, annotationList));
+    }
+
+    private int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {
+        int result = 0;
+        for (Modifier modifier : modifiers) {
+            switch (modifier) {
+                case ABSTRACT: result += java.lang.reflect.Modifier.ABSTRACT;
+                case PUBLIC: result += java.lang.reflect.Modifier.PUBLIC;
+                case PRIVATE: result += java.lang.reflect.Modifier.PRIVATE;
+                case STATIC: result += java.lang.reflect.Modifier.STATIC;
+                case PROTECTED: result += java.lang.reflect.Modifier.PROTECTED;
+                default:
+            }
+        }
+        return result;
     }
 
     private String getTypeName(TypeElement typeElementRequiringScanning) {
@@ -306,13 +323,13 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
     private void addToInjectedMembers(String annotationClassName, String typeElementName, String injectionPointName, HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassWithInjectionNameToMembersSet) {
         Map<String, Set<String>> mapClassWithInjectionNameToMemberSet = mapAnnotationToMapClassWithInjectionNameToMembersSet.get(annotationClassName);
         if (mapClassWithInjectionNameToMemberSet == null) {
-            mapClassWithInjectionNameToMemberSet = new HashMap<String, Set<String>>();
+            mapClassWithInjectionNameToMemberSet = new HashMap<>();
             mapAnnotationToMapClassWithInjectionNameToMembersSet.put(annotationClassName, mapClassWithInjectionNameToMemberSet);
         }
 
         Set<String> injectionPointNameSet = mapClassWithInjectionNameToMemberSet.get(typeElementName);
         if (injectionPointNameSet == null) {
-            injectionPointNameSet = new HashSet<String>();
+            injectionPointNameSet = new HashSet<>();
             mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
         }
         injectionPointNameSet.add(injectionPointName);

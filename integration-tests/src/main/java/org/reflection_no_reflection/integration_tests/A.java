@@ -14,4 +14,7 @@ public class A {
     @Inject public char publicPrimitiveCharField;
 
     @Inject public Integer publicWrapperIntegerField;
+
+    @Inject private B privateObjectField;
+
 }
