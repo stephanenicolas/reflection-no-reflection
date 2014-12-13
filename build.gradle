@@ -1,3 +1,24 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'be.jlr-home.gradle:plantumlPlugin:0.1.1.SNAPSHOT'
+    classpath 'org.ajoberstar:gradle-git:0.13.0-milestone.1'
+  }
+}
+
+apply plugin: 'org.ajoberstar.github-pages'
+
+githubPages {
+  repoUri 'git@github.com:stephanenicolas/reflection-no-reflection.git'
+  pages {
+    from fileTree(dir:"$buildDir/javadoc/")
+    eachFile { println it }
+  }
+}
+
 allprojects {
   repositories {
     mavenCentral()
@@ -7,4 +28,69 @@ allprojects {
 
   apply plugin: 'maven'
   apply plugin: 'idea'
+}
+
+import net.sourceforge.plantuml.GeneratedImage
+import net.sourceforge.plantuml.Option
+import net.sourceforge.plantuml.SourceFileReader
+import net.sourceforge.plantuml.preproc.Defines
+import org.gradle.api.DefaultTask
+import be.jlrhome.gradle.plantuml.GeneratePlantumlTask;
+
+
+//from http://stackoverflow.com/a/15361666/693752
+gradle.projectsEvaluated {
+  //from http://gradle.1045684.n5.nabble.com/aggregating-javadocs-td1433469.html
+  task javadocAllJavaFiles(type: Javadoc) {
+    source subprojects.findAll({ project -> !project.name.contains('sample') && !project.name.contains('tests') }).collect {project -> project.sourceSets.main.allJava }
+    destinationDir = new File(buildDir, 'javadoc')
+    // Might need a classpath
+    classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath})
+    options.overview = "overview.html" // relative to source root
+    doLast {
+      subprojects.findAll({ project -> !project.name.contains('sample') && !project.name.contains('tests') }).each {
+        project ->
+          copy {
+            from project.file('src/main/java')
+            into "$buildDir/javadoc/"
+            includes = ['**/doc-files/']
+          }
+      }
+    }
+  }
+
+  task javadoc{
+  }
+
+  project.createOverviewWithPlantUmlTask.dependsOn javadocAllJavaFiles
+  project.javadoc.dependsOn javadocAllJavaFiles, createOverviewWithPlantUmlTask
+}
+
+
+//from http://forums.gradle.org/gradle/topics/accessing_the_buildscript_classpath
+//and from http://forums.gradle.org/gradle/topics/how_to_get_absolute_path_of_a_file_declared_in_dependencies
+task createOverviewWithPlantUmlTask << {
+  String plantumlJarPath;
+  buildscript.configurations.classpath.each {
+    String absolutePath = it.getAbsolutePath();
+    if (absolutePath.contains("plantuml-")) {
+      plantumlJarPath = absolutePath
+    }
+  }
+  if (plantumlJarPath == null) {
+    throw new RuntimeException("Could not find plant uml jar.");
+  }
+
+  String execPlantUml = 'java -jar ' + plantumlJarPath + ' '
+  String execPlantUmlSuffix = ' -o ' + "$buildDir/javadoc/"
+  List<String> files = [project.file('overview.html').toString()]
+  files.each{
+    String execGeneratePlantUml = execPlantUml + it + execPlantUmlSuffix
+    execGeneratePlantUml.execute();
+    println 'executed ' + execGeneratePlantUml
+  }
+}
+
+wrapper {
+  gradleVersion = '2.2'
 }
