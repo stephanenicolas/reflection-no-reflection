@@ -1,9 +1,0 @@
-include "common-lib"
-include "annotation-processor"
-include "weaver"
-include "gradle-plugin"
-if (!hasProperty('boostrap')) {
-  include "integration-tests"
-  include "sample"
-}
-//include "sample-exploded"
