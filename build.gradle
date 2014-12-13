@@ -12,7 +12,8 @@ buildscript {
 apply plugin: 'org.ajoberstar.github-pages'
 
 githubPages {
-  repoUri 'git@github.com:stephanenicolas/reflection-no-reflection.git'
+  repoUri = 'git@github.com:stephanenicolas/reflection-no-reflection.git'
+  targetBranch = 'gh-pages'
   pages {
     from fileTree(dir:"$buildDir/javadoc/")
     eachFile { println it }
