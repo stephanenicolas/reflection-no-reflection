@@ -25,6 +25,9 @@ proguard/
 # Log Files
 *.log
 
+#plantuml files
+doc-files/
+
 #intelliJ
 .idea/
 *.iml
