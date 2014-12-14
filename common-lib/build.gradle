@@ -1,1 +1,12 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'be.jlr-home.gradle:plantumlPlugin:0.1.1.SNAPSHOT'
+  }
+}
+
 apply plugin: 'java'
+apply plugin: 'plantuml'

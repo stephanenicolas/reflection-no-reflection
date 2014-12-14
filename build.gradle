@@ -60,38 +60,52 @@ gradle.projectsEvaluated {
     }
   }
 
-  task javadoc{
+  task javadoc {
   }
 
-  project.createOverviewWithPlantUmlTask.dependsOn javadocAllJavaFiles
-  project.javadoc.dependsOn javadocAllJavaFiles, createOverviewWithPlantUmlTask
+  createOverviewWithPlantUmlTask.dependsOn javadocAllJavaFiles
+  javadoc.dependsOn javadocAllJavaFiles, createOverviewWithPlantUmlTask
+
 }
 
+task createOverviewWithPlantUmlTask(type: ParseFileWithPlantUmlTask) {
+  sources = [project.file('overview.html')]
+  destDir = project.file("$buildDir/javadoc/")
+}
 
 //from http://forums.gradle.org/gradle/topics/accessing_the_buildscript_classpath
 //and from http://forums.gradle.org/gradle/topics/how_to_get_absolute_path_of_a_file_declared_in_dependencies
-task createOverviewWithPlantUmlTask << {
-  String plantumlJarPath;
-  buildscript.configurations.classpath.each {
-    String absolutePath = it.getAbsolutePath();
-    if (absolutePath.contains("plantuml-")) {
-      plantumlJarPath = absolutePath
-    }
-  }
-  if (plantumlJarPath == null) {
-    throw new RuntimeException("Could not find plant uml jar.");
-  }
+//and https://gradle.org/docs/current/userguide/custom_tasks.html
+class ParseFileWithPlantUmlTask extends DefaultTask {
+  String plantumlJarPath
+  @OutputDirectory
+  File destDir
+  @InputFiles
+  List<File> sources
 
-  String execPlantUml = 'java -jar ' + plantumlJarPath + ' '
-  String execPlantUmlSuffix = ' -o ' + "$buildDir/javadoc/"
-  List<String> files = [project.file('overview.html').toString()]
-  files.each{
-    String execGeneratePlantUml = execPlantUml + it + execPlantUmlSuffix
-    execGeneratePlantUml.execute();
-    println 'executed ' + execGeneratePlantUml
+  @TaskAction
+  def parseFiles(IncrementalTaskInputs inputs) {
+    project.buildscript.configurations.classpath.each {
+      String absolutePath = it.getAbsolutePath();
+      if (absolutePath.contains("plantuml-")) {
+        plantumlJarPath = absolutePath
+      }
+    }
+    if (plantumlJarPath == null) {
+      throw new RuntimeException("Could not find plant uml jar.");
+    }
+
+    String execPlantUml = 'java -jar ' + plantumlJarPath + ' '
+    String execPlantUmlSuffix = ' -o ' + destDir
+    inputs.outOfDate {
+      String execGeneratePlantUml = execPlantUml + it.file.getAbsolutePath() + execPlantUmlSuffix
+      execGeneratePlantUml.execute();
+      getLogger().debug('executed ' + execGeneratePlantUml)
+    }
   }
 }
 
 wrapper {
   gradleVersion = '2.2'
 }
+
