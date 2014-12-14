@@ -43,7 +43,8 @@ import be.jlrhome.gradle.plantuml.GeneratePlantumlTask;
 gradle.projectsEvaluated {
   //from http://gradle.1045684.n5.nabble.com/aggregating-javadocs-td1433469.html
   task javadocAllJavaFiles(type: Javadoc) {
-    source subprojects.findAll({ project -> !project.name.contains('sample') && !project.name.contains('tests') }).collect {project -> project.sourceSets.main.allJava }
+    source subprojects.findAll({ project -> !project.name.contains('sample') && !project.name.contains('tests') })
+        .collect {project -> project.sourceSets.main.allJava}
     destinationDir = new File(buildDir, 'javadoc')
     // Might need a classpath
     classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath})
