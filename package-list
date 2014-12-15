@@ -1,5 +1,6 @@
 org.reflection_no_reflection
 org.reflection_no_reflection.annotation_processor
 org.reflection_no_reflection.no_reflection
+org.reflection_no_reflection.plugin
 org.reflection_no_reflection.reflection
 org.reflection_no_reflection.weaver
