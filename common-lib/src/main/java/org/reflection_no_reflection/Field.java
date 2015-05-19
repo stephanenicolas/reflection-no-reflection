@@ -26,11 +26,20 @@ public class Field {
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
-        return null; //not implemented
+        for (Annotation annotation : annotationList) {
+            if (annotation.annotationType().equals(annotationType)) {
+                return (A) annotation;
+            }
+        }
+
+        return null;
     }
 
     public Annotation[] getDeclaredAnnotations() {
-        return null; //not implemented
+        if (annotationList == null) {
+            return new Annotation[0];
+        }
+        return annotationList.toArray(new Annotation[annotationList.size()]); //not implemented
     }
 
     public Class<?> getDeclaringClass() {

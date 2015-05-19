@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.annotation_processor;
+package org.reflection_no_reflection.processor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +30,7 @@ import org.reflection_no_reflection.Field;
  * An annotation processor that detects classes that need to receive injections.
  * It is a {@link AbstractProcessor} that can be triggered for all kinds of annotations.
  * It will create a RNR database of annotated fields, methods and constuctors.
+ *
  * @author SNI
  */
 //TODO MUST REMOVE THIS. ANNOTATION TYPES SHOULD BE DYNAMIC
@@ -37,7 +38,7 @@ import org.reflection_no_reflection.Field;
 //chances are that the processor must be called in a different way by the gradle
 //plugin. We have to get full control over annotation processor instance creation.
 @SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector", "annotatedClasses"})
-public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor {
+public class Processor extends AbstractProcessor {
 
     private boolean isUsingFragmentUtil = true;
     private boolean isCommentingInjector = true;
@@ -155,7 +156,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         String injectedClassName = getTypeName(injectionPoint);
         if (isPrimitiveType(injectedClassName)) {
             bindableClasses.add(injectedClassName + ".class");
-        } else  {
+        } else {
             bindableClasses.add(injectedClassName);
         }
         injectionPointName = injectionPoint.getSimpleName().toString();
@@ -245,15 +246,15 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
 
         List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
         for (AnnotationMirror annotationMirror : annotationMirrors) {
-            Map<String,Object> mapMethodToValue = new HashMap<>();
-            Map<String,String> mapMethodToReturnType = new HashMap<>();
+            Map<String, Object> mapMethodToValue = new HashMap<>();
+            Map<String, String> mapMethodToReturnType = new HashMap<>();
 
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
                 String methodName = entry.getKey().getSimpleName().toString();
                 mapMethodToValue.put(methodName, entry.getValue().getValue());
                 mapMethodToReturnType.put(methodName, entry.getKey().getReturnType().toString());
             }
-            org.reflection_no_reflection.Annotation annotationInstance = new Annotation(annotationMirror.getAnnotationType().toString(), mapMethodToValue, mapMethodToReturnType);
+            org.reflection_no_reflection.Annotation annotationInstance = new Annotation(getClass(annotationMirror.getAnnotationType().toString()), mapMethodToValue, mapMethodToReturnType);
             annotationList.add(annotationInstance);
             mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
         }
@@ -281,11 +282,21 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         int result = 0;
         for (Modifier modifier : modifiers) {
             switch (modifier) {
-                case ABSTRACT: result |= java.lang.reflect.Modifier.ABSTRACT;break;
-                case PUBLIC: result |= java.lang.reflect.Modifier.PUBLIC;break;
-                case PRIVATE: result |= java.lang.reflect.Modifier.PRIVATE;break;
-                case STATIC: result |= java.lang.reflect.Modifier.STATIC;break;
-                case PROTECTED: result |= java.lang.reflect.Modifier.PROTECTED;break;
+                case ABSTRACT:
+                    result |= java.lang.reflect.Modifier.ABSTRACT;
+                    break;
+                case PUBLIC:
+                    result |= java.lang.reflect.Modifier.PUBLIC;
+                    break;
+                case PRIVATE:
+                    result |= java.lang.reflect.Modifier.PRIVATE;
+                    break;
+                case STATIC:
+                    result |= java.lang.reflect.Modifier.STATIC;
+                    break;
+                case PROTECTED:
+                    result |= java.lang.reflect.Modifier.PROTECTED;
+                    break;
                 default:
             }
         }

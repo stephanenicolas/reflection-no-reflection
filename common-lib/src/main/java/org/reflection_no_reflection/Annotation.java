@@ -10,7 +10,7 @@ import java.util.Map;
 public class Annotation {
 
     /** The class name of this annotation type. */
-    private String annotationTypeName;
+    private Class<?> annotationType;
     /** Maps method names to their return values. The methods are methods of this annotation. */
     private Map<String, Object> mapMethodToValue = new HashMap<String, Object>();
     /** Maps method names to their return types. The methods are methods of this annotation. */
@@ -19,18 +19,18 @@ public class Annotation {
     /**
      * Creates a new annotation.
      *
-     * @param annotationTypeName class name of this annotation type.
+     * @param annotationType class of this annotation type.
      * @param mapMethodToValue maps method names to their return values.
      * @param mapMethodToReturnType maps method names to their return types.
      */
-    public Annotation(String annotationTypeName, Map<String, Object> mapMethodToValue, Map<String, String> mapMethodToReturnType) {
-        this.annotationTypeName = annotationTypeName;
+    public Annotation(Class annotationType, Map<String, Object> mapMethodToValue, Map<String, String> mapMethodToReturnType) {
+        this.annotationType = annotationType;
         this.mapMethodToValue = mapMethodToValue;
         this.mapMethodToReturnType = mapMethodToReturnType;
     }
 
     public String getAnnotationTypeName() {
-        return annotationTypeName;
+        return annotationType.getName();
     }
 
     public Map<String, Object> getMapMethodToValue() {
@@ -41,11 +41,7 @@ public class Annotation {
         return mapMethodToReturnType;
     }
 
-    public Class<? extends Annotation> annotationType() {
-        try {
-            return (Class<? extends Annotation>) Class.forName(annotationTypeName);
-        } catch (Exception ex) {
-            throw new RuntimeException("Impossible to load the annotation type via the class loader. Type name is " + annotationTypeName, ex);
-        }
+    public Class<?> annotationType() {
+        return annotationType;
     }
 }

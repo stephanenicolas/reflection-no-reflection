@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.annotation_processor;
+package org.reflection_no_reflection.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
@@ -6,10 +6,10 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.processing.Processor;
 import javax.tools.JavaFileObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
 
@@ -20,11 +20,11 @@ import static org.truth0.Truth.ASSERT;
 
 public class ProcessorTest {
 
-    private static ReflectionNoReflectionAnnotationProcessor reflectionNoReflectionAnnotationProcessor;
+    private static Processor processor;
 
     @Before
     public void setup() {
-        reflectionNoReflectionAnnotationProcessor = new ReflectionNoReflectionAnnotationProcessor();
+        processor = new Processor();
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ProcessorTest {
             .processedWith(rnrProcessors())
             .compilesWithoutError();
 
-        final Set<Class> annotatedClasses = reflectionNoReflectionAnnotationProcessor.getAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
     }
@@ -61,7 +61,7 @@ public class ProcessorTest {
             .processedWith(rnrProcessors())
             .compilesWithoutError();
 
-        final Set<Class> annotatedClasses = reflectionNoReflectionAnnotationProcessor.getAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
         final Class<?> aClass = Class.forName("test.Foo");
         assertThat(aClass.getFields().length, is(1));
@@ -70,14 +70,18 @@ public class ProcessorTest {
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getDeclaringClass(), is((Class) aClass));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
+        final Annotation[] annotations = aField.getDeclaredAnnotations();
+        assertThat(annotations.length, is(1));
+        final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
+        assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
+        assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
     }
-
 
     private void configureProcessor(String[] annotations) {
-        reflectionNoReflectionAnnotationProcessor.setAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
+        processor.setAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
     }
 
-    static Iterable<? extends Processor> rnrProcessors() {
-        return Arrays.asList(reflectionNoReflectionAnnotationProcessor);
+    static Iterable<? extends javax.annotation.processing.Processor> rnrProcessors() {
+        return Arrays.asList(processor);
     }
 }
