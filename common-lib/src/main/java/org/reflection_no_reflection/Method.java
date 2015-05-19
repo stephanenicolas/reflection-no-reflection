@@ -43,33 +43,18 @@ public class Method extends GenericDeclaration {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Package-private constructor used by ReflectAccess to enable
-     * instantiation of these objects in Java code from the java.lang
-     * package via sun.reflect.LangReflectAccess.
-     */
-    Method(Class declaringClass,
-           String name,
-           Class[] parameterTypes,
-           Class returnType,
-           Class[] checkedExceptions,
-           int modifiers,
-           int slot,
-           String signature,
-           byte[] annotations,
-           byte[] parameterAnnotations,
-           byte[] annotationDefault) {
+    public Method(Class declaringClass,
+                  String name,
+                  Class[] parameterTypes,
+                  Class returnType,
+                  Class[] checkedExceptions,
+                  int modifiers) {
         this.clazz = declaringClass;
         this.name = name;
         this.parameterTypes = parameterTypes;
         this.returnType = returnType;
         this.exceptionTypes = checkedExceptions;
         this.modifiers = modifiers;
-        this.slot = slot;
-        this.signature = signature;
-        this.annotations = annotations;
-        this.parameterAnnotations = parameterAnnotations;
-        this.annotationDefault = annotationDefault;
     }
 
     /**

@@ -25,6 +25,7 @@ import javax.lang.model.type.TypeMirror;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.Method;
 
 /**
  * An annotation processor that detects classes that need to receive injections.
@@ -248,11 +249,21 @@ public class Processor extends AbstractProcessor {
         for (AnnotationMirror annotationMirror : annotationMirrors) {
             Map<String, Object> mapMethodToValue = new HashMap<>();
             Map<String, String> mapMethodToReturnType = new HashMap<>();
+            Map<String, Method> mapMethodNameToMethod = new HashMap<>();
 
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
                 String methodName = entry.getKey().getSimpleName().toString();
                 mapMethodToValue.put(methodName, entry.getValue().getValue());
                 mapMethodToReturnType.put(methodName, entry.getKey().getReturnType().toString());
+                Method method = new Method(getClass(annotationClassName),
+                                           methodName,
+                                           //TODO : param types
+                                           new Class[0],
+                                           getClass(entry.getKey().getReturnType().toString()),
+                                           //TODO : exception types
+                                           new Class[0],
+                                           java.lang.reflect.Modifier.PUBLIC
+                );
             }
             org.reflection_no_reflection.Annotation annotationInstance = new Annotation(getClass(annotationMirror.getAnnotationType().toString()), mapMethodToValue, mapMethodToReturnType);
             annotationList.add(annotationInstance);
