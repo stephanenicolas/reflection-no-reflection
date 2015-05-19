@@ -85,4 +85,8 @@ public class Field {
     public String toString() {
         return null; //not implemented
     }
+
+    public static String getTypeName(Class<?> returnType) {
+        return returnType.toString();
+    }
 }
