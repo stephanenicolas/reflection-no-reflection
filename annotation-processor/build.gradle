@@ -7,6 +7,7 @@ repositories {
 
 dependencies {
   compile project(':common-lib')
-  compile 'org.apache.velocity:velocity:1.7'
-  compile 'com.google.inject:blender:4.0-SNAPSHOT'
+  testCompile 'junit:junit:4.10'
+  testCompile 'org.easytesting:fest:1.0.7'
+  testCompile 'com.google.testing.compile:compile-testing:0.4'
 }

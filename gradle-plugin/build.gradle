@@ -34,14 +34,10 @@ repositories {
 dependencies {
 
   //compile 'com.android.tools.build:gradle:0.12.2'
-  compile 'com.github.stephanenicolas.javassist:javassist-build-plugin-api:1.0.0'
 
   //only needed to create a plugin
-  compile 'com.github.stephanenicolas.morpheus:morpheus-plugin:1.0.9-SNAPSHOT'
-  compile 'com.github.stephanenicolas.morpheus:morpheus-commons:1.0.9-SNAPSHOT'
   compile gradleApi()
   compile localGroovy()
-  compile project(':weaver')
 
   compile 'org.projectlombok:lombok:1.14.2'
   //--TESTS

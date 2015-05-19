@@ -1,6 +1,5 @@
 package org.reflection_no_reflection.annotation_processor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
@@ -24,11 +22,9 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 import org.reflection_no_reflection.Annotation;
+import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
-import org.reflection_no_reflection.no_reflection.NoReflectionField;
 
 /**
  * An annotation processor that detects classes that need to receive injections.
@@ -43,11 +39,9 @@ import org.reflection_no_reflection.no_reflection.NoReflectionField;
 @SupportedOptions({"guiceAnnotationDatabasePackageName", "guiceUsesFragmentUtil", "guiceCommentsInjector", "annotatedClasses"})
 public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor {
 
-    public static final String TEMPLATE_ANNOTATION_DATABASE_PATH = "templates/AnnotationDatabaseImpl.vm";
-
     private boolean isUsingFragmentUtil = true;
     private boolean isCommentingInjector = true;
-    private Set<String> annotatedClasses = new HashSet<>();
+    private Set<String> annotatedClasses = new HashSet<String>();
     //TODO add a HashMap<String, Set<String>>
 
     /**
@@ -72,7 +66,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
     private HashMap<String, Annotation> mapAnnotationNameToAnnotation = new HashMap<>();
 
     /** Contains all classes that contain injection points. */
-    private HashSet<String> classesContainingInjectionPointsSet = new HashSet<String>();
+    private HashSet<Class> annotatedClassSet = new HashSet<>();
 
     /** Contains all classes that can be injected into a class with injection points. */
     private HashSet<String> bindableClasses;
@@ -126,53 +120,34 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         }
 
         for (Map<String, Set<Field>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedFieldSet.values()) {
-            classesContainingInjectionPointsSet.addAll(entryAnnotationToclassesContainingInjectionPoints.keySet());
+            final Set<String> classNames = entryAnnotationToclassesContainingInjectionPoints.keySet();
+            for (String className : classNames) {
+                annotatedClassSet.add(new Class(className));
+            }
         }
 
         for (Map<String, Set<String>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedMethodSet.values()) {
-            classesContainingInjectionPointsSet.addAll(entryAnnotationToclassesContainingInjectionPoints.keySet());
+            final Set<String> classNames = entryAnnotationToclassesContainingInjectionPoints.keySet();
+            for (String className : classNames) {
+                annotatedClassSet.add(new Class(className));
+            }
         }
 
         for (Map<String, Set<String>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet.values()) {
-            classesContainingInjectionPointsSet.addAll(entryAnnotationToclassesContainingInjectionPoints.keySet());
-        }
-
-        JavaFileObject jfo;
-        try {
-            String className = "AnnotationDatabaseImpl";
-            if (annotationDatabasePackageName != null && !annotationDatabasePackageName.isEmpty()) {
-                className = annotationDatabasePackageName + '.' + className;
+            final Set<String> classNames = entryAnnotationToclassesContainingInjectionPoints.keySet();
+            for (String className : classNames) {
+                annotatedClassSet.add(new Class(className));
             }
-            jfo = processingEnv.getFiler().createSourceFile(className);
-            ReflectionNoReflectionAnnotationDatabaseGenerator annotationDatabaseGenerator = createAnnotationDatabaseGenerator();
-            configure(annotationDatabaseGenerator);
-            annotationDatabaseGenerator.generateAnnotationDatabase(jfo);
-        } catch (IOException e) {
-            e.printStackTrace();
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }
 
         return true;
-    }
-
-    protected void configure(ReflectionNoReflectionAnnotationDatabaseGenerator annotationDatabaseGenerator) {
-        annotationDatabaseGenerator.setTemplatePath(TEMPLATE_ANNOTATION_DATABASE_PATH);
-        annotationDatabaseGenerator.setPackageName(annotationDatabasePackageName);
-        annotationDatabaseGenerator.setBindableClasses(bindableClasses);
-        annotationDatabaseGenerator.setClassesContainingInjectionPointsSet(classesContainingInjectionPointsSet);
-        annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToConstructorSet(mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet);
-        annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToMethodSet(mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
-        annotationDatabaseGenerator.setMapAnnotationToMapClassWithInjectionNameToFieldSet(mapAnnotationToMapClassContainingInjectionToInjectedFieldSet);
-        annotationDatabaseGenerator.setMapAnnotationNameToAnnotation(mapAnnotationNameToAnnotation);
-        annotationDatabaseGenerator.setUsingFragmentUtil(isUsingFragmentUtil);
-        annotationDatabaseGenerator.setCommentingInjector(isCommentingInjector);
     }
 
     private void addClassToAnnotationDatabase(Element injectionPoint) {
         TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint;
         String typeElementName = getTypeName(typeElementRequiringScanning);
         //System.out.printf("Type: %s, is injected\n",typeElementName);
-        classesContainingInjectionPointsSet.add(typeElementName);
+        annotatedClassSet.add(new Class(typeElementName));
     }
 
     private void addFieldToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
@@ -283,7 +258,7 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
             mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
         }
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        injectionPointNameSet.add(new NoReflectionField(injectionPointName, typeElementName, injectedClassName, modifiersInt, annotationList));
+        injectionPointNameSet.add(new Field(injectionPointName, typeElementName, injectedClassName, modifiersInt, annotationList));
     }
 
     private int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {
@@ -345,7 +320,11 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
         return annotatedClasses;
     }
 
-    protected ReflectionNoReflectionAnnotationDatabaseGenerator createAnnotationDatabaseGenerator() {
-        return new ReflectionNoReflectionAnnotationDatabaseGenerator();
+    public void setAnnotatedClasses(Set<String> annotatedClasses) {
+        this.annotatedClasses = annotatedClasses;
+    }
+
+    public Set<Class> getAnnotatedClasses() {
+        return annotatedClassSet;
     }
 }
