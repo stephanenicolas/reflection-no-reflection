@@ -258,7 +258,23 @@ public class ReflectionNoReflectionAnnotationProcessor extends AbstractProcessor
             mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
         }
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        injectionPointNameSet.add(new Field(injectionPointName, typeElementName, injectedClassName, modifiersInt, annotationList));
+        final Field field = new Field(injectionPointName, getClass(injectedClassName), getClass(typeElementName), modifiersInt, annotationList);
+        injectionPointNameSet.add(field);
+
+        //rnr 2
+        try {
+            Class.forName(typeElementName).addField(field);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Class getClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            return new Class(name);
+        }
     }
 
     private int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {

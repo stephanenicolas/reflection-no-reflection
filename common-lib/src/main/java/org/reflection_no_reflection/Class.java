@@ -5,7 +5,9 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import sun.reflect.annotation.AnnotationType;
@@ -34,7 +36,7 @@ public class Class<T> implements java.io.Serializable,
     private Method enclosingMethod;
     private EnclosingMethodInfo[] enclosingMethodInfos;
     private Class<?>[] classes;
-    private Field[] fields;
+    private List<Field> fields = new ArrayList<>();
     private Method[] methods;
     private Constructor<?>[] constructors;
     private Map<String, Annotation> annotations;
@@ -634,6 +636,10 @@ public class Class<T> implements java.io.Serializable,
         this.genericInfo = genericInfo;
     }
 
+    public void addField(Field field) {
+        fields.add(field);
+    }
+
     private final static class EnclosingMethodInfo {
         private Class<?> enclosingClass;
         private String name;
@@ -992,10 +998,10 @@ public class Class<T> implements java.io.Serializable,
      * @since JDK1.1
      */
     public Field[] getFields() throws SecurityException {
-        return fields;
+        return fields.toArray(new Field[fields.size()]);
     }
 
-    public void setFields(Field[] fields) {
+    public void setFields(List<Field> fields) {
         this.fields = fields;
     }
 

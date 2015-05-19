@@ -12,15 +12,15 @@ import java.util.List;
 public class Field {
 
     private String name;
-    private String className;
-    private String enclosingClassName;
+    private final Class<?> type;
+    private Class<?> enclosingClass;
     private int modifiers;
     private final List<Annotation> annotationList;
 
-    public Field(String name, String className, String enclosingClassName, int modifiers, List<Annotation> annotationList) {
+    public Field(String name, Class<?> type, Class<?> enclosingClass, int modifiers, List<Annotation> annotationList) {
         this.name = name;
-        this.className = className;
-        this.enclosingClassName = enclosingClassName;
+        this.type = type;
+        this.enclosingClass = enclosingClass;
         this.modifiers = modifiers;
         this.annotationList = annotationList;
     }
@@ -34,7 +34,7 @@ public class Field {
     }
 
     public Class<?> getDeclaringClass() {
-        return null; //not implemented
+        return enclosingClass;
     }
 
     public Type getGenericType() {
@@ -50,7 +50,7 @@ public class Field {
     }
 
     public Class<?> getType() {
-        return null; //not implemented
+        return type;
     }
 
     public int hashCode() {
