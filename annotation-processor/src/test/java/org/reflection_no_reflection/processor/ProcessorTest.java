@@ -64,15 +64,19 @@ public class ProcessorTest {
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
-        final Class<?> aClass = Class.forName("test.Foo");
+
+        final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getFields().length, is(1));
+
         final Field aField = aClass.getFields()[0];
-        assertThat(aField.getName(), is("s"));
+        final Field expected = new Field("s", Class.forName("java.lang.String"), aClass, Modifier.PRIVATE, null);
+        assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
-        assertThat(aField.getDeclaringClass(), is((Class) aClass));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
+
         final Annotation[] annotations = aField.getDeclaredAnnotations();
         assertThat(annotations.length, is(1));
+
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
         assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
         assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
@@ -96,21 +100,25 @@ public class ProcessorTest {
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+
         final Class<?> aClass = Class.forName("test.Foo");
         assertThat(aClass.getFields().length, is(1));
+
         final Field aField = aClass.getFields()[0];
-        assertThat(aField.getName(), is("s"));
+        final Field expected = new Field("s", Class.forName("java.lang.String"), aClass, Modifier.PRIVATE, null);
+        assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
-        assertThat(aField.getDeclaringClass(), is((Class) aClass));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
+
         final Annotation[] annotations = aField.getDeclaredAnnotations();
         assertThat(annotations.length, is(1));
+
         final Class deprecatedAnnotationClass = Class.forName("java.lang.SuppressWarnings");
         assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
         assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
         assertThat(aField.getAnnotation(deprecatedAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
+
         final Object value = aField.getAnnotation(deprecatedAnnotationClass).getValue("value");
-        assertThat(value, notNullValue());
         assertThat((String) value, is("foo"));
     }
 

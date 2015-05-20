@@ -89,4 +89,20 @@ public class Field {
     public static String getTypeName(Class<?> returnType) {
         return returnType.toString();
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Field field = (Field) o;
+
+        if (!name.equals(field.name)) {
+            return false;
+        }
+        return enclosingClass.equals(field.enclosingClass);
+    }
 }
