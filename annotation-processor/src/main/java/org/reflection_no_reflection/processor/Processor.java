@@ -199,8 +199,23 @@ public class Processor extends AbstractProcessor {
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
             addToInjectedConstructors(annotationClassName, typeElementName, injectionPointName);
+            //TODO add constructor
         } else {
             addToInjectedMethods(annotationClassName, typeElementName, injectionPointName);
+            //RnR 2
+            try {
+                Method method = new Method(getClass(typeElementName),
+                                           injectionPointName,
+                                           //TODO : param types
+                                           new Class[0],
+                                           getClass(((ExecutableElement) injectionPoint).getReturnType().toString()),
+                                           //TODO : exception types
+                                           new Class[0],
+                                           convertModifiersFromAnnnotationProcessing(injectionPoint.getModifiers()));
+                Class.forName(typeElementName).addMethod(method);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -218,8 +233,23 @@ public class Processor extends AbstractProcessor {
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
             addToInjectedConstructors(annotationClassName, typeElementName, injectionPointName);
+            //TODO add constructor
         } else {
             addToInjectedMethods(annotationClassName, typeElementName, injectionPointName);
+            //RnR 2
+            try {
+                Method method = new Method(getClass(typeElementName),
+                                           injectionPointName,
+                                           //TODO : param types
+                                           new Class[0],
+                                           getClass(((ExecutableElement) injectionPoint).getReturnType().toString()),
+                                           //TODO : exception types
+                                           new Class[0],
+                                           convertModifiersFromAnnnotationProcessing(injectionPoint.getModifiers()));
+                Class.forName(typeElementName).addMethod(method);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -229,6 +259,7 @@ public class Processor extends AbstractProcessor {
 
     protected void addToInjectedMethods(String annotationClassName, String typeElementName, String injectionPointName) {
         addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
+
     }
 
     protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, Set<Modifier> modifiers, String injectedClassName, List<? extends AnnotationMirror> annotationMirrors) {
@@ -246,6 +277,7 @@ public class Processor extends AbstractProcessor {
             mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
         }
 
+        //TODO add that code here to add a method !
         List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
         for (AnnotationMirror annotationMirror : annotationMirrors) {
             Map<String, Object> mapMethodToValue = new HashMap<>();
@@ -254,6 +286,8 @@ public class Processor extends AbstractProcessor {
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
                 String methodName = entry.getKey().getSimpleName().toString();
                 mapMethodToValue.put(methodName, entry.getValue().getValue());
+
+                //RnR 2
                 Method method = new Method(getClass(annotationClassName),
                                            methodName,
                                            //TODO : param types

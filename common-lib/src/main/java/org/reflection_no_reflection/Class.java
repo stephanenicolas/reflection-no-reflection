@@ -37,8 +37,8 @@ public class Class<T> implements java.io.Serializable,
     private EnclosingMethodInfo[] enclosingMethodInfos;
     private Class<?>[] classes;
     private List<Field> fields = new ArrayList<>();
-    private Method[] methods;
-    private Constructor<?>[] constructors;
+    private List<Method> methods = new ArrayList<>();
+    private List<Constructor<?>> constructors;
     private Map<String, Annotation> annotations;
     private GenericDeclaration genericInfo;
     private Constructor<?> enclosingConstructor;
@@ -640,6 +640,10 @@ public class Class<T> implements java.io.Serializable,
         fields.add(field);
     }
 
+    public void addMethod(Method method) {
+        methods.add(method);
+    }
+
     public static void purgeAllClasses() {
         CLASS_POOL.clear();
     }
@@ -1049,11 +1053,11 @@ public class Class<T> implements java.io.Serializable,
      * </ul>
      * @since JDK1.1
      */
-    public Method[] getMethods() throws SecurityException {
+    public List<Method> getMethods() {
         return methods;
     }
 
-    public void setMethods(Method[] methods) {
+    public void setMethods(List<Method> methods) {
         this.methods = methods;
     }
 
@@ -1095,7 +1099,7 @@ public class Class<T> implements java.io.Serializable,
      * </ul>
      * @since JDK1.1
      */
-    public Constructor<?>[] getConstructors() throws SecurityException {
+    public List<Constructor<?>> getConstructors() throws SecurityException {
         return constructors;
     }
 

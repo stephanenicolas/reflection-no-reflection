@@ -251,7 +251,7 @@ public class Method extends GenericDeclaration {
         if (obj != null && obj instanceof Method) {
             Method other = (Method) obj;
             if ((getDeclaringClass() == other.getDeclaringClass())
-                && (getName() == other.getName())) {
+                && (getName().equals(other.getName()))) {
                 if (!returnType.equals(other.getReturnType())) {
                     return false;
                 }
