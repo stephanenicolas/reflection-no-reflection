@@ -5,7 +5,6 @@ import com.google.testing.compile.JavaFileObjects;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.tools.JavaFileObject;
 import org.junit.Before;
@@ -81,7 +80,7 @@ public class ProcessorTest {
 
     @Test
     @SuppressWarnings("foo")
-    public void mapsAnnotatedFieldWithParams() throws ClassNotFoundException {
+    public void mapsAnnotatedFieldWithParams() throws ClassNotFoundException, NoSuchMethodException {
         JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
                                                                                                   "package test;", //
                                                                                                   "public class Foo {",//
@@ -109,9 +108,10 @@ public class ProcessorTest {
         final Class deprecatedAnnotationClass = Class.forName("java.lang.SuppressWarnings");
         assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
         assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
-        assertThat(aField.getAnnotation(deprecatedAnnotationClass).getMapNameMethodToMethod().get("value"), notNullValue());
-        assertThat(aField.getAnnotation(deprecatedAnnotationClass).getMapNameMethodToMethod().get("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
-        assertThat((String) ((com.sun.tools.javac.code.Attribute.Constant) ((List) aField.getAnnotation(deprecatedAnnotationClass).getMapMethodToValue().get("value")).get(0)).getValue(), is("foo"));
+        assertThat(aField.getAnnotation(deprecatedAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
+        final Object value = aField.getAnnotation(deprecatedAnnotationClass).getValue("value");
+        assertThat(value, notNullValue());
+        assertThat((String) value, is("foo"));
     }
 
     private void configureProcessor(String[] annotations) {

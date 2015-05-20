@@ -1,6 +1,8 @@
 package org.reflection_no_reflection;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,12 +35,35 @@ public class Annotation {
         return annotationType.getName();
     }
 
-    public Map<String, Object> getMapMethodToValue() {
-        return mapMethodToValue;
+    public List<Method> getMethods() {
+        return new ArrayList<>(mapNameMethodToMethod.values());
     }
 
-    public Map<String, Method> getMapNameMethodToMethod() {
-        return mapNameMethodToMethod;
+    public Method getMethod(String methodName) throws NoSuchMethodException {
+        for (Method method : mapNameMethodToMethod.values()) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+
+        throw new NoSuchMethodException(methodName);
+    }
+
+    public Object getValue(String methodName) throws NoSuchMethodException {
+        Object result = mapMethodToValue.get(methodName);
+        if (result == null) {
+            throw new NoSuchMethodException(methodName);
+        }
+
+        //special cases handling
+        if (getMethod(methodName).getReturnType().getName().equals("java.lang.String[]")
+            && result instanceof List) {
+            List temp = (List) result;
+            if (temp.size() == 1) {
+                result = ((com.sun.tools.javac.code.Attribute.Constant) temp.get(0)).getValue();
+            }
+        }
+        return result;
     }
 
     public Class<?> annotationType() {
