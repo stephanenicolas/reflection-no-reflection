@@ -47,22 +47,6 @@ public class Processor extends AbstractProcessor {
     //TODO add a HashMap<String, Set<String>>
 
     /**
-     * Maps each annotation name to an inner map.
-     * The inner map maps classes (containing injection points) names to the list of injected field names.
-     */
-    private HashMap<String, Map<String, Set<Field>>> mapAnnotationToMapClassContainingInjectionToInjectedFieldSet;
-    /**
-     * Maps each annotation name to an inner map.
-     * The inner map maps classes (containing injection points) names to the list of injected method names and parameters classes.
-     */
-    private HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassContainingInjectionToInjectedMethodSet;
-    /**
-     * Maps each annotation name to an inner map.
-     * The inner map maps classes (containing injection points) names to the list of injected constructors parameters classes.
-     */
-    private HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet;
-
-    /**
      * Maps each annotation name to a list of Annotation.
      */
     private HashMap<String, Annotation> mapAnnotationNameToAnnotation = new HashMap<>();
@@ -80,9 +64,6 @@ public class Processor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
         annotationDatabasePackageName = processingEnv.getOptions().get("guiceAnnotationDatabasePackageName");
-        mapAnnotationToMapClassContainingInjectionToInjectedFieldSet = new HashMap<>();
-        mapAnnotationToMapClassContainingInjectionToInjectedMethodSet = new HashMap<>();
-        mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet = new HashMap<>();
         bindableClasses = new HashSet<>();
         String isUsingFragmentUtilString = processingEnv.getOptions().get("guiceUsesFragmentUtil");
         if (isUsingFragmentUtilString != null) {
@@ -119,27 +100,6 @@ public class Processor extends AbstractProcessor {
                 } else if (injectionPoint instanceof TypeElement) {
                     addClassToAnnotationDatabase(injectionPoint);
                 }
-            }
-        }
-
-        for (Map<String, Set<Field>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedFieldSet.values()) {
-            final Set<String> classNames = entryAnnotationToclassesContainingInjectionPoints.keySet();
-            for (String className : classNames) {
-                annotatedClassSet.add(new Class(className));
-            }
-        }
-
-        for (Map<String, Set<String>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedMethodSet.values()) {
-            final Set<String> classNames = entryAnnotationToclassesContainingInjectionPoints.keySet();
-            for (String className : classNames) {
-                annotatedClassSet.add(new Class(className));
-            }
-        }
-
-        for (Map<String, Set<String>> entryAnnotationToclassesContainingInjectionPoints : mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet.values()) {
-            final Set<String> classNames = entryAnnotationToclassesContainingInjectionPoints.keySet();
-            for (String className : classNames) {
-                annotatedClassSet.add(new Class(className));
             }
         }
 
@@ -198,10 +158,8 @@ public class Processor extends AbstractProcessor {
         String typeElementName = getTypeName(typeElementRequiringScanning);
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
-            addToInjectedConstructors(annotationClassName, typeElementName, injectionPointName);
             //TODO add constructor
         } else {
-            addToInjectedMethods(annotationClassName, typeElementName, injectionPointName);
             //RnR 2
             try {
                 Method method = new Method(getClass(typeElementName),
@@ -212,7 +170,9 @@ public class Processor extends AbstractProcessor {
                                            //TODO : exception types
                                            new Class[0],
                                            convertModifiersFromAnnnotationProcessing(injectionPoint.getModifiers()));
-                Class.forName(typeElementName).addMethod(method);
+                final Class<?> classContainingMethod = Class.forName(typeElementName);
+                classContainingMethod.addMethod(method);
+                annotatedClassSet.add(classContainingMethod);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -232,10 +192,8 @@ public class Processor extends AbstractProcessor {
 
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
-            addToInjectedConstructors(annotationClassName, typeElementName, injectionPointName);
             //TODO add constructor
         } else {
-            addToInjectedMethods(annotationClassName, typeElementName, injectionPointName);
             //RnR 2
             try {
                 Method method = new Method(getClass(typeElementName),
@@ -275,37 +233,16 @@ public class Processor extends AbstractProcessor {
                 }
 
                 method.setDeclaredAnnotations(mapAnnotationClassToAnnotationInstance);
-                Class.forName(typeElementName).addMethod(method);
+                final Class<?> classContainingMethod = Class.forName(typeElementName);
+                classContainingMethod.addMethod(method);
+                annotatedClassSet.add(classContainingMethod);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    protected void addToInjectedConstructors(String annotationClassName, String typeElementName, String injectionPointName) {
-        addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedConstructorsSet);
-    }
-
-    protected void addToInjectedMethods(String annotationClassName, String typeElementName, String injectionPointName) {
-        addToInjectedMembers(annotationClassName, typeElementName, injectionPointName, mapAnnotationToMapClassContainingInjectionToInjectedMethodSet);
-
-    }
-
     protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, Set<Modifier> modifiers, String injectedClassName, List<? extends AnnotationMirror> annotationMirrors) {
-        Map<String, Set<Field>> mapClassWithInjectionNameToMemberSet = mapAnnotationToMapClassContainingInjectionToInjectedFieldSet
-            .get(annotationClassName);
-        if (mapClassWithInjectionNameToMemberSet == null) {
-            mapClassWithInjectionNameToMemberSet = new HashMap<>();
-            mapAnnotationToMapClassContainingInjectionToInjectedFieldSet
-                .put(annotationClassName, mapClassWithInjectionNameToMemberSet);
-        }
-
-        Set<Field> injectionPointNameSet = mapClassWithInjectionNameToMemberSet.get(typeElementName);
-        if (injectionPointNameSet == null) {
-            injectionPointNameSet = new HashSet<>();
-            mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
-        }
-
         //TODO add that code here to add a method !
         List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
         for (AnnotationMirror annotationMirror : annotationMirrors) {
@@ -335,14 +272,11 @@ public class Processor extends AbstractProcessor {
         }
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
         final Field field = new Field(injectionPointName, getClass(injectedClassName), getClass(typeElementName), modifiersInt, annotationList);
-        injectionPointNameSet.add(field);
 
         //rnr 2
-        try {
-            Class.forName(typeElementName).addField(field);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        final Class<?> classContainingField = getClass(typeElementName);
+        classContainingField.addField(field);
+        annotatedClassSet.add(classContainingField);
     }
 
     private Class getClass(String name) {
