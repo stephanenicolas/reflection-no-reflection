@@ -43,19 +43,13 @@ public class Processor extends AbstractProcessor {
 
     private boolean isUsingFragmentUtil = true;
     private boolean isCommentingInjector = true;
-    private Set<String> annotatedClasses = new HashSet<String>();
-    //TODO add a HashMap<String, Set<String>>
-
-    /**
-     * Maps each annotation name to a list of Annotation.
-     */
-    private HashMap<String, Annotation> mapAnnotationNameToAnnotation = new HashMap<>();
+    private Set<String> annotatedClasses = new HashSet<>();
 
     /** Contains all classes that contain injection points. */
     private HashSet<Class> annotatedClassSet = new HashSet<>();
 
     /** Contains all classes that can be injected into a class with injection points. */
-    private HashSet<String> bindableClasses;
+    private HashSet<String> classesUnderAnnotation;
     /** Name of the package to generate the annotation database into. */
     private String annotationDatabasePackageName;
     private ProcessingEnvironment processingEnv;
@@ -64,7 +58,7 @@ public class Processor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
         annotationDatabasePackageName = processingEnv.getOptions().get("guiceAnnotationDatabasePackageName");
-        bindableClasses = new HashSet<>();
+        classesUnderAnnotation = new HashSet<>();
         String isUsingFragmentUtilString = processingEnv.getOptions().get("guiceUsesFragmentUtil");
         if (isUsingFragmentUtilString != null) {
             isUsingFragmentUtil = Boolean.parseBoolean(isUsingFragmentUtilString);
@@ -96,7 +90,7 @@ public class Processor extends AbstractProcessor {
                 } else if (injectionPoint.getEnclosingElement() instanceof ExecutableElement && injectionPoint instanceof VariableElement) {
                     addParameterToAnnotationDatabase(annotationClassName, injectionPoint);
                 } else if (injectionPoint instanceof ExecutableElement) {
-                    addMethodOrConstructorToAnnotationDatabase(annotationClassName, injectionPoint);
+                    addMethodOrConstructorToAnnotationDatabase((ExecutableElement) injectionPoint);
                 } else if (injectionPoint instanceof TypeElement) {
                     addClassToAnnotationDatabase(injectionPoint);
                 }
@@ -117,9 +111,9 @@ public class Processor extends AbstractProcessor {
         String injectionPointName;
         String injectedClassName = getTypeName(injectionPoint);
         if (isPrimitiveType(injectedClassName)) {
-            bindableClasses.add(injectedClassName + ".class");
+            classesUnderAnnotation.add(injectedClassName + ".class");
         } else {
-            bindableClasses.add(injectedClassName);
+            classesUnderAnnotation.add(injectedClassName);
         }
         injectionPointName = injectionPoint.getSimpleName().toString();
 
@@ -145,100 +139,83 @@ public class Processor extends AbstractProcessor {
         return false;
     }
 
-    private void addParameterToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
-        Element enclosing = injectionPoint.getEnclosingElement();
+    private void addParameterToAnnotationDatabase(String annotationClassName, Element paramElement) {
+        Element enclosing = paramElement.getEnclosingElement();
         String injectionPointName = enclosing.getSimpleName().toString();
-        for (VariableElement variable : ((ExecutableElement) enclosing).getParameters()) {
-            String parameterTypeName = getTypeName(variable);
-            bindableClasses.add(parameterTypeName);
-            injectionPointName += ":" + parameterTypeName;
-        }
-
-        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement().getEnclosingElement();
-        String typeElementName = getTypeName(typeElementRequiringScanning);
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
             //TODO add constructor
         } else {
-            //RnR 2
-            try {
-                Method method = new Method(getClass(typeElementName),
-                                           injectionPointName,
-                                           //TODO : param types
-                                           new Class[0],
-                                           getClass(((ExecutableElement) injectionPoint).getReturnType().toString()),
-                                           //TODO : exception types
-                                           new Class[0],
-                                           convertModifiersFromAnnnotationProcessing(injectionPoint.getModifiers()));
-                final Class<?> classContainingMethod = Class.forName(typeElementName);
-                classContainingMethod.addMethod(method);
-                annotatedClassSet.add(classContainingMethod);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            addMethod((ExecutableElement) paramElement.getEnclosingElement());
         }
     }
 
-    private void addMethodOrConstructorToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
-        String injectionPointName = injectionPoint.getSimpleName().toString();
-        for (VariableElement variable : ((ExecutableElement) injectionPoint).getParameters()) {
-            String parameterTypeName = getTypeName((TypeElement) ((DeclaredType) variable.asType()).asElement());
-            bindableClasses.add(parameterTypeName);
-            injectionPointName += ":" + parameterTypeName;
+    private void addMethod(ExecutableElement methodElement) {
+        final Element enclosing = methodElement.getEnclosingElement();
+        final String methodName = methodElement.getSimpleName().toString();
+        final TypeElement declaringClassElement = (TypeElement) enclosing;
+        final String declaringClassName = getTypeName(declaringClassElement);
+        final Class[] paramTypes = getParameterTypes(methodElement);
+        final String returnTypeName = methodElement.getReturnType().toString();
+        final Method method = new Method(getClass(declaringClassName),
+                                         methodName,
+                                         paramTypes,
+                                         getClass(returnTypeName),
+                                         //TODO : exception types
+                                         new Class[0],
+                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
+
+        Map<Class, Annotation> mapAnnotationClassToAnnotationInstance = new HashMap<>();
+        Map<String, Object> mapMethodToValue = new HashMap<>();
+        Map<String, Method> mapMethodNameToMethod = new HashMap<>();
+
+        for (AnnotationMirror annotationMirror : methodElement.getAnnotationMirrors()) {
+            String annotationType = annotationMirror.getAnnotationType().toString();
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                String methodOfAnnotationName = entry.getKey().getSimpleName().toString();
+                mapMethodToValue.put(methodName, entry.getValue().getValue());
+
+                //RnR 2
+                Method methodOfAnnotation = new Method(getClass(annotationType),
+                                                       methodOfAnnotationName,
+                                                       //TODO : param types
+                                                       new Class[0],
+                                                       getClass(entry.getKey().getReturnType().toString()),
+                                                       //TODO : exception types
+                                                       new Class[0],
+                                                       java.lang.reflect.Modifier.PUBLIC
+                );
+                mapMethodNameToMethod.put(methodName, methodOfAnnotation);
+            }
+
+            Annotation annotation = new Annotation(getClass(annotationType), mapMethodToValue, mapMethodNameToMethod);
+            mapAnnotationClassToAnnotationInstance.put(getClass(annotationType), annotation);
         }
 
-        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
-        String typeElementName = getTypeName(typeElementRequiringScanning);
+        method.setDeclaredAnnotations(mapAnnotationClassToAnnotationInstance);
 
+        final Class<?> classContainingMethod = getClass(declaringClassName);
+        classContainingMethod.addMethod(method);
+        annotatedClassSet.add(classContainingMethod);
+    }
+
+    private Class[] getParameterTypes(ExecutableElement methodElement) {
+        final List<? extends VariableElement> parameters = methodElement.getParameters();
+        Class[] paramTypes = new Class[parameters.size()];
+        for (int indexParam = 0; indexParam < parameters.size(); indexParam++) {
+            VariableElement parameter = parameters.get(indexParam);
+            paramTypes[indexParam] = getClass(getTypeName(parameter));
+        }
+        return paramTypes;
+    }
+
+    private void addMethodOrConstructorToAnnotationDatabase(ExecutableElement methodElement) {
+        String injectionPointName = methodElement.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
             //TODO add constructor
         } else {
-            //RnR 2
-            try {
-                Method method = new Method(getClass(typeElementName),
-                                           injectionPointName,
-                                           //TODO : param types
-                                           new Class[0],
-                                           getClass(((ExecutableElement) injectionPoint).getReturnType().toString()),
-                                           //TODO : exception types
-                                           new Class[0],
-                                           convertModifiersFromAnnnotationProcessing(injectionPoint.getModifiers()));
-
-                Map<Class, Annotation> mapAnnotationClassToAnnotationInstance = new HashMap<>();
-                Map<String, Object> mapMethodToValue = new HashMap<>();
-                Map<String, Method> mapMethodNameToMethod = new HashMap<>();
-
-                for (AnnotationMirror annotationMirror : injectionPoint.getAnnotationMirrors()) {
-                    String annotationType = annotationMirror.getAnnotationType().toString();
-                    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
-                        String methodName = entry.getKey().getSimpleName().toString();
-                        mapMethodToValue.put(methodName, entry.getValue().getValue());
-
-                        //RnR 2
-                        Method methodOfAnnotation = new Method(getClass(annotationClassName),
-                                                               methodName,
-                                                               //TODO : param types
-                                                               new Class[0],
-                                                               getClass(entry.getKey().getReturnType().toString()),
-                                                               //TODO : exception types
-                                                               new Class[0],
-                                                               java.lang.reflect.Modifier.PUBLIC
-                        );
-                        mapMethodNameToMethod.put(methodName, methodOfAnnotation);
-                    }
-
-                    Annotation annotation = new Annotation(getClass(annotationType), mapMethodToValue, mapMethodNameToMethod);
-                    mapAnnotationClassToAnnotationInstance.put(getClass(annotationType), annotation);
-                }
-
-                method.setDeclaredAnnotations(mapAnnotationClassToAnnotationInstance);
-                final Class<?> classContainingMethod = Class.forName(typeElementName);
-                classContainingMethod.addMethod(method);
-                annotatedClassSet.add(classContainingMethod);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            addMethod(methodElement);
         }
     }
 
@@ -268,7 +245,6 @@ public class Processor extends AbstractProcessor {
             final Class annotationType = getClass(annotationMirror.getAnnotationType().toString());
             org.reflection_no_reflection.Annotation annotationInstance = new Annotation(annotationType, mapMethodToValue, mapMethodNameToMethod);
             annotationList.add(annotationInstance);
-            mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
         }
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
         final Field field = new Field(injectionPointName, getClass(injectedClassName), getClass(typeElementName), modifiersInt, annotationList);
