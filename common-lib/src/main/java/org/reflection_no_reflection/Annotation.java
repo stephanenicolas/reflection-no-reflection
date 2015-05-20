@@ -13,22 +13,16 @@ public class Annotation {
 
     /** The class name of this annotation type. */
     private Class<?> annotationType;
-    /** Maps method names to their return values. The methods are methods of this annotation. */
-    private Map<String, Object> mapMethodToValue = new HashMap<>();
-    /** Maps method names to the methods. The methods are methods of this annotation. */
-    private Map<String, Method> mapNameMethodToMethod = new HashMap<>();
+    private Map<Method, Object> mapMethodToValue = new HashMap<>();
 
     /**
      * Creates a new annotation.
      *
      * @param annotationType class of this annotation type.
-     * @param mapMethodToValue maps method names to their return values.
-     * @param mapNameMethodToMethod maps method names to the methods.
      */
-    public Annotation(Class annotationType, Map<String, Object> mapMethodToValue, Map<String, Method> mapNameMethodToMethod) {
+    public Annotation(Class annotationType, Map<Method, Object> mapMethodToValue) {
         this.annotationType = annotationType;
         this.mapMethodToValue = mapMethodToValue;
-        this.mapNameMethodToMethod = mapNameMethodToMethod;
     }
 
     public String getAnnotationTypeName() {
@@ -36,11 +30,11 @@ public class Annotation {
     }
 
     public List<Method> getMethods() {
-        return new ArrayList<>(mapNameMethodToMethod.values());
+        return new ArrayList<>(mapMethodToValue.keySet());
     }
 
     public Method getMethod(String methodName) throws NoSuchMethodException {
-        for (Method method : mapNameMethodToMethod.values()) {
+        for (Method method : mapMethodToValue.keySet()) {
             if (method.getName().equals(methodName)) {
                 return method;
             }
@@ -50,13 +44,11 @@ public class Annotation {
     }
 
     public Object getValue(String methodName) throws NoSuchMethodException {
-        Object result = mapMethodToValue.get(methodName);
-        if (result == null) {
-            throw new NoSuchMethodException(methodName);
-        }
+        final Method method = getMethod(methodName);
+        Object result = mapMethodToValue.get(method);
 
         //special cases handling
-        if (getMethod(methodName).getReturnType().getName().equals("java.lang.String[]")
+        if (method.getReturnType().getName().equals("java.lang.String[]")
             && result instanceof List) {
             List temp = (List) result;
             if (temp.size() == 1) {

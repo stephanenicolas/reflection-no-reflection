@@ -115,13 +115,9 @@ public class Processor extends AbstractProcessor {
         } else {
             classesUnderAnnotation.add(injectedClassName);
         }
-        injectionPointName = injectionPoint.getSimpleName().toString();
-
-        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint.getEnclosingElement();
-        String typeElementName = getTypeName(typeElementRequiringScanning);
 
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
-        addToInjectedFields(annotationClassName, typeElementName, injectionPointName, injectionPoint.getModifiers(), injectedClassName, injectionPoint.getAnnotationMirrors());
+        addToInjectedFields(injectionPoint.getModifiers(), injectedClassName, injectionPoint);
     }
 
     private boolean isPrimitiveType(String injectedClassName) {
@@ -150,55 +146,6 @@ public class Processor extends AbstractProcessor {
         }
     }
 
-    private void addMethod(ExecutableElement methodElement) {
-        final Element enclosing = methodElement.getEnclosingElement();
-        final String methodName = methodElement.getSimpleName().toString();
-        final TypeElement declaringClassElement = (TypeElement) enclosing;
-        final String declaringClassName = getTypeName(declaringClassElement);
-        final Class[] paramTypes = getParameterTypes(methodElement);
-        final String returnTypeName = methodElement.getReturnType().toString();
-        final Method method = new Method(getClass(declaringClassName),
-                                         methodName,
-                                         paramTypes,
-                                         getClass(returnTypeName),
-                                         //TODO : exception types
-                                         new Class[0],
-                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
-
-        Map<Class, Annotation> mapAnnotationClassToAnnotationInstance = new HashMap<>();
-        Map<String, Object> mapMethodToValue = new HashMap<>();
-        Map<String, Method> mapMethodNameToMethod = new HashMap<>();
-
-        for (AnnotationMirror annotationMirror : methodElement.getAnnotationMirrors()) {
-            String annotationType = annotationMirror.getAnnotationType().toString();
-            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
-                String methodOfAnnotationName = entry.getKey().getSimpleName().toString();
-                mapMethodToValue.put(methodName, entry.getValue().getValue());
-
-                //RnR 2
-                Method methodOfAnnotation = new Method(getClass(annotationType),
-                                                       methodOfAnnotationName,
-                                                       //TODO : param types
-                                                       new Class[0],
-                                                       getClass(entry.getKey().getReturnType().toString()),
-                                                       //TODO : exception types
-                                                       new Class[0],
-                                                       java.lang.reflect.Modifier.PUBLIC
-                );
-                mapMethodNameToMethod.put(methodName, methodOfAnnotation);
-            }
-
-            Annotation annotation = new Annotation(getClass(annotationType), mapMethodToValue, mapMethodNameToMethod);
-            mapAnnotationClassToAnnotationInstance.put(getClass(annotationType), annotation);
-        }
-
-        method.setDeclaredAnnotations(mapAnnotationClassToAnnotationInstance);
-
-        final Class<?> classContainingMethod = getClass(declaringClassName);
-        classContainingMethod.addMethod(method);
-        annotatedClassSet.add(classContainingMethod);
-    }
-
     private Class[] getParameterTypes(ExecutableElement methodElement) {
         final List<? extends VariableElement> parameters = methodElement.getParameters();
         Class[] paramTypes = new Class[parameters.size()];
@@ -219,40 +166,69 @@ public class Processor extends AbstractProcessor {
         }
     }
 
-    protected void addToInjectedFields(String annotationClassName, String typeElementName, String injectionPointName, Set<Modifier> modifiers, String injectedClassName, List<? extends AnnotationMirror> annotationMirrors) {
-        //TODO add that code here to add a method !
-        List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
-        for (AnnotationMirror annotationMirror : annotationMirrors) {
-            Map<String, Object> mapMethodToValue = new HashMap<>();
-            Map<String, Method> mapMethodNameToMethod = new HashMap<>();
-
-            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
-                String methodName = entry.getKey().getSimpleName().toString();
-                mapMethodToValue.put(methodName, entry.getValue().getValue());
-
-                //RnR 2
-                Method method = new Method(getClass(annotationClassName),
-                                           methodName,
-                                           //TODO : param types
-                                           new Class[0],
-                                           getClass(entry.getKey().getReturnType().toString()),
-                                           //TODO : exception types
-                                           new Class[0],
-                                           java.lang.reflect.Modifier.PUBLIC
-                );
-                mapMethodNameToMethod.put(methodName, method);
-            }
-            final Class annotationType = getClass(annotationMirror.getAnnotationType().toString());
-            org.reflection_no_reflection.Annotation annotationInstance = new Annotation(annotationType, mapMethodToValue, mapMethodNameToMethod);
-            annotationList.add(annotationInstance);
-        }
+    protected void addToInjectedFields(Set<Modifier> modifiers, String injectedClassName, Element fieldElement) {
+        String injectionPointName = fieldElement.getSimpleName().toString();
+        TypeElement declaringClassElement = (TypeElement) fieldElement.getEnclosingElement();
+        String declaringClassName = getTypeName(declaringClassElement);
+        final List<Annotation> annotations = extractAnnotations(fieldElement);
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        final Field field = new Field(injectionPointName, getClass(injectedClassName), getClass(typeElementName), modifiersInt, annotationList);
+        final Field field = new Field(injectionPointName, getClass(injectedClassName), getClass(declaringClassName), modifiersInt, annotations);
 
         //rnr 2
-        final Class<?> classContainingField = getClass(typeElementName);
+        final Class<?> classContainingField = getClass(declaringClassName);
         classContainingField.addField(field);
         annotatedClassSet.add(classContainingField);
+    }
+
+    private void addMethod(ExecutableElement methodElement) {
+        final Element enclosing = methodElement.getEnclosingElement();
+        final String methodName = methodElement.getSimpleName().toString();
+        final TypeElement declaringClassElement = (TypeElement) enclosing;
+        final String declaringClassName = getTypeName(declaringClassElement);
+        final Class[] paramTypes = getParameterTypes(methodElement);
+        final String returnTypeName = methodElement.getReturnType().toString();
+        final Method method = new Method(getClass(declaringClassName),
+                                         methodName,
+                                         paramTypes,
+                                         getClass(returnTypeName),
+                                         //TODO : exception types
+                                         new Class[0],
+                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
+
+        final List<Annotation> annotations = extractAnnotations(methodElement);
+
+        method.setDeclaredAnnotations(annotations);
+
+        final Class<?> classContainingMethod = getClass(declaringClassName);
+        classContainingMethod.addMethod(method);
+        annotatedClassSet.add(classContainingMethod);
+    }
+
+    private List<Annotation> extractAnnotations(Element methodElement) {
+        final List<Annotation> annotations = new ArrayList<>();
+        for (AnnotationMirror annotationMirror : methodElement.getAnnotationMirrors()) {
+            final Map<Method, Object> mapMethodToValue = new HashMap<>();
+            final String annotationType = annotationMirror.getAnnotationType().toString();
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                final String methodOfAnnotationName = entry.getKey().getSimpleName().toString();
+
+                //RnR 2
+                final Method methodOfAnnotation = new Method(getClass(annotationType),
+                                                             methodOfAnnotationName,
+                                                             //TODO : param types
+                                                             new Class[0],
+                                                             getClass(entry.getKey().getReturnType().toString()),
+                                                             //TODO : exception types
+                                                             new Class[0],
+                                                             java.lang.reflect.Modifier.PUBLIC
+                );
+                mapMethodToValue.put(methodOfAnnotation, entry.getValue().getValue());
+            }
+
+            final Annotation annotation = new Annotation(getClass(annotationType), mapMethodToValue);
+            annotations.add(annotation);
+        }
+        return annotations;
     }
 
     private Class getClass(String name) {

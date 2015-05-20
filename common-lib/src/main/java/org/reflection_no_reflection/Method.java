@@ -4,6 +4,8 @@ import java.lang.reflect.GenericSignatureFormatError;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import sun.reflect.generics.repository.MethodRepository;
 
@@ -24,7 +26,7 @@ public class Method extends GenericDeclaration {
     private byte[] annotations;
     private byte[] parameterAnnotations;
     private byte[] annotationDefault;
-    private transient Map<Class, Annotation> declaredAnnotations;
+    private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
 
     // Modifiers that can be applied to a method in source code
     private static final int LANGUAGE_MODIFIERS =
@@ -484,8 +486,11 @@ public class Method extends GenericDeclaration {
         return declaredAnnotations().values().toArray(EMPTY_ANNOTATION_ARRAY);
     }
 
-    public void setDeclaredAnnotations(Map<Class, Annotation> annotations) {
-        declaredAnnotations = annotations;
+    public void setDeclaredAnnotations(List<Annotation> annotations) {
+        declaredAnnotations.clear();
+        for (Annotation annotation : annotations) {
+            declaredAnnotations.put(annotation.annotationType(), annotation);
+        }
     }
 
     private synchronized Map<Class, Annotation> declaredAnnotations() {
