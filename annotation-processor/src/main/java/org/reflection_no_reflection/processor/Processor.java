@@ -96,6 +96,7 @@ public class Processor extends AbstractProcessor {
         if (annotatedClassesString != null) {
             annotatedClasses.addAll(Arrays.asList(annotatedClassesString.split(",")));
         }
+        Class.purgeAllClasses();
     }
 
     @Override
@@ -248,13 +249,11 @@ public class Processor extends AbstractProcessor {
         List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
         for (AnnotationMirror annotationMirror : annotationMirrors) {
             Map<String, Object> mapMethodToValue = new HashMap<>();
-            Map<String, String> mapMethodToReturnType = new HashMap<>();
             Map<String, Method> mapMethodNameToMethod = new HashMap<>();
 
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
                 String methodName = entry.getKey().getSimpleName().toString();
                 mapMethodToValue.put(methodName, entry.getValue().getValue());
-                mapMethodToReturnType.put(methodName, entry.getKey().getReturnType().toString());
                 Method method = new Method(getClass(annotationClassName),
                                            methodName,
                                            //TODO : param types
@@ -264,8 +263,10 @@ public class Processor extends AbstractProcessor {
                                            new Class[0],
                                            java.lang.reflect.Modifier.PUBLIC
                 );
+                mapMethodNameToMethod.put(methodName, method);
             }
-            org.reflection_no_reflection.Annotation annotationInstance = new Annotation(getClass(annotationMirror.getAnnotationType().toString()), mapMethodToValue, mapMethodToReturnType);
+            final Class annotationType = getClass(annotationMirror.getAnnotationType().toString());
+            org.reflection_no_reflection.Annotation annotationInstance = new Annotation(annotationType, mapMethodToValue, mapMethodNameToMethod);
             annotationList.add(annotationInstance);
             mapAnnotationNameToAnnotation.put(annotationInstance.getAnnotationTypeName(), annotationInstance);
         }

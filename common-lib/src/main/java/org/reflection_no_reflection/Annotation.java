@@ -12,21 +12,21 @@ public class Annotation {
     /** The class name of this annotation type. */
     private Class<?> annotationType;
     /** Maps method names to their return values. The methods are methods of this annotation. */
-    private Map<String, Object> mapMethodToValue = new HashMap<String, Object>();
-    /** Maps method names to their return types. The methods are methods of this annotation. */
-    private Map<String, String> mapMethodToReturnType = new HashMap<String, String>();
+    private Map<String, Object> mapMethodToValue = new HashMap<>();
+    /** Maps method names to the methods. The methods are methods of this annotation. */
+    private Map<String, Method> mapNameMethodToMethod = new HashMap<>();
 
     /**
      * Creates a new annotation.
      *
      * @param annotationType class of this annotation type.
      * @param mapMethodToValue maps method names to their return values.
-     * @param mapMethodToReturnType maps method names to their return types.
+     * @param mapNameMethodToMethod maps method names to the methods.
      */
-    public Annotation(Class annotationType, Map<String, Object> mapMethodToValue, Map<String, String> mapMethodToReturnType) {
+    public Annotation(Class annotationType, Map<String, Object> mapMethodToValue, Map<String, Method> mapNameMethodToMethod) {
         this.annotationType = annotationType;
         this.mapMethodToValue = mapMethodToValue;
-        this.mapMethodToReturnType = mapMethodToReturnType;
+        this.mapNameMethodToMethod = mapNameMethodToMethod;
     }
 
     public String getAnnotationTypeName() {
@@ -37,8 +37,8 @@ public class Annotation {
         return mapMethodToValue;
     }
 
-    public Map<String, String> getMapMethodToReturnType() {
-        return mapMethodToReturnType;
+    public Map<String, Method> getMapNameMethodToMethod() {
+        return mapNameMethodToMethod;
     }
 
     public Class<?> annotationType() {

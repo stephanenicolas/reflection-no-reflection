@@ -640,6 +640,10 @@ public class Class<T> implements java.io.Serializable,
         fields.add(field);
     }
 
+    public static void purgeAllClasses() {
+        CLASS_POOL.clear();
+    }
+
     private final static class EnclosingMethodInfo {
         private Class<?> enclosingClass;
         private String name;
