@@ -246,6 +246,35 @@ public class Processor extends AbstractProcessor {
                                            //TODO : exception types
                                            new Class[0],
                                            convertModifiersFromAnnnotationProcessing(injectionPoint.getModifiers()));
+
+                Map<Class, Annotation> mapAnnotationClassToAnnotationInstance = new HashMap<>();
+                Map<String, Object> mapMethodToValue = new HashMap<>();
+                Map<String, Method> mapMethodNameToMethod = new HashMap<>();
+
+                for (AnnotationMirror annotationMirror : injectionPoint.getAnnotationMirrors()) {
+                    String annotationType = annotationMirror.getAnnotationType().toString();
+                    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                        String methodName = entry.getKey().getSimpleName().toString();
+                        mapMethodToValue.put(methodName, entry.getValue().getValue());
+
+                        //RnR 2
+                        Method methodOfAnnotation = new Method(getClass(annotationClassName),
+                                                               methodName,
+                                                               //TODO : param types
+                                                               new Class[0],
+                                                               getClass(entry.getKey().getReturnType().toString()),
+                                                               //TODO : exception types
+                                                               new Class[0],
+                                                               java.lang.reflect.Modifier.PUBLIC
+                        );
+                        mapMethodNameToMethod.put(methodName, methodOfAnnotation);
+                    }
+
+                    Annotation annotation = new Annotation(getClass(annotationType), mapMethodToValue, mapMethodNameToMethod);
+                    mapAnnotationClassToAnnotationInstance.put(getClass(annotationType), annotation);
+                }
+
+                method.setDeclaredAnnotations(mapAnnotationClassToAnnotationInstance);
                 Class.forName(typeElementName).addMethod(method);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();

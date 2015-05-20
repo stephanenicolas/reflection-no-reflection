@@ -484,6 +484,10 @@ public class Method extends GenericDeclaration {
         return declaredAnnotations().values().toArray(EMPTY_ANNOTATION_ARRAY);
     }
 
+    public void setDeclaredAnnotations(Map<Class, Annotation> annotations) {
+        declaredAnnotations = annotations;
+    }
+
     private synchronized Map<Class, Annotation> declaredAnnotations() {
         return declaredAnnotations;
     }
