@@ -24,6 +24,7 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
+import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.Method;
 
@@ -139,10 +140,11 @@ public class Processor extends AbstractProcessor {
         Element enclosing = paramElement.getEnclosingElement();
         String injectionPointName = enclosing.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
+        final ExecutableElement methodOrConstructor = (ExecutableElement) paramElement.getEnclosingElement();
         if (injectionPointName.startsWith("<init>")) {
-            //TODO add constructor
+            addConstructor(methodOrConstructor);
         } else {
-            addMethod((ExecutableElement) paramElement.getEnclosingElement());
+            addMethod(methodOrConstructor);
         }
     }
 
@@ -166,14 +168,13 @@ public class Processor extends AbstractProcessor {
         return paramTypes;
     }
 
-
-    private void addMethodOrConstructorToAnnotationDatabase(ExecutableElement methodElement) {
-        String injectionPointName = methodElement.getSimpleName().toString();
+    private void addMethodOrConstructorToAnnotationDatabase(ExecutableElement methodOrConstructorElement) {
+        String injectionPointName = methodOrConstructorElement.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
-            //TODO add constructor
+            addConstructor(methodOrConstructorElement);
         } else {
-            addMethod(methodElement);
+            addMethod(methodOrConstructorElement);
         }
     }
 
@@ -189,6 +190,26 @@ public class Processor extends AbstractProcessor {
         final Class<?> classContainingField = getClass(declaringClassName);
         classContainingField.addField(field);
         annotatedClassSet.add(classContainingField);
+    }
+
+    private void addConstructor(ExecutableElement methodElement) {
+        final Element enclosing = methodElement.getEnclosingElement();
+        final TypeElement declaringClassElement = (TypeElement) enclosing;
+        final String declaringClassName = getTypeName(declaringClassElement);
+        final Class[] paramTypes = getParameterTypes(methodElement);
+        final Class[] exceptionTypes = getExceptionTypes(methodElement);
+        final Constructor constructor = new Constructor(getClass(declaringClassName),
+                                         paramTypes,
+                                         exceptionTypes,
+                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
+
+        final List<Annotation> annotations = extractAnnotations(methodElement);
+
+        constructor.setDeclaredAnnotations(annotations);
+
+        final Class<?> classContainingMethod = getClass(declaringClassName);
+        classContainingMethod.addConstructor(constructor);
+        annotatedClassSet.add(classContainingMethod);
     }
 
     private void addMethod(ExecutableElement methodElement) {

@@ -644,6 +644,11 @@ public class Class<T> implements java.io.Serializable,
         methods.add(method);
     }
 
+    public void addConstructor(Constructor constructor) {
+        constructors.add(constructor);
+    }
+
+
     public static void purgeAllClasses() {
         CLASS_POOL.clear();
     }
