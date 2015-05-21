@@ -10,7 +10,7 @@ import org.reflection_no_reflection.Field;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class PrimitiveTest extends AbstractRnRTest {
+public class FieldPrimitiveTest extends AbstractRnRTest {
 
     @Test
     public void mapsAnnotatedPrimitiveIntField() throws ClassNotFoundException {

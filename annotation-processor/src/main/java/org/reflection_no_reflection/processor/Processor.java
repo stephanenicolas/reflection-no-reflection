@@ -19,6 +19,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
@@ -83,13 +84,11 @@ public class Processor extends AbstractProcessor {
         }
 
         for (TypeElement annotation : annotations) {
-            String annotationClassName = getTypeName(annotation);
-
             for (Element injectionPoint : roundEnv.getElementsAnnotatedWith(annotation)) {
                 if (injectionPoint.getEnclosingElement() instanceof TypeElement && injectionPoint instanceof VariableElement) {
-                    addFieldToAnnotationDatabase(annotationClassName, injectionPoint);
+                    addFieldToAnnotationDatabase(injectionPoint);
                 } else if (injectionPoint.getEnclosingElement() instanceof ExecutableElement && injectionPoint instanceof VariableElement) {
-                    addParameterToAnnotationDatabase(annotationClassName, injectionPoint);
+                    addParameterToAnnotationDatabase(injectionPoint);
                 } else if (injectionPoint instanceof ExecutableElement) {
                     addMethodOrConstructorToAnnotationDatabase((ExecutableElement) injectionPoint);
                 } else if (injectionPoint instanceof TypeElement) {
@@ -108,8 +107,7 @@ public class Processor extends AbstractProcessor {
         annotatedClassSet.add(new Class(typeElementName));
     }
 
-    private void addFieldToAnnotationDatabase(String annotationClassName, Element injectionPoint) {
-        String injectionPointName;
+    private void addFieldToAnnotationDatabase(Element injectionPoint) {
         String injectedClassName = getTypeName(injectionPoint);
         if (isPrimitiveType(injectedClassName)) {
             classesUnderAnnotation.add(injectedClassName + ".class");
@@ -136,7 +134,7 @@ public class Processor extends AbstractProcessor {
         return false;
     }
 
-    private void addParameterToAnnotationDatabase(String annotationClassName, Element paramElement) {
+    private void addParameterToAnnotationDatabase(Element paramElement) {
         Element enclosing = paramElement.getEnclosingElement();
         String injectionPointName = enclosing.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
@@ -311,6 +309,8 @@ public class Processor extends AbstractProcessor {
             injectedClassName = getTypeName((TypeElement) ((DeclaredType) fieldTypeMirror).asElement());
         } else if (fieldTypeMirror instanceof PrimitiveType) {
             injectedClassName = fieldTypeMirror.toString();
+        } else if (fieldTypeMirror instanceof ArrayType) {
+            injectedClassName = ((ArrayType) fieldTypeMirror).getComponentType().toString() + "[]";
         }
         return injectedClassName;
     }
