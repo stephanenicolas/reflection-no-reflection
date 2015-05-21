@@ -18,18 +18,15 @@ public class MethodParameterTest extends AbstractRnRTest {
 
     @Test
     public void mapsMethodWithAnnotatedParams() throws ClassNotFoundException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
+        javaSourceCode("test.Foo", //
                                                                                                   "package test;", //
                                                                                                   "public class Foo {",//
                                                                                                   "protected String s(@Deprecated String a) {return a; }", //
                                                                                                   "}" //
-        ));
+        );
 
         configureProcessor(new String[] {"java.lang.Deprecated"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
+        assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));

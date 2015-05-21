@@ -19,18 +19,15 @@ public class FieldTest extends AbstractRnRTest {
 
     @Test
     public void mapsSimpleAnnotatedField() throws ClassNotFoundException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
+        javaSourceCode("test.Foo", //
                                                                                                   "package test;", //
                                                                                                   "public class Foo {",//
                                                                                                   "@Deprecated private String s;", //
                                                                                                   "}" //
-        ));
+        );
 
         configureProcessor(new String[] {"java.lang.Deprecated"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
+        assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
@@ -55,18 +52,15 @@ public class FieldTest extends AbstractRnRTest {
     @Test
     @SuppressWarnings("foo")
     public void mapsAnnotatedFieldWithParams() throws ClassNotFoundException, NoSuchMethodException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
+        javaSourceCode("test.Foo", //
                                                                                                   "package test;", //
                                                                                                   "public class Foo {",//
                                                                                                   "@SuppressWarnings(\"foo\") private String s;", //
                                                                                                   "}" //
-        ));
+        );
 
         configureProcessor(new String[] {"java.lang.SuppressWarnings"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
+        assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));

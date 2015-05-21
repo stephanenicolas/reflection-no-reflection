@@ -1,10 +1,7 @@
 package org.reflection_no_reflection.processor;
 
-import com.google.common.base.Joiner;
-import com.google.testing.compile.JavaFileObjects;
 import java.lang.reflect.Modifier;
 import java.util.Set;
-import javax.tools.JavaFileObject;
 import org.junit.Test;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
@@ -19,18 +16,15 @@ public class ConstructorTest extends AbstractRnRTest {
 
     @Test
     public void mapsSimpleAnnotatedConstructor() throws ClassNotFoundException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
-                                                                                                  "package test;", //
-                                                                                                  "public class Foo {",//
-                                                                                                  "@Deprecated protected Foo() {}", //
-                                                                                                  "}" //
-        ));
+        javaSourceCode("test.Foo", //
+                       "package test;", //
+                       "public class Foo {",//
+                       "@Deprecated protected Foo() {}", //
+                       "}" //
+        );
 
         configureProcessor(new String[] {"java.lang.Deprecated"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
+        assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
@@ -53,18 +47,15 @@ public class ConstructorTest extends AbstractRnRTest {
 
     @Test
     public void mapsSimpleAnnotatedConstructorWithParams() throws ClassNotFoundException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
-                                                                                                  "package test;", //
-                                                                                                  "public class Foo {",//
-                                                                                                  "@Deprecated protected Foo(String a) {}", //
-                                                                                                  "}" //
-        ));
+        javaSourceCode("test.Foo", //
+                       "package test;", //
+                       "public class Foo {",//
+                       "@Deprecated protected Foo(String a) {}", //
+                       "}" //
+        );
 
         configureProcessor(new String[] {"java.lang.Deprecated"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
+        assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
@@ -94,18 +85,15 @@ public class ConstructorTest extends AbstractRnRTest {
 
     @Test
     public void mapsSimpleAnnotatedConstructorWithException() throws ClassNotFoundException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
-                                                                                                  "package test;", //
-                                                                                                  "public class Foo {",//
-                                                                                                  "@Deprecated protected Foo() throws Exception {throw new Exception(); }", //
-                                                                                                  "}" //
-        ));
+        javaSourceCode("test.Foo", //
+                       "package test;", //
+                       "public class Foo {",//
+                       "@Deprecated protected Foo() throws Exception {throw new Exception(); }", //
+                       "}" //
+        );
 
         configureProcessor(new String[] {"java.lang.Deprecated"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
+        assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
         assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
