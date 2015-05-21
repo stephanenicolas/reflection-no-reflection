@@ -7,10 +7,8 @@ import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Constructor;
 
-import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.truth0.Truth.ASSERT;
 
 public class ConstructorTest extends AbstractRnRTest {
 

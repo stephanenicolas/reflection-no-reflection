@@ -1,29 +1,24 @@
 package org.reflection_no_reflection.processor;
 
-import com.google.common.base.Joiner;
-import com.google.testing.compile.JavaFileObjects;
 import java.lang.reflect.Modifier;
 import java.util.Set;
-import javax.tools.JavaFileObject;
 import org.junit.Test;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
 
-import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.truth0.Truth.ASSERT;
 
 public class FieldTest extends AbstractRnRTest {
 
     @Test
     public void mapsSimpleAnnotatedField() throws ClassNotFoundException {
         javaSourceCode("test.Foo", //
-                                                                                                  "package test;", //
-                                                                                                  "public class Foo {",//
-                                                                                                  "@Deprecated private String s;", //
-                                                                                                  "}" //
+                       "package test;", //
+                       "public class Foo {",//
+                       "@Deprecated private String s;", //
+                       "}" //
         );
 
         configureProcessor(new String[] {"java.lang.Deprecated"});
@@ -53,10 +48,10 @@ public class FieldTest extends AbstractRnRTest {
     @SuppressWarnings("foo")
     public void mapsAnnotatedFieldWithParams() throws ClassNotFoundException, NoSuchMethodException {
         javaSourceCode("test.Foo", //
-                                                                                                  "package test;", //
-                                                                                                  "public class Foo {",//
-                                                                                                  "@SuppressWarnings(\"foo\") private String s;", //
-                                                                                                  "}" //
+                       "package test;", //
+                       "public class Foo {",//
+                       "@SuppressWarnings(\"foo\") private String s;", //
+                       "}" //
         );
 
         configureProcessor(new String[] {"java.lang.SuppressWarnings"});
