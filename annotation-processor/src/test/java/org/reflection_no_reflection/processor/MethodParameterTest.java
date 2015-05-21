@@ -3,11 +3,8 @@ package org.reflection_no_reflection.processor;
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import javax.tools.JavaFileObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Method;
@@ -17,14 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.truth0.Truth.ASSERT;
 
-public class MethodParameterTest {
-
-    private static Processor processor;
-
-    @Before
-    public void setup() {
-        processor = new Processor();
-    }
+public class MethodParameterTest extends AbstractRnRTest {
 
     @Test
     public void mapsMethodWithAnnotatedParams() throws ClassNotFoundException {
@@ -54,13 +44,5 @@ public class MethodParameterTest {
         assertThat(method.getModifiers(), is(Modifier.PROTECTED));
 
         //TODO test annotations of params
-    }
-
-    private void configureProcessor(String[] annotations) {
-        processor.setAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
-    }
-
-    static Iterable<? extends javax.annotation.processing.Processor> rnrProcessors() {
-        return Arrays.asList(processor);
     }
 }

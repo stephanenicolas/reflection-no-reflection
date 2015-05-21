@@ -3,11 +3,8 @@ package org.reflection_no_reflection.processor;
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import javax.tools.JavaFileObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
@@ -18,14 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.truth0.Truth.ASSERT;
 
-public class ConstructorTest {
-
-    private static Processor processor;
-
-    @Before
-    public void setup() {
-        processor = new Processor();
-    }
+public class ConstructorTest extends AbstractRnRTest {
 
     @Test
     public void mapsSimpleAnnotatedConstructor() throws ClassNotFoundException {
@@ -141,13 +131,5 @@ public class ConstructorTest {
         assertThat(exceptionTypes[0], is(expectedExceptionType));
 
         assertThat(Constructor.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
-    }
-
-    private void configureProcessor(String[] annotations) {
-        processor.setAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
-    }
-
-    static Iterable<? extends javax.annotation.processing.Processor> rnrProcessors() {
-        return Arrays.asList(processor);
     }
 }
