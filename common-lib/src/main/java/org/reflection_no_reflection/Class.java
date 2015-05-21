@@ -2,7 +2,6 @@ package org.reflection_no_reflection;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;

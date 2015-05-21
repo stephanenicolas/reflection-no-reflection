@@ -27,7 +27,10 @@ import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.GenericDeclaration;
 import org.reflection_no_reflection.Method;
+import org.reflection_no_reflection.TypeVariable;
+import org.reflection_no_reflection.TypeVariableImpl;
 
 /**
  * An annotation processor that detects classes that need to receive injections.
@@ -111,7 +114,6 @@ public class Processor extends AbstractProcessor {
         final Class<?> classContainingField = getClass(declaringClassName);
         classContainingField.addField(field);
         annotatedClassSet.add(classContainingField);
-
     }
 
     private void addParameterToAnnotationDatabase(Element paramElement) {
@@ -177,9 +179,9 @@ public class Processor extends AbstractProcessor {
         final Class[] paramTypes = getParameterTypes(methodElement);
         final Class[] exceptionTypes = getExceptionTypes(methodElement);
         final Constructor constructor = new Constructor(getClass(declaringClassName),
-                                         paramTypes,
-                                         exceptionTypes,
-                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
+                                                        paramTypes,
+                                                        exceptionTypes,
+                                                        convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
 
         final List<Annotation> annotations = extractAnnotations(methodElement);
 
@@ -247,9 +249,23 @@ public class Processor extends AbstractProcessor {
         boolean isPrimitive = false;
         boolean isArray = false;
         Class component = null;
+        GenericDeclaration declaration = null;
 
         if (typeMirror instanceof DeclaredType) {
             className = getTypeName((TypeElement) ((DeclaredType) typeMirror).asElement());
+            if (!((DeclaredType) typeMirror).getTypeArguments().isEmpty()) {
+                declaration = new GenericDeclaration();
+                TypeVariable[] typesVariables = new TypeVariable[((DeclaredType) typeMirror).getTypeArguments().size()];
+                int index = 0;
+                for (TypeMirror mirror : ((DeclaredType) typeMirror).getTypeArguments()) {
+                    TypeVariableImpl typeVariableImpl = new TypeVariableImpl();
+                    typesVariables[index] = typeVariableImpl;
+                    typeVariableImpl.setName(mirror.toString());
+                    index++;
+                }
+
+                declaration.setTypeParameters(typesVariables);
+            }
         } else if (typeMirror instanceof PrimitiveType) {
             isPrimitive = true;
             className = typeMirror.toString();
@@ -263,6 +279,7 @@ public class Processor extends AbstractProcessor {
         result.setIsArray(isArray);
         result.setIsPrimitive(isPrimitive);
         result.setComponentType(component);
+        result.setGenericInfo(declaration);
         return result;
     }
 
