@@ -28,25 +28,6 @@ public class FieldTest {
     }
 
     @Test
-    public void mapsSimpleAnnotatedClass() throws ClassNotFoundException {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
-                                                                                                  "package test;", //
-                                                                                                  "@Deprecated", //
-                                                                                                  "public class Foo {}" //
-        ));
-
-        configureProcessor(new String[] {"java.lang.Deprecated"});
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(rnrProcessors())
-            .compilesWithoutError();
-
-        final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
-        assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
-    }
-
-    @Test
     public void mapsSimpleAnnotatedField() throws ClassNotFoundException {
         JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
                                                                                                   "package test;", //
