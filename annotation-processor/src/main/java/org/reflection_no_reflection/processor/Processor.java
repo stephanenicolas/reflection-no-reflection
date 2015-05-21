@@ -156,6 +156,17 @@ public class Processor extends AbstractProcessor {
         return paramTypes;
     }
 
+    private Class[] getExceptionTypes(ExecutableElement methodElement) {
+        final List<? extends TypeMirror> exceptionTypes = methodElement.getThrownTypes();
+        Class[] paramTypes = new Class[exceptionTypes.size()];
+        for (int indexParam = 0; indexParam < exceptionTypes.size(); indexParam++) {
+            TypeMirror exceptionType = exceptionTypes.get(indexParam);
+            paramTypes[indexParam] = getClass(exceptionType.toString());
+        }
+        return paramTypes;
+    }
+
+
     private void addMethodOrConstructorToAnnotationDatabase(ExecutableElement methodElement) {
         String injectionPointName = methodElement.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
@@ -186,13 +197,13 @@ public class Processor extends AbstractProcessor {
         final TypeElement declaringClassElement = (TypeElement) enclosing;
         final String declaringClassName = getTypeName(declaringClassElement);
         final Class[] paramTypes = getParameterTypes(methodElement);
+        final Class[] exceptionTypes = getExceptionTypes(methodElement);
         final String returnTypeName = methodElement.getReturnType().toString();
         final Method method = new Method(getClass(declaringClassName),
                                          methodName,
                                          paramTypes,
                                          getClass(returnTypeName),
-                                         //TODO : exception types
-                                         new Class[0],
+                                         exceptionTypes,
                                          convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
 
         final List<Annotation> annotations = extractAnnotations(methodElement);
