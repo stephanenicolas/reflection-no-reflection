@@ -34,6 +34,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("int"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("int")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -66,6 +67,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("short"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("short")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -98,6 +100,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("byte"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("byte")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -130,6 +133,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("long"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("long")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -162,6 +166,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("boolean"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("boolean")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -194,6 +199,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("char"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("char")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -226,6 +232,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("double"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("double")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -258,6 +265,7 @@ public class FieldPrimitiveTest extends AbstractRnRTest {
         final Field expected = new Field("a", Class.forName("float"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("float")));
+        assertThat(aField.getType().isPrimitive(), is(true));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();

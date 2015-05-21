@@ -50,25 +50,11 @@ public class Processor extends AbstractProcessor {
     /** Contains all classes that contain injection points. */
     private HashSet<Class> annotatedClassSet = new HashSet<>();
 
-    /** Contains all classes that can be injected into a class with injection points. */
-    private HashSet<String> classesUnderAnnotation;
-    /** Name of the package to generate the annotation database into. */
-    private String annotationDatabasePackageName;
     private ProcessingEnvironment processingEnv;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
-        annotationDatabasePackageName = processingEnv.getOptions().get("guiceAnnotationDatabasePackageName");
-        classesUnderAnnotation = new HashSet<>();
-        String isUsingFragmentUtilString = processingEnv.getOptions().get("guiceUsesFragmentUtil");
-        if (isUsingFragmentUtilString != null) {
-            isUsingFragmentUtil = Boolean.parseBoolean(isUsingFragmentUtilString);
-        }
-        String isCommentingInjectorString = processingEnv.getOptions().get("guiceCommentsInjector");
-        if (isCommentingInjectorString != null) {
-            isCommentingInjector = Boolean.parseBoolean(isCommentingInjectorString);
-        }
         String annotatedClassesString = processingEnv.getOptions().get("annotatedClasses");
         if (annotatedClassesString != null) {
             annotatedClasses.addAll(Arrays.asList(annotatedClassesString.split(",")));
@@ -107,31 +93,25 @@ public class Processor extends AbstractProcessor {
         annotatedClassSet.add(new Class(typeElementName));
     }
 
-    private void addFieldToAnnotationDatabase(Element injectionPoint) {
-        String injectedClassName = getTypeName(injectionPoint);
-        if (isPrimitiveType(injectedClassName)) {
-            classesUnderAnnotation.add(injectedClassName + ".class");
-        } else {
-            classesUnderAnnotation.add(injectedClassName);
-        }
-
+    private void addFieldToAnnotationDatabase(Element fieldElement) {
+        Class fieldClass;
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
-        addToInjectedFields(injectionPoint.getModifiers(), injectedClassName, injectionPoint);
-    }
+        //TODO change this to get primitives and arrays
+        fieldClass = getClass(fieldElement.asType());
 
-    private boolean isPrimitiveType(String injectedClassName) {
-        switch (injectedClassName) {
-            case "byte":
-            case "short":
-            case "int":
-            case "long":
-            case "float":
-            case "double":
-            case "boolean":
-            case "char":
-                return true;
-        }
-        return false;
+        final Set<Modifier> modifiers = fieldElement.getModifiers();
+        String injectionPointName = fieldElement.getSimpleName().toString();
+        TypeElement declaringClassElement = (TypeElement) fieldElement.getEnclosingElement();
+        String declaringClassName = getTypeName(declaringClassElement);
+        final List<Annotation> annotations = extractAnnotations(fieldElement);
+        int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
+        final Field field = new Field(injectionPointName, fieldClass, getClass(declaringClassName), modifiersInt, annotations);
+
+        //rnr 2
+        final Class<?> classContainingField = getClass(declaringClassName);
+        classContainingField.addField(field);
+        annotatedClassSet.add(classContainingField);
+
     }
 
     private void addParameterToAnnotationDatabase(Element paramElement) {
@@ -261,6 +241,31 @@ public class Processor extends AbstractProcessor {
         return annotations;
     }
 
+    private Class getClass(TypeMirror typeMirror) {
+        Class result;
+        String className = null;
+        boolean isPrimitive = false;
+        boolean isArray = false;
+        Class component = null;
+
+        if (typeMirror instanceof DeclaredType) {
+            className = getTypeName((TypeElement) ((DeclaredType) typeMirror).asElement());
+        } else if (typeMirror instanceof PrimitiveType) {
+            isPrimitive = true;
+            className = typeMirror.toString();
+        } else if (typeMirror instanceof ArrayType) {
+            isArray = true;
+            className = ((ArrayType) typeMirror).getComponentType().toString() + "[]";
+            component = getClass(((ArrayType) typeMirror).getComponentType());
+        }
+
+        result = new Class(className);
+        result.setIsArray(isArray);
+        result.setIsPrimitive(isPrimitive);
+        result.setComponentType(component);
+        return result;
+    }
+
     private Class getClass(String name) {
         try {
             return Class.forName(name);
@@ -269,7 +274,7 @@ public class Processor extends AbstractProcessor {
         }
     }
 
-    private int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {
+    /*Visible for testing*/ int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {
         int result = 0;
         for (Modifier modifier : modifiers) {
             switch (modifier) {
@@ -288,17 +293,26 @@ public class Processor extends AbstractProcessor {
                 case PROTECTED:
                     result |= java.lang.reflect.Modifier.PROTECTED;
                     break;
+                case FINAL:
+                    result |= java.lang.reflect.Modifier.FINAL;
+                    break;
+                case SYNCHRONIZED:
+                    result |= java.lang.reflect.Modifier.SYNCHRONIZED;
+                    break;
+                case VOLATILE:
+                    result |= java.lang.reflect.Modifier.VOLATILE;
+                    break;
                 default:
             }
         }
         return result;
     }
 
-    private String getTypeName(TypeElement typeElementRequiringScanning) {
-        if (typeElementRequiringScanning.getEnclosingElement() instanceof TypeElement) {
-            return getTypeName(typeElementRequiringScanning.getEnclosingElement()) + "$" + typeElementRequiringScanning.getSimpleName().toString();
+    private String getTypeName(TypeElement typeElement) {
+        if (typeElement.getEnclosingElement() instanceof TypeElement) {
+            return getTypeName(typeElement.getEnclosingElement()) + "$" + typeElement.getSimpleName().toString();
         } else {
-            return typeElementRequiringScanning.getQualifiedName().toString();
+            return typeElement.getQualifiedName().toString();
         }
     }
 
@@ -313,21 +327,6 @@ public class Processor extends AbstractProcessor {
             injectedClassName = ((ArrayType) fieldTypeMirror).getComponentType().toString() + "[]";
         }
         return injectedClassName;
-    }
-
-    private void addToInjectedMembers(String annotationClassName, String typeElementName, String injectionPointName, HashMap<String, Map<String, Set<String>>> mapAnnotationToMapClassWithInjectionNameToMembersSet) {
-        Map<String, Set<String>> mapClassWithInjectionNameToMemberSet = mapAnnotationToMapClassWithInjectionNameToMembersSet.get(annotationClassName);
-        if (mapClassWithInjectionNameToMemberSet == null) {
-            mapClassWithInjectionNameToMemberSet = new HashMap<>();
-            mapAnnotationToMapClassWithInjectionNameToMembersSet.put(annotationClassName, mapClassWithInjectionNameToMemberSet);
-        }
-
-        Set<String> injectionPointNameSet = mapClassWithInjectionNameToMemberSet.get(typeElementName);
-        if (injectionPointNameSet == null) {
-            injectionPointNameSet = new HashSet<>();
-            mapClassWithInjectionNameToMemberSet.put(typeElementName, injectionPointNameSet);
-        }
-        injectionPointNameSet.add(injectionPointName);
     }
 
     @Override

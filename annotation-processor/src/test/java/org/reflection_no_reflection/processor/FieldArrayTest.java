@@ -34,6 +34,8 @@ public class FieldArrayTest extends AbstractRnRTest {
         final Field expected = new Field("s", Class.forName("java.lang.String[]"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String[]")));
+        assertThat(aField.getType().isArray(), is(true));
+        assertThat(aField.getType().getComponentType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
@@ -66,6 +68,8 @@ public class FieldArrayTest extends AbstractRnRTest {
         final Field expected = new Field("s", Class.forName("int[]"), aClass, Modifier.PRIVATE, null);
         assertThat(aField, is(expected));
         assertThat(aField.getType(), is((Class) Class.forName("int[]")));
+        assertThat(aField.getType().isArray(), is(true));
+        assertThat(aField.getType().getComponentType(), is((Class) Class.forName("int")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
         final Annotation[] annotations = aField.getDeclaredAnnotations();
