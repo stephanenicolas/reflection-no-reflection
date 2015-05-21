@@ -2,6 +2,7 @@ package org.reflection_no_reflection;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import sun.reflect.generics.factory.GenericsFactory;
@@ -434,7 +435,7 @@ public class Constructor<T> extends GenericDeclaration {
         }
     }
 
-    private transient Map<Class, Annotation> declaredAnnotations;
+    private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
 
     private synchronized Map<Class, Annotation> declaredAnnotations() {
         return declaredAnnotations;

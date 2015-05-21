@@ -32,7 +32,7 @@ public class ConstructorTest {
         JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
                                                                                                   "package test;", //
                                                                                                   "public class Foo {",//
-                                                                                                  "@Deprecated protected Foo() {return \"foo\"; }", //
+                                                                                                  "@Deprecated protected Foo() {}", //
                                                                                                   "}" //
         ));
 
@@ -66,7 +66,7 @@ public class ConstructorTest {
         JavaFileObject source = JavaFileObjects.forSourceString("test.Foo", Joiner.on('\n').join( //
                                                                                                   "package test;", //
                                                                                                   "public class Foo {",//
-                                                                                                  "@Deprecated protected Foo(String a) {return a; }", //
+                                                                                                  "@Deprecated protected Foo(String a) {}", //
                                                                                                   "}" //
         ));
 

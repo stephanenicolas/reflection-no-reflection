@@ -38,7 +38,7 @@ public class Class<T> implements java.io.Serializable,
     private Class<?>[] classes;
     private List<Field> fields = new ArrayList<>();
     private List<Method> methods = new ArrayList<>();
-    private List<Constructor<?>> constructors;
+    private List<Constructor<?>> constructors = new ArrayList<>();
     private Map<String, Annotation> annotations;
     private GenericDeclaration genericInfo;
     private Constructor<?> enclosingConstructor;
