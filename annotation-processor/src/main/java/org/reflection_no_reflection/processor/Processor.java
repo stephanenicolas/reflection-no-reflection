@@ -90,9 +90,8 @@ public class Processor extends AbstractProcessor {
     }
 
     private void addClassToAnnotationDatabase(Element classElement) {
-        String typeElementName = getTypeName((TypeElement) classElement);
+        Class newClass = getClass(classElement.asType());
         //System.out.printf("Type: %s, is injected\n",typeElementName);
-        final Class newClass = new Class(typeElementName);
         annotatedClassSet.add(newClass);
         final List<Annotation> annotations = extractAnnotations(classElement);
         newClass.setAnnotations(annotations);
@@ -269,8 +268,7 @@ public class Processor extends AbstractProcessor {
 
                 declaration.setTypeParameters(typesVariables);
             }
-            //TODO
-            //isInterface = ((DeclaredType) typeMirror).
+            isInterface = ((com.sun.tools.javac.code.Type) typeMirror).isInterface();
         } else if (typeMirror instanceof PrimitiveType) {
             isPrimitive = true;
             className = typeMirror.toString();
@@ -285,6 +283,7 @@ public class Processor extends AbstractProcessor {
         result.setIsPrimitive(isPrimitive);
         result.setComponentType(component);
         result.setGenericInfo(declaration);
+        result.setIsInterface(isInterface);
         return result;
     }
 
