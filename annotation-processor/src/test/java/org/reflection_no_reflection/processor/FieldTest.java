@@ -72,12 +72,12 @@ public class FieldTest extends AbstractRnRTest {
         final Annotation[] annotations = aField.getDeclaredAnnotations();
         assertThat(annotations.length, is(1));
 
-        final Class deprecatedAnnotationClass = Class.forName("java.lang.SuppressWarnings");
-        assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
-        assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
-        assertThat(aField.getAnnotation(deprecatedAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
+        final Class suppressWarningsAnnotationClass = Class.forName("java.lang.SuppressWarnings");
+        assertThat(annotations[0].annotationType(), is(suppressWarningsAnnotationClass));
+        assertThat(aField.getAnnotation(suppressWarningsAnnotationClass).annotationType(), is(suppressWarningsAnnotationClass));
+        assertThat(aField.getAnnotation(suppressWarningsAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
 
-        final Object value = aField.getAnnotation(deprecatedAnnotationClass).getValue("value");
+        final Object value = aField.getAnnotation(suppressWarningsAnnotationClass).getValue("value");
         assertThat((String) value, is("foo"));
     }
 }

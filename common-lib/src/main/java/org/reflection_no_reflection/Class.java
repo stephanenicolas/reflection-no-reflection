@@ -1,9 +1,7 @@
 package org.reflection_no_reflection;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,10 +11,8 @@ import sun.reflect.annotation.AnnotationType;
 /**
  * @author SNI.
  */
-public class Class<T> implements java.io.Serializable,
-    java.lang.reflect.GenericDeclaration,
-    java.lang.reflect.Type,
-    java.lang.reflect.AnnotatedElement {
+public class Class<T> extends GenericDeclaration implements java.io.Serializable,
+    java.lang.reflect.Type {
 
     private static final int ANNOTATION = 0x00002000;
     private static final int ENUM = 0x00004000;
@@ -1709,7 +1705,7 @@ public class Class<T> implements java.io.Serializable,
 
     private static Annotation[] EMPTY_ANNOTATIONS_ARRAY = new Annotation[0];
 
-    @Override public <T extends Annotation> T getAnnotation(java.lang.Class<T> annotationClass) {
+    public <T extends Annotation> T getAnnotation(java.lang.Class<T> annotationClass) {
         return null;
     }
 
