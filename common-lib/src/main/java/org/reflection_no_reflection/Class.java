@@ -7,7 +7,6 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import sun.reflect.annotation.AnnotationType;
 
@@ -38,7 +37,7 @@ public class Class<T> implements java.io.Serializable,
     private List<Field> fields = new ArrayList<>();
     private List<Method> methods = new ArrayList<>();
     private List<Constructor<?>> constructors = new ArrayList<>();
-    private Map<String, Annotation> annotations;
+    private List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
     private GenericDeclaration genericInfo;
     private Constructor<?> enclosingConstructor;
 
@@ -646,7 +645,6 @@ public class Class<T> implements java.io.Serializable,
     public void addConstructor(Constructor constructor) {
         constructors.add(constructor);
     }
-
 
     public static void purgeAllClasses() {
         CLASS_POOL.clear();
@@ -1682,12 +1680,18 @@ public class Class<T> implements java.io.Serializable,
      * @throws NullPointerException {@inheritDoc}
      * @since 1.5
      */
-    public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+    public <A extends org.reflection_no_reflection.Annotation> A getAnnotation(Class<A> annotationClass) {
         if (annotationClass == null) {
             throw new NullPointerException();
         }
 
-        return (A) annotations.get(annotationClass);
+        for (org.reflection_no_reflection.Annotation annotation : annotationList) {
+            if (annotation.annotationType().equals(annotationClass)) {
+                return (A) annotation;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1695,7 +1699,7 @@ public class Class<T> implements java.io.Serializable,
      * @since 1.5
      */
     public boolean isAnnotationPresent(
-        Class<? extends Annotation> annotationClass) {
+        Class<? extends org.reflection_no_reflection.Annotation> annotationClass) {
         if (annotationClass == null) {
             throw new NullPointerException();
         }
@@ -1713,7 +1717,11 @@ public class Class<T> implements java.io.Serializable,
      * @since 1.5
      */
     public Annotation[] getAnnotations() {
-        return annotations.values().toArray(EMPTY_ANNOTATIONS_ARRAY);
+        return annotationList.toArray(EMPTY_ANNOTATIONS_ARRAY);
+    }
+
+    public void setAnnotations(List<org.reflection_no_reflection.Annotation> annotations) {
+        this.annotationList = annotations;
     }
 
     /**

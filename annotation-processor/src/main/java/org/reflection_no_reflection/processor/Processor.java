@@ -89,11 +89,13 @@ public class Processor extends AbstractProcessor {
         return true;
     }
 
-    private void addClassToAnnotationDatabase(Element injectionPoint) {
-        TypeElement typeElementRequiringScanning = (TypeElement) injectionPoint;
-        String typeElementName = getTypeName(typeElementRequiringScanning);
+    private void addClassToAnnotationDatabase(Element classElement) {
+        String typeElementName = getTypeName((TypeElement) classElement);
         //System.out.printf("Type: %s, is injected\n",typeElementName);
-        annotatedClassSet.add(new Class(typeElementName));
+        final Class newClass = new Class(typeElementName);
+        annotatedClassSet.add(newClass);
+        final List<Annotation> annotations = extractAnnotations(classElement);
+        newClass.setAnnotations(annotations);
     }
 
     private void addFieldToAnnotationDatabase(Element fieldElement) {
@@ -248,6 +250,7 @@ public class Processor extends AbstractProcessor {
         String className = null;
         boolean isPrimitive = false;
         boolean isArray = false;
+        boolean isInterface = false;
         Class component = null;
         GenericDeclaration declaration = null;
 
@@ -266,6 +269,8 @@ public class Processor extends AbstractProcessor {
 
                 declaration.setTypeParameters(typesVariables);
             }
+            //TODO
+            //isInterface = ((DeclaredType) typeMirror).
         } else if (typeMirror instanceof PrimitiveType) {
             isPrimitive = true;
             className = typeMirror.toString();
