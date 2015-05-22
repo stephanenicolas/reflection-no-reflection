@@ -112,7 +112,9 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
             }
         }
 
-        return new Class(className);
+        final Class aClass = new Class(className);
+        CLASS_POOL.add(aClass);
+        return aClass;
     }
 
     /**
