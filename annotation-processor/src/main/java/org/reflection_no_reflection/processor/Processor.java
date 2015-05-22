@@ -330,11 +330,7 @@ public class Processor extends AbstractProcessor {
     }
 
     private String getTypeName(TypeElement typeElement) {
-        if (typeElement.getEnclosingElement() instanceof TypeElement) {
-            return getTypeName(typeElement.getEnclosingElement()) + "$" + typeElement.getSimpleName().toString();
-        } else {
-            return typeElement.getQualifiedName().toString();
-        }
+        return typeElement.getQualifiedName().toString();
     }
 
     private String getTypeName(Element injectionPoint) {
