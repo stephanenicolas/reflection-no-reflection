@@ -24,14 +24,14 @@ public class MethodParameterTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class expectedParamType = Class.forName("java.lang.String");
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getMethods().size(), is(1));
 
         final Method method = (Method) aClass.getMethods().get(0);
-        final Method expected = new Method(aClass, "s", new Class[] {expectedParamType}, new Class("java.lang.String"), new Class[0], Modifier.PROTECTED);
+        final Method expected = new Method(aClass, "s", new Class[] {expectedParamType}, Class.forNameSafe("java.lang.String"), new Class[0], Modifier.PROTECTED);
         assertThat(method, is(expected));
         assertThat(method.getModifiers(), is(Modifier.PROTECTED));
 

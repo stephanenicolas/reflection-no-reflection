@@ -25,7 +25,7 @@ public class ConstructorTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getConstructors().size(), is(1));
@@ -56,7 +56,7 @@ public class ConstructorTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class expectedParamType = Class.forName("java.lang.String");
         final Class aClass = Class.forName("test.Foo");
@@ -94,7 +94,7 @@ public class ConstructorTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class expectedExceptionType = Class.forName("java.lang.Exception");
         final Class aClass = Class.forName("test.Foo");

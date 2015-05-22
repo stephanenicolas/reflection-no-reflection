@@ -24,9 +24,9 @@ public class InnerClassTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo.Bar")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo.Bar")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo.Bar")), is(true));
-        final Class deprecatedAnnotationClass = new Class("java.lang.Deprecated");
+        final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo.Bar").getAnnotation(deprecatedAnnotationClass), notNullValue());
     }
 
@@ -44,9 +44,9 @@ public class InnerClassTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo.Bar")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo.Bar")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo.Bar")), is(true));
-        final Class deprecatedAnnotationClass = new Class("java.lang.Deprecated");
+        final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo.Bar").getAnnotation(deprecatedAnnotationClass), notNullValue());
     }
 
@@ -64,9 +64,9 @@ public class InnerClassTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo.Bar")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo.Bar")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo.Bar")), is(true));
-        final Class deprecatedAnnotationClass = new Class("java.lang.Deprecated");
+        final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo.Bar").getAnnotation(deprecatedAnnotationClass), notNullValue());
     }
 

@@ -39,7 +39,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
 
     private static Set<Class> CLASS_POOL = new HashSet<>();
 
-    public Class(String name) {
+    private Class(String name) {
         if (name == null) {
             throw new RuntimeException("Class has null name");
         }
@@ -103,6 +103,16 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         }
 
         throw new ClassNotFoundException(className);
+    }
+
+    public static Class<?> forNameSafe(String className) {
+        for (Class aClass : CLASS_POOL) {
+            if (aClass.getName().equals(className)) {
+                return aClass;
+            }
+        }
+
+        return new Class(className);
     }
 
     /**

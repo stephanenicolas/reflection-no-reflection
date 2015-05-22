@@ -25,7 +25,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getFields().length, is(1));
@@ -59,7 +59,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getFields().length, is(1));

@@ -23,9 +23,9 @@ public class ClassTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
-        final Class deprecatedAnnotationClass = new Class("java.lang.Deprecated");
+        final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass), notNullValue());
     }
 
@@ -45,7 +45,7 @@ public class ClassTest extends AbstractRnRTest {
         final Class clazz = Class.forName("test.Foo");
         assertThat(annotatedClasses.contains(clazz), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
-        final Class deprecatedAnnotationClass = new Class("java.lang.Deprecated");
+        final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass), notNullValue());
 
         final Annotation[] annotations = clazz.getAnnotations();

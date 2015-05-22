@@ -24,7 +24,7 @@ public class ConstructorParameterTest extends AbstractRnRTest {
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = processor.getAnnotatedClasses();
-        assertThat(annotatedClasses.contains(new Class("test.Foo")), is(true));
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class expectedParamType = Class.forName("java.lang.String");
         final Class aClass = Class.forName("test.Foo");

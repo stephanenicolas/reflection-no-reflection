@@ -90,7 +90,7 @@ public class Processor extends AbstractProcessor {
     }
 
     private void addClassToAnnotationDatabase(Element classElement) {
-        Class newClass = getClass(classElement.asType());
+        Class newClass = createClass(classElement.asType());
         //System.out.printf("Type: %s, is injected\n",typeElementName);
         annotatedClassSet.add(newClass);
         final List<Annotation> annotations = extractAnnotations(classElement);
@@ -101,7 +101,7 @@ public class Processor extends AbstractProcessor {
         Class fieldClass;
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         //TODO change this to get primitives and arrays
-        fieldClass = getClass(fieldElement.asType());
+        fieldClass = createClass(fieldElement.asType());
 
         final Set<Modifier> modifiers = fieldElement.getModifiers();
         String injectionPointName = fieldElement.getSimpleName().toString();
@@ -109,10 +109,10 @@ public class Processor extends AbstractProcessor {
         String declaringClassName = getTypeName(declaringClassElement);
         final List<Annotation> annotations = extractAnnotations(fieldElement);
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        final Field field = new Field(injectionPointName, fieldClass, getClass(declaringClassName), modifiersInt, annotations);
+        final Field field = new Field(injectionPointName, fieldClass, Class.forNameSafe(declaringClassName), modifiersInt, annotations);
 
         //rnr 2
-        final Class<?> classContainingField = getClass(declaringClassName);
+        final Class<?> classContainingField = Class.forNameSafe(declaringClassName);
         classContainingField.addField(field);
         annotatedClassSet.add(classContainingField);
     }
@@ -134,7 +134,7 @@ public class Processor extends AbstractProcessor {
         Class[] paramTypes = new Class[parameters.size()];
         for (int indexParam = 0; indexParam < parameters.size(); indexParam++) {
             VariableElement parameter = parameters.get(indexParam);
-            paramTypes[indexParam] = getClass(getTypeName(parameter));
+            paramTypes[indexParam] = Class.forNameSafe(getTypeName(parameter));
         }
         return paramTypes;
     }
@@ -144,7 +144,7 @@ public class Processor extends AbstractProcessor {
         Class[] paramTypes = new Class[exceptionTypes.size()];
         for (int indexParam = 0; indexParam < exceptionTypes.size(); indexParam++) {
             TypeMirror exceptionType = exceptionTypes.get(indexParam);
-            paramTypes[indexParam] = getClass(exceptionType.toString());
+            paramTypes[indexParam] = Class.forNameSafe(exceptionType.toString());
         }
         return paramTypes;
     }
@@ -165,10 +165,10 @@ public class Processor extends AbstractProcessor {
         String declaringClassName = getTypeName(declaringClassElement);
         final List<Annotation> annotations = extractAnnotations(fieldElement);
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        final Field field = new Field(injectionPointName, getClass(injectedClassName), getClass(declaringClassName), modifiersInt, annotations);
+        final Field field = new Field(injectionPointName, Class.forNameSafe(injectedClassName), Class.forNameSafe(declaringClassName), modifiersInt, annotations);
 
         //rnr 2
-        final Class<?> classContainingField = getClass(declaringClassName);
+        final Class<?> classContainingField = Class.forNameSafe(declaringClassName);
         classContainingField.addField(field);
         annotatedClassSet.add(classContainingField);
     }
@@ -179,7 +179,7 @@ public class Processor extends AbstractProcessor {
         final String declaringClassName = getTypeName(declaringClassElement);
         final Class[] paramTypes = getParameterTypes(methodElement);
         final Class[] exceptionTypes = getExceptionTypes(methodElement);
-        final Constructor constructor = new Constructor(getClass(declaringClassName),
+        final Constructor constructor = new Constructor(Class.forNameSafe(declaringClassName),
                                                         paramTypes,
                                                         exceptionTypes,
                                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
@@ -188,7 +188,7 @@ public class Processor extends AbstractProcessor {
 
         constructor.setDeclaredAnnotations(annotations);
 
-        final Class<?> classContainingMethod = getClass(declaringClassName);
+        final Class<?> classContainingMethod = Class.forNameSafe(declaringClassName);
         classContainingMethod.addConstructor(constructor);
         annotatedClassSet.add(classContainingMethod);
     }
@@ -201,10 +201,10 @@ public class Processor extends AbstractProcessor {
         final Class[] paramTypes = getParameterTypes(methodElement);
         final Class[] exceptionTypes = getExceptionTypes(methodElement);
         final String returnTypeName = methodElement.getReturnType().toString();
-        final Method method = new Method(getClass(declaringClassName),
+        final Method method = new Method(Class.forNameSafe(declaringClassName),
                                          methodName,
                                          paramTypes,
-                                         getClass(returnTypeName),
+                                         Class.forNameSafe(returnTypeName),
                                          exceptionTypes,
                                          convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
 
@@ -212,7 +212,7 @@ public class Processor extends AbstractProcessor {
 
         method.setDeclaredAnnotations(annotations);
 
-        final Class<?> classContainingMethod = getClass(declaringClassName);
+        final Class<?> classContainingMethod = Class.forNameSafe(declaringClassName);
         classContainingMethod.addMethod(method);
         annotatedClassSet.add(classContainingMethod);
     }
@@ -226,11 +226,11 @@ public class Processor extends AbstractProcessor {
                 final String methodOfAnnotationName = entry.getKey().getSimpleName().toString();
 
                 //RnR 2
-                final Method methodOfAnnotation = new Method(getClass(annotationType),
+                final Method methodOfAnnotation = new Method(Class.forNameSafe(annotationType),
                                                              methodOfAnnotationName,
                                                              //TODO : param types
                                                              new Class[0],
-                                                             getClass(entry.getKey().getReturnType().toString()),
+                                                             Class.forNameSafe(entry.getKey().getReturnType().toString()),
                                                              //TODO : exception types
                                                              new Class[0],
                                                              java.lang.reflect.Modifier.PUBLIC
@@ -238,13 +238,13 @@ public class Processor extends AbstractProcessor {
                 mapMethodToValue.put(methodOfAnnotation, entry.getValue().getValue());
             }
 
-            final Annotation annotation = new Annotation(getClass(annotationType), mapMethodToValue);
+            final Annotation annotation = new Annotation(Class.forNameSafe(annotationType), mapMethodToValue);
             annotations.add(annotation);
         }
         return annotations;
     }
 
-    private Class getClass(TypeMirror typeMirror) {
+    private Class createClass(TypeMirror typeMirror) {
         Class result;
         String className = null;
         boolean isPrimitive = false;
@@ -275,24 +275,16 @@ public class Processor extends AbstractProcessor {
         } else if (typeMirror instanceof ArrayType) {
             isArray = true;
             className = ((ArrayType) typeMirror).getComponentType().toString() + "[]";
-            component = getClass(((ArrayType) typeMirror).getComponentType());
+            component = createClass(((ArrayType) typeMirror).getComponentType());
         }
 
-        result = new Class(className);
+        result = Class.forNameSafe(className);
         result.setIsArray(isArray);
         result.setIsPrimitive(isPrimitive);
         result.setComponentType(component);
         result.setGenericInfo(declaration);
         result.setIsInterface(isInterface);
         return result;
-    }
-
-    private Class getClass(String name) {
-        try {
-            return Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            return new Class(name);
-        }
     }
 
     /*Visible for testing*/ int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {
