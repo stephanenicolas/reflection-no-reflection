@@ -6,15 +6,10 @@ buildscript {
     // NOTE: This is only needed when developing the plugin!
     mavenLocal()
   }
-
-  dependencies {
-    classpath 'org.reflection_no_reflection:gradle-plugin:1.0.0-SNAPSHOT'
-  }
 }
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'org.reflection_no_reflection.plugin'
 
 mainClassName = "org.reflection_no_reflection.sample.Main"
 
@@ -27,19 +22,8 @@ configurations {
   provided
 }
 
-sourceSets {
-  main.compileClasspath += configurations.provided
-  test.compileClasspath += configurations.provided
-  test.runtimeClasspath += configurations.provided
-}
-
 dependencies {
-  provided project(':annotation-processor')
+  provided project(':processor-sample')
   compile project(':common-lib')
   compile 'javax.inject:javax.inject:1'
-}
-
-noreflection {
-  debug true
-  annotationClasses = ['javax.inject.Inject']
 }

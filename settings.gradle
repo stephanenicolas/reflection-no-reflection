@@ -1,6 +1,6 @@
 include "common-lib"
-include "annotation-processor"
-include "gradle-plugin"
+include "processor"
+include "processor-sample"
 if (!hasProperty('boostrap')) {
   include "sample"
 }
