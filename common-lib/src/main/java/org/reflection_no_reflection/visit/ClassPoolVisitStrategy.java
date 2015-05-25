@@ -1,6 +1,8 @@
 package org.reflection_no_reflection.visit;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
@@ -13,7 +15,8 @@ import org.reflection_no_reflection.Method;
 public class ClassPoolVisitStrategy {
 
     public void visit(Collection<Class> classCollection, ClassPoolVisitor classPoolVisitor) {
-        for (Class aClass : classCollection) {
+        List<Class> classList = sortClassesByLevel(classCollection);
+        for (Class aClass : classList) {
             classPoolVisitor.visit(aClass);
 
             for (Field field : aClass.getFields()) {
@@ -32,6 +35,16 @@ public class ClassPoolVisitStrategy {
             }
             classPoolVisitor.endVisit(aClass);
         }
+    }
+
+    private List<Class> sortClassesByLevel(Collection<Class> classCollection) {
+        List<Class> classList = new ArrayList<>(classCollection);
+        classList.sort(new Comparator<Class>() {
+            @Override public int compare(Class o1, Class o2) {
+                return o1.getLevel() - o2.getLevel();
+            }
+        });
+        return classList;
     }
 
     private void visitAnnotation(Annotation annotation, ClassPoolVisitor classPoolVisitor) {

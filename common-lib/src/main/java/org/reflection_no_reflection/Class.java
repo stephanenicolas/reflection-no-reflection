@@ -121,7 +121,20 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     }
 
     public static Class<?> forNameSafe(String className, int level) {
-        final Class aClass = Class.forNameSafe(className);
+        if (className == null) {
+            return null;
+        }
+        for (Class aClass : CLASS_POOL) {
+            if (aClass.getName().equals(className)) {
+                if (aClass.level > level) {
+                    aClass.level = level;
+                }
+                return aClass;
+            }
+        }
+
+        final Class aClass = new Class(className);
+        CLASS_POOL.add(aClass);
         aClass.level = level;
         return aClass;
     }
