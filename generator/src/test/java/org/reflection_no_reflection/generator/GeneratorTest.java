@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.processor.sample;
+package org.reflection_no_reflection.generator;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
@@ -10,19 +10,20 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
-public class SampleProcessorTest {
+public class GeneratorTest {
 
     protected javax.annotation.processing.Processor processor;
     protected JavaFileObject javaSourceCode;
 
     @Before
     public void setup() {
-        processor = new SampleProcessor();
+        processor = new Generator();
         javaSourceCode = null;
     }
 
     @Test
     public void test() {
+        //TODO
         javaSourceCode("test.Foo", //
                        "package test;", //
                        "public class Foo {",//

@@ -1,6 +1,7 @@
 include "common-lib"
 include "processor"
 include "processor-sample"
+include "generator"
 if (!hasProperty('boostrap')) {
   include "sample"
 }
