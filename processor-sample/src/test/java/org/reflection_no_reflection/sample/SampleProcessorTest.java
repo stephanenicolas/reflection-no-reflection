@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.generator;
+package org.reflection_no_reflection.sample;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;

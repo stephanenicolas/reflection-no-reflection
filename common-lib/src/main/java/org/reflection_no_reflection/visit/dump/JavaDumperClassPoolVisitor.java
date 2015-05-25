@@ -9,15 +9,20 @@ import org.reflection_no_reflection.visit.ClassPoolVisitor;
  * @author SNI.
  */
 public class JavaDumperClassPoolVisitor implements ClassPoolVisitor {
-    private static final String CLASS_SEPARATOR = "\n----------\n";
+    private static final String CLASS_SEPARATOR = "\n";
     private static final String INDENT = "\t";
     private StringBuffer buffer = new StringBuffer();
 
     @Override
     public <T> void visit(org.reflection_no_reflection.Class<T> aClass) {
-        buffer.delete(0, buffer.length());
+        buffer.append(CLASS_SEPARATOR);
+        buffer.append(aClass.getLevel());
+        buffer.append(":");
         buffer.append(aClass.getName());
-        buffer.append(" {\n");
+        buffer.append(" {");
+        if (aClass.getFields().length != 0 || !aClass.getMethods().isEmpty()) {
+            buffer.append(" \n");
+        }
     }
 
     @Override

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
+import org.reflection_no_reflection.visit.ClassPoolVisitor;
 import sun.reflect.annotation.AnnotationType;
 
 /**
@@ -36,6 +38,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     private List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
     private GenericDeclaration genericInfo;
     private Constructor<?> enclosingConstructor;
+    private int level;
 
     private static Set<Class> CLASS_POOL = new HashSet<>();
 
@@ -115,6 +118,17 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         final Class aClass = new Class(className);
         CLASS_POOL.add(aClass);
         return aClass;
+    }
+
+    public static Class<?> forNameSafe(String className, int level) {
+        final Class aClass = Class.forNameSafe(className);
+        aClass.level = level;
+        return aClass;
+    }
+
+    public static void visit(ClassPoolVisitor classPoolVisitor) {
+        ClassPoolVisitStrategy visitStrategy = new ClassPoolVisitStrategy();
+        visitStrategy.visit(CLASS_POOL, classPoolVisitor);
     }
 
     /**
@@ -656,6 +670,10 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
 
     public static void purgeAllClasses() {
         CLASS_POOL.clear();
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     private final static class EnclosingMethodInfo {

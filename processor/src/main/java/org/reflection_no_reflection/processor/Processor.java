@@ -51,6 +51,8 @@ public class Processor extends AbstractProcessor {
     /** Contains all classes that contain injection points. */
     private HashSet<Class> annotatedClassSet = new HashSet<>();
 
+    private int maxLevel = 0;
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         String annotatedClassesString = processingEnv.getOptions().get("annotatedClasses");
@@ -67,114 +69,103 @@ public class Processor extends AbstractProcessor {
             return true;
         }
 
+        int level = 0;
         for (TypeElement annotation : annotations) {
-            for (Element injectionPoint : roundEnv.getElementsAnnotatedWith(annotation)) {
-                if (injectionPoint.getEnclosingElement() instanceof TypeElement && injectionPoint instanceof VariableElement) {
-                    addFieldToAnnotationDatabase(injectionPoint);
-                } else if (injectionPoint.getEnclosingElement() instanceof ExecutableElement && injectionPoint instanceof VariableElement) {
-                    addParameterToAnnotationDatabase(injectionPoint);
-                } else if (injectionPoint instanceof ExecutableElement) {
-                    addMethodOrConstructorToAnnotationDatabase((ExecutableElement) injectionPoint);
-                } else if (injectionPoint instanceof TypeElement) {
-                    addClassToAnnotationDatabase(injectionPoint);
-                }
+            for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                mapElementToReflection(element, level);
             }
         }
 
         return true;
     }
 
-    private void addClassToAnnotationDatabase(Element classElement) {
-        Class newClass = createClass(classElement.asType());
+    private void mapElementToReflection(Element element, int level) {
+        if (element.getEnclosingElement() instanceof TypeElement && element instanceof VariableElement) {
+            addFieldToAnnotationDatabase(element, level);
+        } else if (element.getEnclosingElement() instanceof ExecutableElement && element instanceof VariableElement) {
+            addParameterToAnnotationDatabase(element, level);
+        } else if (element instanceof ExecutableElement) {
+            addMethodOrConstructorToAnnotationDatabase((ExecutableElement) element, level);
+        } else if (element instanceof TypeElement) {
+            addClassToAnnotationDatabase(element, level);
+        }
+    }
+
+    private void addClassToAnnotationDatabase(Element classElement, int level) {
+        Class newClass = createClass(classElement.asType(), level);
         //System.out.printf("Type: %s, is injected\n",typeElementName);
         annotatedClassSet.add(newClass);
         final List<Annotation> annotations = extractAnnotations(classElement);
         newClass.setAnnotations(annotations);
     }
 
-    private void addFieldToAnnotationDatabase(Element fieldElement) {
+    private void addFieldToAnnotationDatabase(Element fieldElement, int level) {
         Class fieldClass;
-        //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
+        //System.out.printf("Type: %s, injection: %s \n",typeElementName, fieldName);
         //TODO change this to get primitives and arrays
-        fieldClass = createClass(fieldElement.asType());
+        fieldClass = createClass(fieldElement.asType(), level);
 
         final Set<Modifier> modifiers = fieldElement.getModifiers();
-        String injectionPointName = fieldElement.getSimpleName().toString();
+        String fieldName = fieldElement.getSimpleName().toString();
         TypeElement declaringClassElement = (TypeElement) fieldElement.getEnclosingElement();
-        String declaringClassName = getTypeName(declaringClassElement);
+        String declaringClassName = declaringClassElement.getQualifiedName().toString();
         final List<Annotation> annotations = extractAnnotations(fieldElement);
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        final Field field = new Field(injectionPointName, fieldClass, Class.forNameSafe(declaringClassName), modifiersInt, annotations);
-
-        //rnr 2
-        final Class<?> classContainingField = Class.forNameSafe(declaringClassName);
-        classContainingField.addField(field);
-        annotatedClassSet.add(classContainingField);
+        final Class<?> enclosingClass = Class.forNameSafe(declaringClassName, level);
+        final Field field = new Field(fieldName, fieldClass, enclosingClass, modifiersInt, annotations);
+        enclosingClass.addField(field);
+        annotatedClassSet.add(enclosingClass);
     }
 
-    private void addParameterToAnnotationDatabase(Element paramElement) {
+    private void addParameterToAnnotationDatabase(Element paramElement, int level) {
         Element enclosing = paramElement.getEnclosingElement();
         String injectionPointName = enclosing.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         final ExecutableElement methodOrConstructor = (ExecutableElement) paramElement.getEnclosingElement();
         if (injectionPointName.startsWith("<init>")) {
-            addConstructor(methodOrConstructor);
+            addConstructor(methodOrConstructor, level);
         } else {
-            addMethod(methodOrConstructor);
+            addMethod(methodOrConstructor, level);
         }
     }
 
-    private Class[] getParameterTypes(ExecutableElement methodElement) {
+    private Class[] getParameterTypes(ExecutableElement methodElement, int level) {
         final List<? extends VariableElement> parameters = methodElement.getParameters();
         Class[] paramTypes = new Class[parameters.size()];
         for (int indexParam = 0; indexParam < parameters.size(); indexParam++) {
             VariableElement parameter = parameters.get(indexParam);
-            paramTypes[indexParam] = Class.forNameSafe(getTypeName(parameter));
+            paramTypes[indexParam] = Class.forNameSafe(getTypeName(parameter), level);
         }
         return paramTypes;
     }
 
-    private Class[] getExceptionTypes(ExecutableElement methodElement) {
+    private Class[] getExceptionTypes(ExecutableElement methodElement, int level) {
         final List<? extends TypeMirror> exceptionTypes = methodElement.getThrownTypes();
         Class[] paramTypes = new Class[exceptionTypes.size()];
         for (int indexParam = 0; indexParam < exceptionTypes.size(); indexParam++) {
             TypeMirror exceptionType = exceptionTypes.get(indexParam);
-            paramTypes[indexParam] = Class.forNameSafe(exceptionType.toString());
+            paramTypes[indexParam] = Class.forNameSafe(exceptionType.toString(), level);
         }
         return paramTypes;
     }
 
-    private void addMethodOrConstructorToAnnotationDatabase(ExecutableElement methodOrConstructorElement) {
+    private void addMethodOrConstructorToAnnotationDatabase(ExecutableElement methodOrConstructorElement, int level) {
         String injectionPointName = methodOrConstructorElement.getSimpleName().toString();
         //System.out.printf("Type: %s, injection: %s \n",typeElementName, injectionPointName);
         if (injectionPointName.startsWith("<init>")) {
-            addConstructor(methodOrConstructorElement);
+            addConstructor(methodOrConstructorElement, level);
         } else {
-            addMethod(methodOrConstructorElement);
+            addMethod(methodOrConstructorElement, level);
         }
     }
 
-    protected void addToInjectedFields(Set<Modifier> modifiers, String injectedClassName, Element fieldElement) {
-        String injectionPointName = fieldElement.getSimpleName().toString();
-        TypeElement declaringClassElement = (TypeElement) fieldElement.getEnclosingElement();
-        String declaringClassName = getTypeName(declaringClassElement);
-        final List<Annotation> annotations = extractAnnotations(fieldElement);
-        int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
-        final Field field = new Field(injectionPointName, Class.forNameSafe(injectedClassName), Class.forNameSafe(declaringClassName), modifiersInt, annotations);
-
-        //rnr 2
-        final Class<?> classContainingField = Class.forNameSafe(declaringClassName);
-        classContainingField.addField(field);
-        annotatedClassSet.add(classContainingField);
-    }
-
-    private void addConstructor(ExecutableElement methodElement) {
+    private void addConstructor(ExecutableElement methodElement, int level) {
         final Element enclosing = methodElement.getEnclosingElement();
         final TypeElement declaringClassElement = (TypeElement) enclosing;
-        final String declaringClassName = getTypeName(declaringClassElement);
-        final Class[] paramTypes = getParameterTypes(methodElement);
-        final Class[] exceptionTypes = getExceptionTypes(methodElement);
-        final Constructor constructor = new Constructor(Class.forNameSafe(declaringClassName),
+        final String declaringClassName = declaringClassElement.getQualifiedName().toString();
+        final Class[] paramTypes = getParameterTypes(methodElement, level);
+        final Class[] exceptionTypes = getExceptionTypes(methodElement, level);
+        final Constructor constructor = new Constructor(Class.forNameSafe(declaringClassName, level),
                                                         paramTypes,
                                                         exceptionTypes,
                                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
@@ -188,13 +179,13 @@ public class Processor extends AbstractProcessor {
         annotatedClassSet.add(classContainingMethod);
     }
 
-    private void addMethod(ExecutableElement methodElement) {
+    private void addMethod(ExecutableElement methodElement, int level) {
         final Element enclosing = methodElement.getEnclosingElement();
         final String methodName = methodElement.getSimpleName().toString();
         final TypeElement declaringClassElement = (TypeElement) enclosing;
-        final String declaringClassName = getTypeName(declaringClassElement);
-        final Class[] paramTypes = getParameterTypes(methodElement);
-        final Class[] exceptionTypes = getExceptionTypes(methodElement);
+        final String declaringClassName = declaringClassElement.getQualifiedName().toString();
+        final Class[] paramTypes = getParameterTypes(methodElement, level);
+        final Class[] exceptionTypes = getExceptionTypes(methodElement, level);
         final String returnTypeName = methodElement.getReturnType().toString();
         final Method method = new Method(Class.forNameSafe(declaringClassName),
                                          methodName,
@@ -239,7 +230,7 @@ public class Processor extends AbstractProcessor {
         return annotations;
     }
 
-    private Class createClass(TypeMirror typeMirror) {
+    private Class createClass(TypeMirror typeMirror, int level) {
         Class result;
         String className = null;
         boolean isPrimitive = false;
@@ -249,7 +240,7 @@ public class Processor extends AbstractProcessor {
         GenericDeclaration declaration = null;
 
         if (typeMirror instanceof DeclaredType) {
-            className = getTypeName((TypeElement) ((DeclaredType) typeMirror).asElement());
+            className = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getQualifiedName().toString();
             if (!((DeclaredType) typeMirror).getTypeArguments().isEmpty()) {
                 declaration = new GenericDeclaration();
                 TypeVariable[] typesVariables = new TypeVariable[((DeclaredType) typeMirror).getTypeArguments().size()];
@@ -264,16 +255,22 @@ public class Processor extends AbstractProcessor {
                 declaration.setTypeParameters(typesVariables);
             }
             isInterface = ((com.sun.tools.javac.code.Type) typeMirror).isInterface();
+            if (level + 1 < maxLevel) {
+                final List<? extends Element> enclosedElements = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getEnclosedElements();
+                for (Element enclosedElement : enclosedElements) {
+                    mapElementToReflection(enclosedElement, level + 1);
+                }
+            }
         } else if (typeMirror instanceof PrimitiveType) {
             isPrimitive = true;
             className = typeMirror.toString();
         } else if (typeMirror instanceof ArrayType) {
             isArray = true;
             className = ((ArrayType) typeMirror).getComponentType().toString() + "[]";
-            component = createClass(((ArrayType) typeMirror).getComponentType());
+            component = createClass(((ArrayType) typeMirror).getComponentType(), level);
         }
 
-        result = Class.forNameSafe(className);
+        result = Class.forNameSafe(className, level);
         result.setIsArray(isArray);
         result.setIsPrimitive(isPrimitive);
         result.setComponentType(component);
@@ -316,15 +313,11 @@ public class Processor extends AbstractProcessor {
         return result;
     }
 
-    private String getTypeName(TypeElement typeElement) {
-        return typeElement.getQualifiedName().toString();
-    }
-
     private String getTypeName(Element injectionPoint) {
         String injectedClassName = null;
         final TypeMirror fieldTypeMirror = injectionPoint.asType();
         if (fieldTypeMirror instanceof DeclaredType) {
-            injectedClassName = getTypeName((TypeElement) ((DeclaredType) fieldTypeMirror).asElement());
+            injectedClassName = ((TypeElement) ((DeclaredType) fieldTypeMirror).asElement()).getQualifiedName().toString();
         } else if (fieldTypeMirror instanceof PrimitiveType) {
             injectedClassName = fieldTypeMirror.toString();
         } else if (fieldTypeMirror instanceof ArrayType) {
@@ -345,6 +338,10 @@ public class Processor extends AbstractProcessor {
 
     public void setTargetAnnotatedClasses(Set<String> targetAnnotatedClasses) {
         this.targetAnnotatedClasses = targetAnnotatedClasses;
+    }
+
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
     }
 
     public Set<Class> getTargetAnnotatedClasses() {

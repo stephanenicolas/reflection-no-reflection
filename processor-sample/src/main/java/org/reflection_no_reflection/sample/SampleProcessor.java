@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.generator;
+package org.reflection_no_reflection.sample;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,7 +9,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.processor.Processor;
-import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 import org.reflection_no_reflection.visit.dump.JavaDumperClassPoolVisitor;
 
 /**
@@ -33,11 +32,10 @@ public class SampleProcessor extends AbstractProcessor {
         if (!roundEnv.processingOver()) {
             return processed;
         }
-        HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
+        //HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
 
         JavaDumperClassPoolVisitor dumper = new JavaDumperClassPoolVisitor();
-        ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
-        visitor.visit(annotatedClassSet, dumper);
+        Class.visit(dumper);
         final StringBuffer buffer = dumper.getBuffer();
 
         System.out.println("Dumping all collected data: \n");
