@@ -9,6 +9,7 @@ dependencies {
   compile project(':common-lib')
   compile project(':processor')
   compile 'javax.inject:javax.inject:1'
+  compile 'com.squareup:javapoet:1.0.0'
   testCompile 'junit:junit:4.10'
   testCompile 'org.easytesting:fest:1.0.7'
   testCompile 'com.google.testing.compile:compile-testing:0.4'
