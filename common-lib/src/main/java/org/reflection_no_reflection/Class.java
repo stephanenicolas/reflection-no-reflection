@@ -670,14 +670,31 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     }
 
     public void addField(Field field) {
+        for (Field field1 : fields) {
+            if (field1.equals(field)) {
+                return;
+            }
+        }
+
         fields.add(field);
     }
 
     public void addMethod(Method method) {
+        for (Method method1 : methods) {
+            if (method1.equals(method)) {
+                return;
+            }
+        }
+
         methods.add(method);
     }
 
     public void addConstructor(Constructor constructor) {
+        for (Constructor constructor1 : constructors) {
+            if (constructor1.equals(constructor)) {
+                return;
+            }
+        }
         constructors.add(constructor);
     }
 

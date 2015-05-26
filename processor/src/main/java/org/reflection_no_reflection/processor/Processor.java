@@ -133,7 +133,7 @@ public class Processor extends AbstractProcessor {
         Class[] paramTypes = new Class[parameters.size()];
         for (int indexParam = 0; indexParam < parameters.size(); indexParam++) {
             VariableElement parameter = parameters.get(indexParam);
-            paramTypes[indexParam] = Class.forNameSafe(getTypeName(parameter), level);
+            paramTypes[indexParam] = createClass(parameter.asType(), level);
         }
         return paramTypes;
     }
@@ -143,7 +143,7 @@ public class Processor extends AbstractProcessor {
         Class[] paramTypes = new Class[exceptionTypes.size()];
         for (int indexParam = 0; indexParam < exceptionTypes.size(); indexParam++) {
             TypeMirror exceptionType = exceptionTypes.get(indexParam);
-            paramTypes[indexParam] = Class.forNameSafe(exceptionType.toString(), level);
+            paramTypes[indexParam] = createClass(exceptionType, level);
         }
         return paramTypes;
     }
@@ -161,10 +161,9 @@ public class Processor extends AbstractProcessor {
     private void addConstructor(ExecutableElement methodElement, int level) {
         final Element enclosing = methodElement.getEnclosingElement();
         final TypeElement declaringClassElement = (TypeElement) enclosing;
-        final String declaringClassName = declaringClassElement.getQualifiedName().toString();
         final Class[] paramTypes = getParameterTypes(methodElement, level);
         final Class[] exceptionTypes = getExceptionTypes(methodElement, level);
-        final Class<?> classContainingMethod = Class.forNameSafe(declaringClassName, level + 1);
+        final Class<?> classContainingMethod = Class.forNameSafe(declaringClassElement.asType().toString(), level + 1);
         final Constructor constructor = new Constructor(classContainingMethod,
                                                         paramTypes,
                                                         exceptionTypes,
@@ -182,11 +181,10 @@ public class Processor extends AbstractProcessor {
         final Element enclosing = methodElement.getEnclosingElement();
         final String methodName = methodElement.getSimpleName().toString();
         final TypeElement declaringClassElement = (TypeElement) enclosing;
-        final String declaringClassName = declaringClassElement.getQualifiedName().toString();
         final Class[] paramTypes = getParameterTypes(methodElement, level);
         final Class[] exceptionTypes = getExceptionTypes(methodElement, level);
         final String returnTypeName = methodElement.getReturnType().toString();
-        final Class<?> declaringClass = Class.forNameSafe(declaringClassName, level + 1);
+        final Class<?> declaringClass = Class.forNameSafe(declaringClassElement.asType().toString(), level + 1);
         final Method method = new Method(declaringClass,
                                          methodName,
                                          paramTypes,
@@ -206,12 +204,12 @@ public class Processor extends AbstractProcessor {
         final List<Annotation> annotations = new ArrayList<>();
         for (AnnotationMirror annotationMirror : annotatedElement.getAnnotationMirrors()) {
             final Map<Method, Object> mapMethodToValue = new HashMap<>();
-            final String annotationType = annotationMirror.getAnnotationType().toString();
+            final Class<?> annotationClass = Class.forNameSafe(annotationMirror.getAnnotationType().toString(), level);
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
                 final String methodOfAnnotationName = entry.getKey().getSimpleName().toString();
 
                 //RnR 2
-                final Method methodOfAnnotation = new Method(Class.forNameSafe(annotationType, level),
+                final Method methodOfAnnotation = new Method(annotationClass,
                                                              methodOfAnnotationName,
                                                              //TODO : param types
                                                              new Class[0],
@@ -223,7 +221,7 @@ public class Processor extends AbstractProcessor {
                 mapMethodToValue.put(methodOfAnnotation, entry.getValue().getValue());
             }
 
-            final Annotation annotation = new Annotation(Class.forNameSafe(annotationType, level), mapMethodToValue);
+            final Annotation annotation = new Annotation(annotationClass, mapMethodToValue);
             annotations.add(annotation);
         }
         return annotations;
@@ -270,11 +268,13 @@ public class Processor extends AbstractProcessor {
         }
 
         result = Class.forNameSafe(className, level);
-        result.setIsArray(isArray);
-        result.setIsPrimitive(isPrimitive);
-        result.setComponentType(component);
-        result.setGenericInfo(declaration);
-        result.setIsInterface(isInterface);
+        if (result != null) {
+            result.setIsArray(isArray);
+            result.setIsPrimitive(isPrimitive);
+            result.setComponentType(component);
+            result.setGenericInfo(declaration);
+            result.setIsInterface(isInterface);
+        }
         return result;
     }
 
@@ -331,7 +331,8 @@ public class Processor extends AbstractProcessor {
         return SourceVersion.latest();
     }
 
-    @Override public Set<String> getSupportedAnnotationTypes() {
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
         return targetAnnotatedClasses;
     }
 
@@ -339,6 +340,15 @@ public class Processor extends AbstractProcessor {
         this.targetAnnotatedClasses = targetAnnotatedClasses;
     }
 
+    /**
+     * Level 0 : everything that is annotated will place every class referenced in its signature in the pool.
+     * Level N : everything that is of level N-1 will place every class referenced in the signature of its members in the pool.
+     *
+     * A class that is only referenced in the pool, but empty (of level N), is called partially referenced or partial.
+     * A class whose members are fully known (of level 0-->N-1), is called fully referenced or full.
+     *
+     * @param maxLevel
+     */
     public void setMaxLevel(int maxLevel) {
         this.maxLevel = maxLevel;
     }
