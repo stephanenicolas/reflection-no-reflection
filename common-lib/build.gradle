@@ -10,3 +10,8 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'plantuml'
+
+dependencies {
+  testCompile 'junit:junit:4.11'
+}
+
