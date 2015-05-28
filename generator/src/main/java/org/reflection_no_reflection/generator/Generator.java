@@ -41,7 +41,6 @@ public class Generator extends AbstractProcessor {
         visitor.visit(annotatedClassSet, dumper);
 
         JavaFile javaFile = dumper.getJavaFile();
-
         String buffer = javaFile.toString();
         System.out.println("Dumping all collected data: \n");
         System.out.println(buffer);

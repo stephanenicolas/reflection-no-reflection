@@ -25,6 +25,7 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
     private List<Class<?>> classList = new ArrayList<>();
     private final TypeSpec.Builder moduleType;
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
+    public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
 
     public JavaRuntimeDumperClassPoolVisitor() {
 
@@ -82,7 +83,14 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
         for (Class clazz : classList) {
             constructorSpecBuilder.addStatement("$T c$L = Class.forName($S)", CLASS_TYPE_NAME, classCounter, clazz.getName());
             constructorSpecBuilder.addStatement("classList.add(c$L)", classCounter);
+            int fieldCounter = 0;
+            for (Field field : clazz.getFields()) {
+                constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forName($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
+                constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
+            }
+
             classCounter++;
+            constructorSpecBuilder.addCode("\n");
         }
         MethodSpec constructorSpec = constructorSpecBuilder.build();
         moduleType.addMethod(constructorSpec);
