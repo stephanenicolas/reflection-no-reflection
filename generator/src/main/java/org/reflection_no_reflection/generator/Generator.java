@@ -1,5 +1,6 @@
 package org.reflection_no_reflection.generator;
 
+import com.squareup.javapoet.JavaFile;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,6 @@ import javax.lang.model.element.TypeElement;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.processor.Processor;
 import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
-import org.reflection_no_reflection.visit.dump.JavaDumperClassPoolVisitor;
 
 /**
  * An annotation processor sample that demonstrates how to use the RNR annotation processor.
@@ -36,11 +36,13 @@ public class Generator extends AbstractProcessor {
         }
         HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
 
-        JavaDumperClassPoolVisitor dumper = new JavaDumperClassPoolVisitor();
+        JavaRuntimeDumperClassPoolVisitor dumper = new JavaRuntimeDumperClassPoolVisitor();
         ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
         visitor.visit(annotatedClassSet, dumper);
-        final StringBuffer buffer = dumper.getBuffer();
 
+        JavaFile javaFile = dumper.getJavaFile();
+
+        String buffer = javaFile.toString();
         System.out.println("Dumping all collected data: \n");
         System.out.println(buffer);
         return processed;

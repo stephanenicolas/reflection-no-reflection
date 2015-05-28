@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = "org.reflection_no_reflection.sample.Main"
+mainClassName = "Main"
 
 repositories {
   mavenCentral()

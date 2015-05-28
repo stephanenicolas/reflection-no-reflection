@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.sample;
+package org.reflection_no_reflection.generator.sample;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
@@ -6,18 +6,19 @@ import java.util.Arrays;
 import javax.tools.JavaFileObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.reflection_no_reflection.generator.Generator;
 
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
-public class SampleProcessorTest {
+public class SampleGeneratorTest {
 
     protected javax.annotation.processing.Processor processor;
     protected JavaFileObject javaSourceCode;
 
     @Before
     public void setup() {
-        processor = new SampleProcessor();
+        processor = new Generator();
         javaSourceCode = null;
     }
 

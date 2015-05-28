@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.sample;
+package org.reflection_no_reflection.generator.sample;
 
 import java.util.Arrays;
 import java.util.HashSet;
