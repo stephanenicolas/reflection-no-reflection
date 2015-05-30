@@ -8,7 +8,9 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.processor.Processor;
 import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
@@ -39,25 +41,47 @@ public class Generator extends AbstractProcessor {
             return processed;
         }
         HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
-
         JavaRuntimeDumperClassPoolVisitor dumper = new JavaRuntimeDumperClassPoolVisitor();
-        ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
-        visitor.visit(annotatedClassSet, dumper);
+        dumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
+        JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, dumper);
+        writeModule(rnRModuleJavaFile);
+        printModule(rnRModuleJavaFile);
+        return processed;
+    }
 
-        JavaFile javaFile = dumper.getJavaFile();
+    private void printModule(JavaFile rnRModuleJavaFile) {
+        String buffer = rnRModuleJavaFile.toString();
+        System.out.println("Dumping all collected data: \n");
+        System.out.println(buffer);
+    }
+
+    private void writeModule(JavaFile javaFile) {
         try {
             javaFile.writeTo(processingEnv.getFiler());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String buffer = javaFile.toString();
-        System.out.println("Dumping all collected data: \n");
-        System.out.println(buffer);
-        return processed;
+    }
+
+    private JavaFile createRnRModuleJavaFile(HashSet<Class> annotatedClassSet, JavaRuntimeDumperClassPoolVisitor dumper) {
+        ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
+        visitor.visit(annotatedClassSet, dumper);
+
+        return dumper.getJavaFile();
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return processor.getSupportedAnnotationTypes();
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return processor.getSupportedSourceVersion();
+    }
+
+    @Override
+    public Set<String> getSupportedOptions() {
+        return processor.getSupportedOptions();
     }
 }

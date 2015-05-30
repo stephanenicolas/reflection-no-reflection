@@ -48,8 +48,10 @@ public class Processor extends AbstractProcessor {
 
     private Set<String> targetAnnotatedClasses = new HashSet<>();
 
-    /** Contains all classes that contain injection points. */
+    /** Contains all classes that contain annotations. */
     private HashSet<Class> annotatedClassSet = new HashSet<>();
+    /** Maps annotation type to classes that contain this annotation. */
+    private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
 
     private int maxLevel = 0;
 
@@ -111,6 +113,15 @@ public class Processor extends AbstractProcessor {
         final List<Annotation> annotations = extractAnnotations(fieldElement, level);
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
         final Class<?> enclosingClass = Class.forNameSafe(declaringClassName, level + 1);
+        if (level == 0) {
+            final Class<? extends Annotation> annotationType = annotations.get(0).annotationType();
+            Set<Class<?>> classes = mapAnnotationTypeToClassContainingAnnotation.get(annotationType);
+            if (classes == null) {
+                classes = new HashSet<>();
+            }
+            classes.add(enclosingClass);
+            mapAnnotationTypeToClassContainingAnnotation.put(annotationType, classes);
+        }
         final Field field = new Field(fieldName, fieldClass, enclosingClass, modifiersInt, annotations);
         enclosingClass.addField(field);
         annotatedClassSet.add(enclosingClass);
@@ -354,10 +365,20 @@ public class Processor extends AbstractProcessor {
     }
 
     public Set<Class> getTargetAnnotatedClasses() {
+        //TODO bug we should return target classes
         return annotatedClassSet;
     }
 
     public Set<Class> getAnnotatedClassSet() {
         return annotatedClassSet;
     }
+
+    public Set<Class<?>> getClassesContainingAnnotation(Class<? extends Annotation> annotationType) {
+        return mapAnnotationTypeToClassContainingAnnotation.get(annotationType);
+    }
+
+    public Map<Class<? extends Annotation>, Set<Class<?>>> getMapAnnotationTypeToClassContainingAnnotation() {
+        return mapAnnotationTypeToClassContainingAnnotation;
+    }
+
 }

@@ -12,7 +12,7 @@ import java.util.Map;
 public class Annotation {
 
     /** The class name of this annotation type. */
-    private Class<?> annotationType;
+    private Class<? extends Annotation> annotationType;
     private Map<Method, Object> mapMethodToValue = new HashMap<>();
 
     /**
@@ -58,7 +58,7 @@ public class Annotation {
         return result;
     }
 
-    public Class<?> annotationType() {
+    public Class<? extends Annotation> annotationType() {
         return annotationType;
     }
 }
