@@ -706,6 +706,14 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         return level;
     }
 
+    public static void loadModule(Module module) {
+        for (Class aClass : module.getClassList()) {
+            //TODO all classes have already been registered when instanciating the module
+            //TODO we should have more control here, even possible dynamic class loading
+            //TODO how to manage conflicts ? It looks like JNDI.. oh no !
+        }
+    }
+
     private final static class EnclosingMethodInfo {
         private Class<?> enclosingClass;
         private String name;

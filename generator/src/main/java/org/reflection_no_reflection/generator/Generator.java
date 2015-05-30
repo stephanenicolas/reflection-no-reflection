@@ -1,6 +1,7 @@
 package org.reflection_no_reflection.generator;
 
 import com.squareup.javapoet.JavaFile;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,12 +19,15 @@ import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 public class Generator extends AbstractProcessor {
 
     private Processor processor = new Processor();
+    private ProcessingEnvironment processingEnv;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
+        this.processingEnv = processingEnv;
         //comma separated list of injected classes
         processor.init(processingEnv);
         processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(javax.inject.Inject.class.getName())));
+        System.out.println("RNR Generator created.");
     }
 
     @Override
@@ -41,6 +45,11 @@ public class Generator extends AbstractProcessor {
         visitor.visit(annotatedClassSet, dumper);
 
         JavaFile javaFile = dumper.getJavaFile();
+        try {
+            javaFile.writeTo(processingEnv.getFiler());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         String buffer = javaFile.toString();
         System.out.println("Dumping all collected data: \n");
         System.out.println(buffer);

@@ -81,13 +81,14 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
 
     public JavaFile getJavaFile() {
         MethodSpec.Builder constructorSpecBuilder = MethodSpec.constructorBuilder();
+        constructorSpecBuilder.addModifiers(Modifier.PUBLIC);
         int classCounter = 0;
         for (Class clazz : classList) {
-            constructorSpecBuilder.addStatement("$T c$L = Class.forName($S)", CLASS_TYPE_NAME, classCounter, clazz.getName());
+            constructorSpecBuilder.addStatement("$T c$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, classCounter, clazz.getName());
             constructorSpecBuilder.addStatement("classList.add(c$L)", classCounter);
             int fieldCounter = 0;
             for (Field field : clazz.getFields()) {
-                constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forName($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
+                constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
                 constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
             }
 
