@@ -13,3 +13,13 @@ dependencies {
   testCompile 'org.easytesting:fest:1.0.7'
   testCompile 'com.google.testing.compile:compile-testing:0.4'
 }
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.4'
+}
+
+tasks.withType(JavaCompile) {
+  sourceCompatibility = "1.7"
+  targetCompatibility = "1.7"
+}
+

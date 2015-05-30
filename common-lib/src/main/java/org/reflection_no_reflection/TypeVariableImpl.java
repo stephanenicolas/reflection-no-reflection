@@ -1,6 +1,5 @@
 package org.reflection_no_reflection;
 
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 
 /**
@@ -47,10 +46,5 @@ public class TypeVariableImpl<D extends GenericDeclaration> implements TypeVaria
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public AnnotatedType[] getAnnotatedBounds() {
-        //TODO
-        return new AnnotatedType[0];
     }
 }

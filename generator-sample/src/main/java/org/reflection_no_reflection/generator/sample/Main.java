@@ -7,6 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         new A();
+
         //Class.loadModule(new org.reflection_no_reflection.sample.Module());
         //try {
         //    final Class<?> classFoo = Class.forName("A");

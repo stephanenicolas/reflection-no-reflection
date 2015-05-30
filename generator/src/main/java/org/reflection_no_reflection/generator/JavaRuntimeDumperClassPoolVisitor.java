@@ -24,6 +24,7 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
     private JavaFile javaFile;
     private List<Class<?>> classList = new ArrayList<>();
     private final TypeSpec.Builder moduleType;
+    public static final ClassName MODULE_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Module");
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
 
@@ -43,8 +44,9 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
             .addStatement("return $L", "classList")
             .build();
 
-        moduleType = TypeSpec.classBuilder("Module")
+        moduleType = TypeSpec.classBuilder("ModuleImpl")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+            .addSuperinterface(MODULE_TYPE_NAME)
             .addField(classListField)
             .addMethod(getClassListMethod);
     }
@@ -95,7 +97,7 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
         MethodSpec constructorSpec = constructorSpecBuilder.build();
         moduleType.addMethod(constructorSpec);
 
-        javaFile = JavaFile.builder("org.reflection_no_reflection.generator.example", moduleType.build()).build();
+        javaFile = JavaFile.builder("org.reflection_no_reflection.generator.sample.gen", moduleType.build()).build();
 
         return javaFile;
     }

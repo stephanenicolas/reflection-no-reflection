@@ -2,6 +2,7 @@ package org.reflection_no_reflection.visit;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.reflection_no_reflection.Annotation;
@@ -39,7 +40,7 @@ public class ClassPoolVisitStrategy {
 
     private List<Class> sortClassesByLevel(Collection<Class> classCollection) {
         List<Class> classList = new ArrayList<>(classCollection);
-        classList.sort(new Comparator<Class>() {
+        Collections.sort(classList, new Comparator<Class>() {
             @Override public int compare(Class o1, Class o2) {
                 return o1.getLevel() - o2.getLevel();
             }
