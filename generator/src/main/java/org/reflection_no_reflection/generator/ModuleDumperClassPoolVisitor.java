@@ -23,18 +23,18 @@ import org.reflection_no_reflection.visit.ClassPoolVisitor;
 /**
  * @author SNI.
  */
-public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
+public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
     private JavaFile javaFile;
     private List<Class<?>> classList = new ArrayList<>();
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
     private final TypeSpec.Builder moduleType;
-    public static final ClassName MODULE_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Module");
+    public static final ClassName MODULE_TYPE_NAME = ClassName.get("org.reflection_no_reflection.runtime", "Module");
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
     public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
 
-    public JavaRuntimeDumperClassPoolVisitor() {
+    public ModuleDumperClassPoolVisitor() {
 
         //build class list
         ClassName listTypeName = ClassName.get("java.util", "List");
@@ -119,13 +119,16 @@ public class JavaRuntimeDumperClassPoolVisitor implements ClassPoolVisitor {
         int classCounter = 0;
         //fill class list
         for (Class clazz : classList) {
-            constructorSpecBuilder.addStatement("$T c$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, classCounter, clazz.getName());
+            final String clazzName = clazz.getName();
+            constructorSpecBuilder.addStatement("$T c$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, classCounter, clazzName);
             constructorSpecBuilder.addStatement("classList.add(c$L)", classCounter);
             int fieldCounter = 0;
             for (Field field : clazz.getFields()) {
                 constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
                 constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
             }
+            TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName()+"$$Reflector");
+            constructorSpecBuilder.addStatement("c$L.setReflector( new $T())", classCounter, reflectorTypeName);
 
             classCounter++;
             constructorSpecBuilder.addCode("\n");

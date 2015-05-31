@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.reflection_no_reflection.runtime.BaseReflector;
+import org.reflection_no_reflection.runtime.Module;
 import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
 import sun.reflect.annotation.AnnotationType;
@@ -41,6 +43,8 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     private int level;
 
     private static Set<Class> CLASS_POOL = new HashSet<>();
+    private Class<?> declaringClass;
+    private BaseReflector reflector;
 
     private Class(String name) {
         if (name == null) {
@@ -714,6 +718,14 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         }
     }
 
+    public BaseReflector getReflector() {
+        return reflector;
+    }
+
+    public void setReflector(BaseReflector reflector) {
+        this.reflector = reflector;
+    }
+
     private final static class EnclosingMethodInfo {
         private Class<?> enclosingClass;
         private String name;
@@ -798,7 +810,13 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
      * @return the declaring class for this class
      * @since JDK1.1
      */
-    public native Class<?> getDeclaringClass();
+    public Class<?> getDeclaringClass() {
+        return declaringClass;
+    }
+
+    public void setDeclaringClass(Class<?> declaringClass) {
+        this.declaringClass = declaringClass;
+    }
 
     /**
      * Returns the immediately enclosing class of the underlying

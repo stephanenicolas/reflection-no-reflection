@@ -10,7 +10,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.processor.Processor;
 import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
@@ -41,21 +40,31 @@ public class Generator extends AbstractProcessor {
             return processed;
         }
         HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
-        JavaRuntimeDumperClassPoolVisitor dumper = new JavaRuntimeDumperClassPoolVisitor();
-        dumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
-        JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, dumper);
-        writeModule(rnRModuleJavaFile);
-        printModule(rnRModuleJavaFile);
+        ModuleDumperClassPoolVisitor moduleDumper = new ModuleDumperClassPoolVisitor();
+        moduleDumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
+        JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, moduleDumper);
+        writeJavaFile(rnRModuleJavaFile);
+        System.out.println("Dumping all collected data: \n");
+        printJavaFile(rnRModuleJavaFile);
+
+        IntrospectorDumperClassPoolVisitor reflectorsDumper = new IntrospectorDumperClassPoolVisitor();
+        ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
+        visitor.visit(annotatedClassSet, reflectorsDumper);
+
+        for (JavaFile javaFile : reflectorsDumper.getJavaFiles()) {
+            writeJavaFile(javaFile);
+            System.out.println("Dumping reflector: \n");
+        }
+
         return processed;
     }
 
-    private void printModule(JavaFile rnRModuleJavaFile) {
-        String buffer = rnRModuleJavaFile.toString();
-        System.out.println("Dumping all collected data: \n");
+    private void printJavaFile(JavaFile javaFile) {
+        String buffer = javaFile.toString();
         System.out.println(buffer);
     }
 
-    private void writeModule(JavaFile javaFile) {
+    private void writeJavaFile(JavaFile javaFile) {
         try {
             javaFile.writeTo(processingEnv.getFiler());
         } catch (IOException e) {
@@ -63,7 +72,7 @@ public class Generator extends AbstractProcessor {
         }
     }
 
-    private JavaFile createRnRModuleJavaFile(HashSet<Class> annotatedClassSet, JavaRuntimeDumperClassPoolVisitor dumper) {
+    private JavaFile createRnRModuleJavaFile(HashSet<Class> annotatedClassSet, ModuleDumperClassPoolVisitor dumper) {
         ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
         visitor.visit(annotatedClassSet, dumper);
 

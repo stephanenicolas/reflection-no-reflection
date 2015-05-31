@@ -105,4 +105,8 @@ public class Field {
         }
         return enclosingClass.equals(field.enclosingClass);
     }
+
+    public void set(Object instance, Object value) {
+        enclosingClass.getReflector().setObjectField(instance, getName(), value);
+    }
 }
