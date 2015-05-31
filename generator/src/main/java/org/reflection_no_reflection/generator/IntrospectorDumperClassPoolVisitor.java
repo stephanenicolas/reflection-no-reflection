@@ -80,18 +80,24 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         ParameterSpec parameterSpec1 = ParameterSpec.builder(OBJECT_TYPE_NAME, "instance").build();
         ParameterSpec parameterSpec2 = ParameterSpec.builder(STRING_TYPE_NAME, "name").build();
         ParameterSpec parameterSpec3 = ParameterSpec.builder(OBJECT_TYPE_NAME, "value").build();
-        final ClassName enclosingClassName = ClassName.get("org.reflection_no_reflection.generator.sample", "A");
-        final ClassName fieldTypeName = ClassName.get("org.reflection_no_reflection.generator.sample", "B");
         MethodSpec.Builder setObjectFieldMethodBuilder = MethodSpec.methodBuilder("setObjectField")
-        .addModifiers(Modifier.PUBLIC)
-        .addParameter(parameterSpec1)
-        .addParameter(parameterSpec2)
-        .addParameter(parameterSpec3)
-            .addCode("switch(name) {\n")
-            .addCode("case($S) :", "b")
-            .addStatement("(($T) instance).b = ($T) value", enclosingClassName, fieldTypeName)
-            .addStatement("break")
-            .addStatement("}");
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(parameterSpec1)
+            .addParameter(parameterSpec2)
+            .addParameter(parameterSpec3)
+            .addCode("switch(name) {\n");
+
+        for (Field field : aClass.getFields()) {
+            final ClassName enclosingClassName = getClassName(aClass);
+            final ClassName fieldTypeName = getClassName(field.getType());
+            setObjectFieldMethodBuilder
+            .addCode("case($S) :", field.getName())
+                .addStatement("(($T) instance).$L = ($T) value", enclosingClassName, field.getName(), fieldTypeName)
+                .addStatement("break");
+        }
+
+
+        setObjectFieldMethodBuilder.addStatement("}");
 
         TypeSpec.Builder reflectorType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Reflector")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -99,5 +105,11 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
             .addMethod(setObjectFieldMethodBuilder.build());
         final String aClassName = aClass.getName();
         return JavaFile.builder(aClassName.substring(0, aClassName.lastIndexOf('.')), reflectorType.build()).build();
+    }
+
+    private ClassName getClassName(Class<?> clazz) {
+        final String className = clazz.getName();
+        final String packageName = className.substring(0, className.lastIndexOf('.'));
+        return ClassName.get(packageName, clazz.getSimpleName());
     }
 }
