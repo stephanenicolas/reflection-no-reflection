@@ -84,14 +84,20 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
 
         TypeSpec.Builder reflectorType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Reflector")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .superclass(BASE_REFLECTOR_TYPE_NAME)
-            .addMethod(setObjectFieldMethod)
-            .addMethod(setIntFieldMethod);
+            .superclass(BASE_REFLECTOR_TYPE_NAME);
+
+        if (setObjectFieldMethod!= null) {
+            reflectorType.addMethod(setObjectFieldMethod);
+        }
+        if (setIntFieldMethod!= null) {
+            reflectorType.addMethod(setIntFieldMethod);
+        }
         final String aClassName = aClass.getName();
         return JavaFile.builder(aClassName.substring(0, aClassName.lastIndexOf('.')), reflectorType.build()).build();
     }
 
     private MethodSpec createSetObjectFieldMethod(Class<?> aClass) {
+        boolean hasObjectField = false;
         ParameterSpec parameterSpec1 = ParameterSpec.builder(OBJECT_TYPE_NAME, "instance").build();
         ParameterSpec parameterSpec2 = ParameterSpec.builder(STRING_TYPE_NAME, "name").build();
         ParameterSpec parameterSpec3 = ParameterSpec.builder(OBJECT_TYPE_NAME, "value").build();
@@ -104,6 +110,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
 
         for (Field field : aClass.getFields()) {
             if( !field.getType().isPrimitive()) {
+                hasObjectField = true;
                 final TypeName enclosingClassName = getClassName(aClass);
                 final TypeName fieldTypeName = getClassName(field.getType());
                 setObjectFieldMethodBuilder
@@ -113,11 +120,16 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
             }
         }
 
+        if( !hasObjectField) {
+            return null;
+        }
+
         setObjectFieldMethodBuilder.addStatement("}");
         return setObjectFieldMethodBuilder.build();
     }
 
     private MethodSpec createSetIntFieldMethod(Class<?> aClass) {
+        boolean hasIntField = false;
         ParameterSpec parameterSpec1 = ParameterSpec.builder(OBJECT_TYPE_NAME, "instance").build();
         ParameterSpec parameterSpec2 = ParameterSpec.builder(STRING_TYPE_NAME, "name").build();
         ParameterSpec parameterSpec3 = ParameterSpec.builder(INT_TYPE_NAME, "value").build();
@@ -130,6 +142,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
 
         for (Field field : aClass.getFields()) {
             if( field.getType().isPrimitive() && field.getType() == Class.forNameSafe("int")) {
+                hasIntField = true;
                 final TypeName enclosingClassName = getClassName(aClass);
                 final TypeName fieldTypeName = getClassName(field.getType());
                 setIntFieldMethodBuilder
@@ -139,6 +152,9 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
             }
         }
 
+        if( !hasIntField) {
+            return null;
+        }
         setIntFieldMethodBuilder.addStatement("}");
         return setIntFieldMethodBuilder.build();
     }
