@@ -79,8 +79,9 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
     }
 
     private JavaFile buildReflector(Class<?> aClass) {
-        final MethodSpec setObjectFieldMethod = createSetObjectFieldMethod(aClass);
-        final MethodSpec setIntFieldMethod = createSetIntFieldMethod(aClass);
+        IntrospectorFieldAccessMethodCreator creator = new IntrospectorFieldAccessMethodCreator();
+        final MethodSpec setObjectFieldMethod = creator.createSetObjectFieldMethod(aClass);
+        final MethodSpec setIntFieldMethod = creator.createSetIntFieldMethod(aClass);
 
         TypeSpec.Builder reflectorType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Reflector")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -94,83 +95,5 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         }
         final String aClassName = aClass.getName();
         return JavaFile.builder(aClassName.substring(0, aClassName.lastIndexOf('.')), reflectorType.build()).build();
-    }
-
-    private MethodSpec createSetObjectFieldMethod(Class<?> aClass) {
-        boolean hasObjectField = false;
-        ParameterSpec parameterSpec1 = ParameterSpec.builder(OBJECT_TYPE_NAME, "instance").build();
-        ParameterSpec parameterSpec2 = ParameterSpec.builder(STRING_TYPE_NAME, "name").build();
-        ParameterSpec parameterSpec3 = ParameterSpec.builder(OBJECT_TYPE_NAME, "value").build();
-        MethodSpec.Builder setObjectFieldMethodBuilder = MethodSpec.methodBuilder("setObjectField")
-            .addModifiers(Modifier.PUBLIC)
-            .addParameter(parameterSpec1)
-            .addParameter(parameterSpec2)
-            .addParameter(parameterSpec3)
-            .addCode("switch(name) {\n");
-
-        for (Field field : aClass.getFields()) {
-            if( !field.getType().isPrimitive()) {
-                hasObjectField = true;
-                final TypeName enclosingClassName = getClassName(aClass);
-                final TypeName fieldTypeName = getClassName(field.getType());
-                setObjectFieldMethodBuilder
-                    .addCode("case($S) :", field.getName())
-                    .addStatement("(($T) instance).$L = ($T) value", enclosingClassName, field.getName(), fieldTypeName)
-                    .addStatement("break");
-            }
-        }
-
-        if( !hasObjectField) {
-            return null;
-        }
-
-        setObjectFieldMethodBuilder.addStatement("}");
-        return setObjectFieldMethodBuilder.build();
-    }
-
-    private MethodSpec createSetIntFieldMethod(Class<?> aClass) {
-        boolean hasIntField = false;
-        ParameterSpec parameterSpec1 = ParameterSpec.builder(OBJECT_TYPE_NAME, "instance").build();
-        ParameterSpec parameterSpec2 = ParameterSpec.builder(STRING_TYPE_NAME, "name").build();
-        ParameterSpec parameterSpec3 = ParameterSpec.builder(INT_TYPE_NAME, "value").build();
-        MethodSpec.Builder setIntFieldMethodBuilder = MethodSpec.methodBuilder("setIntField")
-            .addModifiers(Modifier.PUBLIC)
-            .addParameter(parameterSpec1)
-            .addParameter(parameterSpec2)
-            .addParameter(parameterSpec3)
-            .addCode("switch(name) {\n");
-
-        for (Field field : aClass.getFields()) {
-            if( field.getType().isPrimitive() && field.getType() == Class.forNameSafe("int")) {
-                hasIntField = true;
-                final TypeName enclosingClassName = getClassName(aClass);
-                final TypeName fieldTypeName = getClassName(field.getType());
-                setIntFieldMethodBuilder
-                    .addCode("case($S) :", field.getName())
-                    .addStatement("(($T) instance).$L = value", enclosingClassName, field.getName())
-                    .addStatement("break");
-            }
-        }
-
-        if( !hasIntField) {
-            return null;
-        }
-        setIntFieldMethodBuilder.addStatement("}");
-        return setIntFieldMethodBuilder.build();
-    }
-
-    private TypeName getClassName(Class<?> clazz) {
-        final String className = clazz.getName();
-        if (className.contains(".")) {
-            final String packageName = className.substring(0, className.lastIndexOf('.'));
-            return ClassName.get(packageName, clazz.getSimpleName());
-        } else {
-            //for primitives
-            switch (className) {
-                case "int" :
-                    return TypeName.get(int.class);
-            }
-            return null;
-        }
     }
 }
