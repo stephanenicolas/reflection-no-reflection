@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.runtime.Module;
-import org.reflection_no_reflection.generator.sample.gen;
 
 /**
  * @author SNI.
@@ -14,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         final A a = new A();
-        Module module = new ModuleImpl();
+        Module module = new org.reflection_no_reflection.generator.sample.gen.ModuleImpl();
         org.reflection_no_reflection.Class.loadModule(module);
         try {
             final Class<?> classFoo = Class.forName("org.reflection_no_reflection.generator.sample.A");
@@ -58,8 +57,8 @@ public class Main {
         fields[6].setDouble(a, (double) 2);
         System.out.println(a.h); //should be 2
 
-        System.out.println(a.i); //should be 0
-        fields[7].setChar(a, (char) 2);
+        System.out.println(a.i); //should be
+        fields[7].setChar(a, '2');
         System.out.println(a.i); //should be 2
 
         System.out.println(a.j); //should be false
