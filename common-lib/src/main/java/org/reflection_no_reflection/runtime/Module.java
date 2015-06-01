@@ -11,7 +11,7 @@ import org.reflection_no_reflection.Class;
  */
 @SuppressWarnings("unused")
 public interface Module {
-    List<org.reflection_no_reflection.Class> getClassList();
+    Set<org.reflection_no_reflection.Class> getClassSet();
 
     Map<Class<? extends Annotation>, Set<Class>> getMapOfAnnotationTypeToClassesContainingAnnotation();
 }

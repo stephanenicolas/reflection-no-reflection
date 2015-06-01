@@ -22,7 +22,7 @@ public class ClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getTargetAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
@@ -41,12 +41,13 @@ public class ClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getTargetAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
         final Class clazz = Class.forName("test.Foo");
         assertThat(annotatedClasses.contains(clazz), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass), notNullValue());
+        assertThat(Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass).annotationType().isAnnotation(), is(true));
 
         final Annotation[] annotations = clazz.getAnnotations();
         assertThat(annotations.length, is(2));
@@ -54,6 +55,7 @@ public class ClassTest extends AbstractRnRTest {
         final Class suppressWarningsAnnotationClass = Class.forName("java.lang.SuppressWarnings");
         assertThat(clazz.getAnnotation(suppressWarningsAnnotationClass).annotationType(), is(suppressWarningsAnnotationClass));
         assertThat(clazz.getAnnotation(suppressWarningsAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
+        assertThat(clazz.getAnnotation(suppressWarningsAnnotationClass).annotationType().isAnnotation(), is(true));
 
         final Object value = clazz.getAnnotation(suppressWarningsAnnotationClass).getValue("value");
         assertThat((String) value, is("foo"));

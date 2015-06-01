@@ -33,30 +33,30 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
     public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
+    private String targetPackageName;
 
     public ModuleDumperClassPoolVisitor() {
 
         //build class list
-        ClassName listTypeName = ClassName.get("java.util", "List");
-        ClassName arrayListTypeName = ClassName.get("java.util", "ArrayList");
-        TypeName listOfClassesTypeName = ParameterizedTypeName.get(listTypeName, CLASS_TYPE_NAME);
+        ClassName setTypeName = ClassName.get("java.util", "Set");
+        ClassName hashSetTypeName = ClassName.get("java.util", "HashSet");
+        TypeName setOfClassesTypeName = ParameterizedTypeName.get(setTypeName, CLASS_TYPE_NAME);
 
-        FieldSpec classListField = FieldSpec.builder(listOfClassesTypeName, "classList", Modifier.PRIVATE)
-            .initializer("new $T<>()", arrayListTypeName)
+        FieldSpec classListField = FieldSpec.builder(setOfClassesTypeName, "classSet", Modifier.PRIVATE)
+            .initializer("new $T<>()", hashSetTypeName)
             .build();
 
-        MethodSpec getClassListMethod = MethodSpec.methodBuilder("getClassList")
+        MethodSpec getClassListMethod = MethodSpec.methodBuilder("getClassSet")
             .addModifiers(Modifier.PUBLIC)
-            .returns(listOfClassesTypeName)
-            .addStatement("return $L", "classList")
+            .addAnnotation(Override.class)
+            .returns(setOfClassesTypeName)
+            .addStatement("return $L", "classSet")
             .build();
 
 
         //build map of annotation type names to class set
         ClassName mapTypeName = ClassName.get("java.util", "Map");
         ClassName hashMapTypeName = ClassName.get("java.util", "HashMap");
-        ClassName setTypeName = ClassName.get("java.util", "Set");
-        TypeName setOfClassesTypeName = ParameterizedTypeName.get(setTypeName, CLASS_TYPE_NAME);
         WildcardTypeName subClassOfAnnotationTypeName = WildcardTypeName.subtypeOf(ANNOTATION_TYPE_NAME);
         TypeName classesOfAnnotationTypeName = ParameterizedTypeName.get(CLASS_TYPE_NAME, subClassOfAnnotationTypeName);
         TypeName mapOfAnnotationTypeToClassesContainingAnnotationTypeName = ParameterizedTypeName.get(mapTypeName, classesOfAnnotationTypeName, setOfClassesTypeName);
@@ -116,20 +116,34 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public JavaFile getJavaFile() {
         MethodSpec.Builder constructorSpecBuilder = MethodSpec.constructorBuilder();
         constructorSpecBuilder.addModifiers(Modifier.PUBLIC);
+        int annotationCounter = 0;
         int classCounter = 0;
+        int fieldCounter = 0;
         //fill class list
         for (Class clazz : classList) {
             final String clazzName = clazz.getName();
             constructorSpecBuilder.addStatement("$T c$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, classCounter, clazzName);
-            constructorSpecBuilder.addStatement("classList.add(c$L)", classCounter);
-            int fieldCounter = 0;
+            constructorSpecBuilder.addStatement("classSet.add(c$L)", classCounter);
             for (Field field : clazz.getFields()) {
+                for (Annotation annotation : field.getDeclaredAnnotations()) {
+                    constructorSpecBuilder.addStatement("$T a$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
+                    constructorSpecBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
+                    constructorSpecBuilder.addStatement("classSet.add(a$L)", annotationCounter);
+                    annotationCounter++;
+                }
+
                 constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
                 constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
                 fieldCounter++;
             }
             TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName()+"$$Reflector");
-            constructorSpecBuilder.addStatement("c$L.setReflector( new $T())", classCounter, reflectorTypeName);
+            //TODO add all protected java & android packages
+            //TODO the test should be done at the introspector level, there is a dependency
+            //TODO avoid dependency: introduce 3rd party
+            if (!clazz.getName().startsWith("java")) {
+                constructorSpecBuilder.addStatement("c$L.setReflector(new $T())", classCounter, reflectorTypeName);
+            }
+            constructorSpecBuilder.addStatement("c$L.setModifiers($L)", classCounter, clazz.getModifiers());
 
             classCounter++;
             constructorSpecBuilder.addCode("\n");
@@ -157,8 +171,12 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         MethodSpec constructorSpec = constructorSpecBuilder.build();
         moduleType.addMethod(constructorSpec);
 
-        javaFile = JavaFile.builder("org.reflection_no_reflection.generator.sample.gen", moduleType.build()).build();
+        javaFile = JavaFile.builder(targetPackageName, moduleType.build()).build();
 
         return javaFile;
+    }
+
+    public void setTargetPackageName(String targetPackageName) {
+        this.targetPackageName = targetPackageName;
     }
 }

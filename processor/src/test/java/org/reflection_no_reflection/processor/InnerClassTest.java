@@ -23,7 +23,7 @@ public class InnerClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getTargetAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo.Bar")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo.Bar")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
@@ -43,7 +43,7 @@ public class InnerClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getTargetAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo.Bar")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo.Bar")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
@@ -63,7 +63,7 @@ public class InnerClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getTargetAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo.Bar")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo.Bar")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");

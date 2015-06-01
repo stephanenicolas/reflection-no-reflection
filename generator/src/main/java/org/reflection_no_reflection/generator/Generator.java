@@ -23,6 +23,7 @@ import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
  */
 public class Generator extends AbstractProcessor {
 
+    private final String targetPackageName = "org.reflection_no_reflection.generator.sample.gen";
     private Processor processor = new Processor();
     private ProcessingEnvironment processingEnv;
 
@@ -32,6 +33,7 @@ public class Generator extends AbstractProcessor {
         //comma separated list of injected classes
         processor.init(processingEnv);
         processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(javax.inject.Inject.class.getName())));
+        processor.setMaxLevel(1);
         System.out.println("RNR Generator created.");
     }
 
@@ -46,6 +48,7 @@ public class Generator extends AbstractProcessor {
         //module creation
         HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
         ModuleDumperClassPoolVisitor moduleDumper = new ModuleDumperClassPoolVisitor();
+        moduleDumper.setTargetPackageName(targetPackageName);
         moduleDumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
         JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, moduleDumper);
         writeJavaFile(rnRModuleJavaFile);
@@ -60,16 +63,21 @@ public class Generator extends AbstractProcessor {
         for (JavaFile javaFile : reflectorsDumper.getJavaFiles()) {
             writeJavaFile(javaFile);
             System.out.println("Dumping reflector: \n");
+            printJavaFile(javaFile);
+
         }
 
         //annotation implementations creation
         AnnotationCreatorClassPoolVisitor annotationDumper = new AnnotationCreatorClassPoolVisitor();
+        annotationDumper.setTargetPackageName(targetPackageName);
         ClassPoolVisitStrategy visitor2 = new ClassPoolVisitStrategy();
-        visitor2.visit(annotatedClassSet, annotationDumper);
+        final Set<Class> annotationClasses = processor.getAnnotationClasses();
+        visitor2.visit(annotationClasses, annotationDumper);
 
         for (JavaFile javaFile : annotationDumper.getJavaFiles()) {
             writeJavaFile(javaFile);
-            System.out.println("Dumping Anntation implementations: \n");
+            System.out.println("Dumping Annotations implementations: \n");
+            printJavaFile(javaFile);
         }
 
         return processed;
@@ -91,7 +99,6 @@ public class Generator extends AbstractProcessor {
     private JavaFile createRnRModuleJavaFile(HashSet<Class> annotatedClassSet, ModuleDumperClassPoolVisitor dumper) {
         ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
         visitor.visit(annotatedClassSet, dumper);
-
         return dumper.getJavaFile();
     }
 

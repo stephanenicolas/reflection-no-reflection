@@ -18,6 +18,9 @@ public class JavaDumperClassPoolVisitor implements ClassPoolVisitor {
         buffer.append(CLASS_SEPARATOR);
         buffer.append(aClass.getLevel());
         buffer.append(":");
+        if(aClass.isAnnotation()) {
+            buffer.append("@");
+        }
         buffer.append(aClass.getName());
         buffer.append(" {");
         if (aClass.getFields().length != 0 || !aClass.getMethods().isEmpty()) {

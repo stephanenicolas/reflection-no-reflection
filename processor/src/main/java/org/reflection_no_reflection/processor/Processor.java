@@ -39,10 +39,7 @@ import org.reflection_no_reflection.TypeVariableImpl;
  *
  * @author SNI
  */
-//TODO MUST REMOVE THIS. ANNOTATION TYPES SHOULD BE DYNAMIC
-//getSupportedAnnotationType must be triggered
-//chances are that the processor must be called in a different way by the gradle
-//plugin. We have to get full control over annotation processor instance creation.
+//TODO ANNOTATION TYPES SHOULD BE DYNAMIC
 @SupportedOptions({"targetAnnotatedClasses"})
 public class Processor extends AbstractProcessor {
 
@@ -54,6 +51,7 @@ public class Processor extends AbstractProcessor {
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
 
     private int maxLevel = 0;
+    private Set<Class> annotationClasses = new HashSet<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -216,6 +214,8 @@ public class Processor extends AbstractProcessor {
         for (AnnotationMirror annotationMirror : annotatedElement.getAnnotationMirrors()) {
             final Map<Method, Object> mapMethodToValue = new HashMap<>();
             final Class<?> annotationClass = Class.forNameSafe(annotationMirror.getAnnotationType().toString(), level);
+            annotationClass.setModifiers(annotationClass.getModifiers() | Class.ANNOTATION);
+            annotationClasses.add(annotationClass);
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
                 final String methodOfAnnotationName = entry.getKey().getSimpleName().toString();
 
@@ -364,13 +364,16 @@ public class Processor extends AbstractProcessor {
         this.maxLevel = maxLevel;
     }
 
-    public Set<Class> getTargetAnnotatedClasses() {
-        //TODO bug we should return target classes
-        return annotatedClassSet;
+    public Set<String> getTargetAnnotatedClasses() {
+        return targetAnnotatedClasses;
     }
 
     public Set<Class> getAnnotatedClassSet() {
         return annotatedClassSet;
+    }
+
+    public Set<Class> getAnnotationClasses() {
+        return annotationClasses;
     }
 
     public Set<Class<?>> getClassesContainingAnnotation(Class<? extends Annotation> annotationType) {
@@ -380,5 +383,4 @@ public class Processor extends AbstractProcessor {
     public Map<Class<? extends Annotation>, Set<Class<?>>> getMapAnnotationTypeToClassContainingAnnotation() {
         return mapAnnotationTypeToClassContainingAnnotation;
     }
-
 }

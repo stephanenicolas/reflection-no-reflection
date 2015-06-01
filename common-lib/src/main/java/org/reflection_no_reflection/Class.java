@@ -18,7 +18,7 @@ import sun.reflect.annotation.AnnotationType;
 public class Class<T> extends GenericDeclaration implements java.io.Serializable,
     java.lang.reflect.Type {
 
-    private static final int ANNOTATION = 0x00002000;
+    public static final int ANNOTATION = 0x00002000;
     private static final int ENUM = 0x00004000;
     private static final int SYNTHETIC = 0x00001000;
     private boolean isInterface;
@@ -711,7 +711,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     }
 
     public static void loadModule(Module module) {
-        for (Class aClass : module.getClassList()) {
+        for (Class aClass : module.getClassSet()) {
             //TODO all classes have already been registered when instanciating the module
             //TODO we should have more control here, even possible dynamic class loading
             //TODO how to manage conflicts ? It looks like JNDI.. oh no !
@@ -1792,6 +1792,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     private static Annotation[] EMPTY_ANNOTATIONS_ARRAY = new Annotation[0];
 
     public <T extends Annotation> T getAnnotation(java.lang.Class<T> annotationClass) {
+        //TODO only works at runtime, doesn't make sense at compile time.
         return null;
     }
 

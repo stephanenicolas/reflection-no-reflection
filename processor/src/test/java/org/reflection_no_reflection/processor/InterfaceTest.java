@@ -20,7 +20,7 @@ public class InterfaceTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getTargetAnnotatedClasses();
+        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
         assertThat(Class.forName("test.Foo").isInterface(), is(true));

@@ -27,7 +27,7 @@ public class GeneratorTest {
         javaSourceCode("test.Foo", //
                        "package test;", //
                        "public class Foo {",//
-                       "@javax.inject.Inject private String s;", //
+                       "@javax.inject.Inject String s;", //
                        "}" //
         );
 
