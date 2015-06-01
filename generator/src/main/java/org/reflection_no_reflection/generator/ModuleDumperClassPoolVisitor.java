@@ -126,6 +126,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             for (Field field : clazz.getFields()) {
                 constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
                 constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
+                fieldCounter++;
             }
             TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName()+"$$Reflector");
             constructorSpecBuilder.addStatement("c$L.setReflector( new $T())", classCounter, reflectorTypeName);

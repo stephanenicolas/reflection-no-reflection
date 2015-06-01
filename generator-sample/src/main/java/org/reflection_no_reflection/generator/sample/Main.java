@@ -31,5 +31,10 @@ public class Main {
         System.out.println(a.b); //should be null
         fields[0].set(a, new B());
         System.out.println(a.b); //should be non null
+
+        System.out.println(a.c); //should be 0
+        fields[1].setInt(a, 2);
+        System.out.println(a.c); //should be non 2
+
     }
 }

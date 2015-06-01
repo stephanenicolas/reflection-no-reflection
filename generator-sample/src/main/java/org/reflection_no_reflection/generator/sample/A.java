@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 public class A {
     @Inject public B b;
+    @Inject public int c;
 
     @Inject public void m() {}
 }

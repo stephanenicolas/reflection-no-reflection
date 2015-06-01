@@ -109,4 +109,9 @@ public class Field {
     public void set(Object instance, Object value) {
         enclosingClass.getReflector().setObjectField(instance, getName(), value);
     }
+
+    public void setInt(Object instance, int value) {
+        enclosingClass.getReflector().setIntField(instance, getName(), value);
+    }
+
 }
