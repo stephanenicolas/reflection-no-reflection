@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.runtime.Module;
+import org.reflection_no_reflection.generator.sample.gen;
 
 /**
  * @author SNI.
@@ -13,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) {
         final A a = new A();
-        Module module = new org.reflection_no_reflection.generator.sample.gen.ModuleImpl();
+        Module module = new ModuleImpl();
         org.reflection_no_reflection.Class.loadModule(module);
         try {
             final Class<?> classFoo = Class.forName("org.reflection_no_reflection.generator.sample.A");
