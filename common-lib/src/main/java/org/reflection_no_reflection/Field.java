@@ -110,8 +110,36 @@ public class Field {
         enclosingClass.getReflector().setObjectField(instance, getName(), value);
     }
 
+    public void setByte(Object instance, byte value) {
+        enclosingClass.getReflector().setByteField(instance, getName(), value);
+    }
+
+    public void setShort(Object instance, short value) {
+        enclosingClass.getReflector().setShortField(instance, getName(), value);
+    }
+
     public void setInt(Object instance, int value) {
         enclosingClass.getReflector().setIntField(instance, getName(), value);
+    }
+
+    public void setLong(Object instance, long value) {
+        enclosingClass.getReflector().setLongField(instance, getName(), value);
+    }
+
+    public void setFloat(Object instance, float value) {
+        enclosingClass.getReflector().setFloatField(instance, getName(), value);
+    }
+
+    public void setDouble(Object instance, double value) {
+        enclosingClass.getReflector().setDoubleField(instance, getName(), value);
+    }
+
+    public void setChar(Object instance, char value) {
+        enclosingClass.getReflector().setCharField(instance, getName(), value);
+    }
+
+    public void setBoolean(Object instance, boolean value) {
+        enclosingClass.getReflector().setBooleanField(instance, getName(), value);
     }
 
 }

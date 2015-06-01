@@ -33,8 +33,37 @@ public class Main {
         System.out.println(a.b); //should be non null
 
         System.out.println(a.c); //should be 0
-        fields[1].setInt(a, 2);
-        System.out.println(a.c); //should be non 2
+        fields[1].setByte(a, (byte) 2);
+        System.out.println(a.c); //should be 2
+
+        System.out.println(a.d); //should be 0
+        fields[2].setShort(a, (short) 2);
+        System.out.println(a.d); //should be 2
+
+        System.out.println(a.e); //should be 0
+        fields[3].setInt(a, 2);
+        System.out.println(a.e); //should be 2
+
+        System.out.println(a.f); //should be 0
+        fields[4].setLong(a, (long) 2);
+        System.out.println(a.f); //should be 2
+
+        System.out.println(a.g); //should be 0
+        fields[5].setFloat(a, (float) 2);
+        System.out.println(a.g); //should be 2
+
+        System.out.println(a.h); //should be 0
+        fields[6].setDouble(a, (double) 2);
+        System.out.println(a.h); //should be 2
+
+        System.out.println(a.i); //should be 0
+        fields[7].setChar(a, (char) 2);
+        System.out.println(a.i); //should be 2
+
+        System.out.println(a.j); //should be false
+        fields[8].setBoolean(a, true);
+        System.out.println(a.j); //should be true
+
 
     }
 }

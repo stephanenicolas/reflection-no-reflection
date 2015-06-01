@@ -7,14 +7,21 @@ import javax.lang.model.element.Modifier;
 import org.reflection_no_reflection.*;
 import org.reflection_no_reflection.Class;
 
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.BYTE_TYPE_NAME;
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.SHORT_TYPE_NAME;
 import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.INT_TYPE_NAME;
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.LONG_TYPE_NAME;
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.FLOAT_TYPE_NAME;
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.DOUBLE_TYPE_NAME;
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.CHAR_TYPE_NAME;
+import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.BOOLEAN_TYPE_NAME;
 import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.OBJECT_TYPE_NAME;
 import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.STRING_TYPE_NAME;
 
 /**
  * @author SNI.
  */
-public class IntrospectorFieldAccessMethodCreator {
+public class IntrospectorFieldSetterMethodCreator {
     IntrospectorUtil util = new IntrospectorUtil();
 
     public MethodSpec createSetObjectFieldMethod(org.reflection_no_reflection.Class<?> aClass) {
@@ -25,10 +32,66 @@ public class IntrospectorFieldAccessMethodCreator {
         });
     }
 
+    public MethodSpec createSetByteFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass,  BYTE_TYPE_NAME, "setByteField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("byte");
+            }
+        });
+    }
+
+    public MethodSpec createSetShortFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass, SHORT_TYPE_NAME, "setShortField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("short");
+            }
+        });
+    }
+
     public MethodSpec createSetIntFieldMethod(Class<?> aClass) {
         return createSetFieldMethod(aClass, INT_TYPE_NAME, "setIntField", true, new FieldEvaluator() {
             @Override public boolean accepts(Class<?> clazz) {
                 return clazz.isPrimitive() && clazz == Class.forNameSafe("int");
+            }
+        });
+    }
+
+    public MethodSpec createSetLongFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass, LONG_TYPE_NAME, "setLongField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("long");
+            }
+        });
+    }
+
+    public MethodSpec createSetFloatFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass, FLOAT_TYPE_NAME, "setFloatField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("float");
+            }
+        });
+    }
+
+    public MethodSpec createSetDoubleFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass, DOUBLE_TYPE_NAME, "setDoubleField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("double");
+            }
+        });
+    }
+
+    public MethodSpec createSetCharFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass, CHAR_TYPE_NAME, "setCharField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("char");
+            }
+        });
+    }
+
+    public MethodSpec createSetBooleanFieldMethod(Class<?> aClass) {
+        return createSetFieldMethod(aClass, BOOLEAN_TYPE_NAME, "setBooleanField", true, new FieldEvaluator() {
+            @Override public boolean accepts(Class<?> clazz) {
+                return clazz.isPrimitive() && clazz == Class.forNameSafe("boolean");
             }
         });
     }

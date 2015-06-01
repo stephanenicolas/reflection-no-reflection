@@ -3,7 +3,6 @@ package org.reflection_no_reflection.generator;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
@@ -29,11 +28,15 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
     public static final ClassName BASE_REFLECTOR_TYPE_NAME = ClassName.get("org.reflection_no_reflection.runtime", "BaseReflector");
     public static final ClassName OBJECT_TYPE_NAME = ClassName.get("java.lang", "Object");
+    public static final TypeName BYTE_TYPE_NAME = TypeName.get(byte.class);
+    public static final TypeName SHORT_TYPE_NAME = TypeName.get(short.class);
     public static final TypeName INT_TYPE_NAME = TypeName.get(int.class);
+    public static final TypeName LONG_TYPE_NAME = TypeName.get(long.class);
+    public static final TypeName FLOAT_TYPE_NAME = TypeName.get(float.class);
+    public static final TypeName DOUBLE_TYPE_NAME = TypeName.get(double.class);
+    public static final TypeName CHAR_TYPE_NAME = TypeName.get(char.class);
+    public static final TypeName BOOLEAN_TYPE_NAME = TypeName.get(boolean.class);
     public static final ClassName STRING_TYPE_NAME = ClassName.get("java.lang", "String");
-    public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
-    public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
-    public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
 
     @Override
     public <T> void visit(Class<T> clazz) {
@@ -79,21 +82,37 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
     }
 
     private JavaFile buildReflector(Class<?> aClass) {
-        IntrospectorFieldAccessMethodCreator creator = new IntrospectorFieldAccessMethodCreator();
-        final MethodSpec setObjectFieldMethod = creator.createSetObjectFieldMethod(aClass);
-        final MethodSpec setIntFieldMethod = creator.createSetIntFieldMethod(aClass);
+        IntrospectorFieldSetterMethodCreator setterCreator = new IntrospectorFieldSetterMethodCreator();
+        final MethodSpec setObjectFieldMethod = setterCreator.createSetObjectFieldMethod(aClass);
+        final MethodSpec setByteFieldMethod = setterCreator.createSetByteFieldMethod(aClass);
+        final MethodSpec setShortFieldMethod = setterCreator.createSetShortFieldMethod(aClass);
+        final MethodSpec setIntFieldMethod = setterCreator.createSetIntFieldMethod(aClass);
+        final MethodSpec setLongFieldMethod = setterCreator.createSetLongFieldMethod(aClass);
+        final MethodSpec setFloatFieldMethod = setterCreator.createSetFloatFieldMethod(aClass);
+        final MethodSpec setDoubleFieldMethod = setterCreator.createSetDoubleFieldMethod(aClass);
+        final MethodSpec setCharFieldMethod = setterCreator.createSetCharFieldMethod(aClass);
+        final MethodSpec setBooleanFieldMethod = setterCreator.createSetBooleanFieldMethod(aClass);
 
         TypeSpec.Builder reflectorType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Reflector")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .superclass(BASE_REFLECTOR_TYPE_NAME);
 
-        if (setObjectFieldMethod!= null) {
-            reflectorType.addMethod(setObjectFieldMethod);
-        }
-        if (setIntFieldMethod!= null) {
-            reflectorType.addMethod(setIntFieldMethod);
-        }
+        doAddMethod(reflectorType, setObjectFieldMethod);
+        doAddMethod(reflectorType, setByteFieldMethod);
+        doAddMethod(reflectorType, setShortFieldMethod);
+        doAddMethod(reflectorType, setIntFieldMethod);
+        doAddMethod(reflectorType, setLongFieldMethod);
+        doAddMethod(reflectorType, setFloatFieldMethod);
+        doAddMethod(reflectorType, setDoubleFieldMethod);
+        doAddMethod(reflectorType, setCharFieldMethod);
+        doAddMethod(reflectorType, setBooleanFieldMethod);
         final String aClassName = aClass.getName();
         return JavaFile.builder(aClassName.substring(0, aClassName.lastIndexOf('.')), reflectorType.build()).build();
+    }
+
+    private void doAddMethod(TypeSpec.Builder reflectorType, MethodSpec methodSpec) {
+        if (methodSpec != null) {
+            reflectorType.addMethod(methodSpec);
+        }
     }
 }
