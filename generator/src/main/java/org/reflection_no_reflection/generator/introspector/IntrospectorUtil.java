@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.generator;
+package org.reflection_no_reflection.generator.introspector;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;

@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.generator;
+package org.reflection_no_reflection.generator.introspector;
 
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -7,16 +7,16 @@ import javax.lang.model.element.Modifier;
 import org.reflection_no_reflection.*;
 import org.reflection_no_reflection.Class;
 
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.BYTE_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.SHORT_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.INT_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.LONG_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.FLOAT_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.DOUBLE_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.CHAR_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.BOOLEAN_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.OBJECT_TYPE_NAME;
-import static org.reflection_no_reflection.generator.IntrospectorDumperClassPoolVisitor.STRING_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.BYTE_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.SHORT_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.INT_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.LONG_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.FLOAT_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.DOUBLE_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.CHAR_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.BOOLEAN_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.OBJECT_TYPE_NAME;
+import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.STRING_TYPE_NAME;
 
 /**
  * @author SNI.
