@@ -16,6 +16,7 @@ public class Field {
     private Class<?> enclosingClass;
     private int modifiers;
     private final List<Annotation> annotationList;
+    private List<java.lang.annotation.Annotation> annotationImplList;
 
     public Field(String name, Class<?> type, Class<?> enclosingClass, int modifiers, List<Annotation> annotationList) {
         this.name = name;
@@ -25,8 +26,23 @@ public class Field {
         this.annotationList = annotationList;
     }
 
+    @SuppressWarnings("called by generated code")
+    public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
+        this.annotationImplList = annotationImplList;
+    }
+
     public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
         for (Annotation annotation : annotationList) {
+            if (annotation.annotationType().equals(annotationType)) {
+                return (A) annotation;
+            }
+        }
+
+        return null;
+    }
+
+    public <A extends java.lang.annotation.Annotation> A getAnnotation(java.lang.Class<A> annotationType) {
+        for (java.lang.annotation.Annotation annotation : annotationImplList) {
             if (annotation.annotationType().equals(annotationType)) {
                 return (A) annotation;
             }

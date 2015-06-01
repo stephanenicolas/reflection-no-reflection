@@ -1,6 +1,7 @@
 package org.reflection_no_reflection.generator.sample;
 
 import java.util.Set;
+import javax.inject.Inject;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.runtime.Module;
@@ -64,6 +65,6 @@ public class Main {
         fields[8].setBoolean(a, true);
         System.out.println(a.j); //should be true
 
-
+        System.out.println(fields[0].getAnnotation(Inject.class).annotationType().getName()); //should be javax.inject.Inject
     }
 }

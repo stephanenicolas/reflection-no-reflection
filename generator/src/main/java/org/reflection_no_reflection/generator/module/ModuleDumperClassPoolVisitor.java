@@ -33,6 +33,9 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
     public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
+    public static final ClassName LIST_TYPE_NAME = ClassName.get("java.util", "List");
+    public static final ClassName ARRAYLIST_TYPE_NAME = ClassName.get("java.util", "ArrayList");
+
     private String targetPackageName;
 
     public ModuleDumperClassPoolVisitor() {
@@ -52,7 +55,6 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             .returns(setOfClassesTypeName)
             .addStatement("return $L", "classSet")
             .build();
-
 
         //build map of annotation type names to class set
         ClassName mapTypeName = ClassName.get("java.util", "Map");
@@ -101,7 +103,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     }
 
     @Override public void endVisit(org.reflection_no_reflection.Class aClass) {
-        
+
     }
 
     @Override public void endVisit(Annotation annotation) {
@@ -111,7 +113,6 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public Map<Class<? extends Annotation>, Set<Class<?>>> getMapAnnotationTypeToClassContainingAnnotation() {
         return mapAnnotationTypeToClassContainingAnnotation;
     }
-
 
     public JavaFile getJavaFile() {
         MethodSpec.Builder constructorSpecBuilder = MethodSpec.constructorBuilder();
@@ -125,18 +126,28 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             constructorSpecBuilder.addStatement("$T c$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, classCounter, clazzName);
             constructorSpecBuilder.addStatement("classSet.add(c$L)", classCounter);
             for (Field field : clazz.getFields()) {
-                for (Annotation annotation : field.getDeclaredAnnotations()) {
-                    constructorSpecBuilder.addStatement("$T a$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
-                    constructorSpecBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
-                    constructorSpecBuilder.addStatement("classSet.add(a$L)", annotationCounter);
-                    annotationCounter++;
-                }
-
                 constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
                 constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
+
+                if (field.getDeclaredAnnotations().length != 0) {
+                    for (Annotation annotation : field.getDeclaredAnnotations()) {
+                        constructorSpecBuilder.addCode("{\n");
+                        constructorSpecBuilder.addStatement("int indexAnnotation = 0");
+                        constructorSpecBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, field.getDeclaredAnnotations().length);
+                        constructorSpecBuilder.addStatement("$T a$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
+                        constructorSpecBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
+                        constructorSpecBuilder.addStatement("classSet.add(a$L)", annotationCounter);
+                        annotationCounter++;
+                        constructorSpecBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
+                        constructorSpecBuilder.addStatement("indexAnnotation++");
+                        constructorSpecBuilder.addStatement("f$L.setAnnotationImplList(annotationImplTab)", fieldCounter);
+                        constructorSpecBuilder.addCode("}\n");
+                    }
+                }
+
                 fieldCounter++;
             }
-            TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName()+"$$Reflector");
+            TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName() + "$$Reflector");
             //TODO add all protected java & android packages
             //TODO the test should be done at the introspector level, there is a dependency
             //TODO avoid dependency: introduce 3rd party
