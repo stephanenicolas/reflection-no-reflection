@@ -22,7 +22,7 @@ public class ClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
+        final Set<Class> annotatedClasses = getProcessedClasses();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
@@ -41,7 +41,7 @@ public class ClassTest extends AbstractRnRTest {
         configureProcessor("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
+        final Set<Class> annotatedClasses = getProcessedClasses();
         final Class clazz = Class.forName("test.Foo");
         assertThat(annotatedClasses.contains(clazz), is(true));
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));

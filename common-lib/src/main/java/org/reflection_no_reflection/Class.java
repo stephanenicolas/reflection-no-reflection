@@ -173,6 +173,10 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         visitStrategy.visit(CLASS_POOL, classPoolVisitor);
     }
 
+    public static Set<Class> getClassPool() {
+        return CLASS_POOL;
+    }
+
     /**
      * Returns the {@code Class} object associated with the class or
      * interface with the given string name, using the given class loader.

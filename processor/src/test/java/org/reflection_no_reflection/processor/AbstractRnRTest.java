@@ -4,15 +4,19 @@ import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
+import javax.annotation.processing.AbstractProcessor;
 import javax.tools.JavaFileObject;
 import org.junit.Before;
+import org.reflection_no_reflection.*;
+import org.reflection_no_reflection.Class;
 
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
 public class AbstractRnRTest {
 
-    protected Processor processor;
+    protected AbstractProcessor processor;
     protected JavaFileObject javaSourceCode;
 
     @Before
@@ -26,7 +30,7 @@ public class AbstractRnRTest {
     }
 
     protected void configureProcessor(String... annotations) {
-        processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
+        ((Processor)processor).setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
     }
 
     protected Iterable<? extends javax.annotation.processing.Processor> rnrProcessors() {
@@ -38,5 +42,9 @@ public class AbstractRnRTest {
             .that(javaSourceCode)
             .processedWith(rnrProcessors())
             .compilesWithoutError();
+    }
+
+    protected Set<Class> getProcessedClasses() {
+        return ((Processor)processor).getAnnotatedClassSet();
     }
 }

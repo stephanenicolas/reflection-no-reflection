@@ -1,4 +1,4 @@
-package org.reflection_no_reflection.generator.introspector;
+package org.reflection_no_reflection.generator.annotation;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
@@ -11,7 +11,7 @@ import org.reflection_no_reflection.generator.Generator;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
-public class GeneratorTest {
+public class AnnotationTest {
 
     protected javax.annotation.processing.Processor processor;
     protected JavaFileObject javaSourceCode;

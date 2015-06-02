@@ -115,4 +115,9 @@ public class Generator extends AbstractProcessor {
     public Set<String> getSupportedOptions() {
         return processor.getSupportedOptions();
     }
+
+    public void setTargetAnnotatedClasses(Set<String> targetAnnotatedClasses) {
+        processor.setTargetAnnotatedClasses(targetAnnotatedClasses);
+    }
+
 }

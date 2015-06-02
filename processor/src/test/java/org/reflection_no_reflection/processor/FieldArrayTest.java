@@ -25,7 +25,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         configureProcessor(new String[] {"java.lang.Deprecated"});
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
+        final Set<Class> annotatedClasses = getProcessedClasses();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class aClass = Class.forName("test.Foo");
@@ -59,7 +59,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         configureProcessor(new String[] {"java.lang.Deprecated"});
         assertJavaSourceCompileWithoutError();
 
-        final Set<Class> annotatedClasses = processor.getAnnotatedClassSet();
+        final Set<Class> annotatedClasses = getProcessedClasses();
         assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
 
         final Class aClass = Class.forName("test.Foo");
