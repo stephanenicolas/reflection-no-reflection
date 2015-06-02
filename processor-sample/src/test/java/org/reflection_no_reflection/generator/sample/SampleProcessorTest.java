@@ -27,6 +27,8 @@ public class SampleProcessorTest {
                        "package test;", //
                        "public class Foo {",//
                        "@javax.inject.Inject private String s;", //
+                       "@javax.inject.Inject private void m() {};", //
+                       "@javax.inject.Inject private int n() {return 0;};", //
                        "}" //
         );
 

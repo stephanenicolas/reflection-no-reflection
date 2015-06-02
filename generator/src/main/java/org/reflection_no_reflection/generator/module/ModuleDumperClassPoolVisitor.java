@@ -178,7 +178,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
                 constructorSpecBuilder.addStatement("$T m$L = new $T(Class.forNameSafe($S),$S,paramTypeTab$L,Class.forNameSafe($S),exceptionTypeTab$L, $L)",
                                                     METHOD_TYPE_NAME,
-                                                    fieldCounter,
+                                                    methodCounter,
                                                     METHOD_TYPE_NAME,
                                                     method.getDeclaringClass().getName(),
                                                     method.getName(),
@@ -186,7 +186,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                                                     method.getReturnType().getName(),
                                                     methodCounter,
                                                     method.getModifiers());
-                constructorSpecBuilder.addStatement("c$L.addMethod(m$L)", classCounter, fieldCounter);
+                constructorSpecBuilder.addStatement("c$L.addMethod(m$L)", classCounter, methodCounter);
 
                 if (method.getDeclaredAnnotations().length != 0) {
                     for (Annotation annotation : method.getDeclaredAnnotations()) {
@@ -199,7 +199,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                         annotationCounter++;
                         constructorSpecBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
                         constructorSpecBuilder.addStatement("indexAnnotation++");
-                        constructorSpecBuilder.addStatement("m$L.setAnnotationImplList(annotationImplTab)", fieldCounter);
+                        constructorSpecBuilder.addStatement("m$L.setAnnotationImplList(annotationImplTab)", methodCounter);
                         constructorSpecBuilder.addCode("}\n");
                     }
                 }

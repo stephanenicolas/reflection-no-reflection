@@ -31,7 +31,8 @@ public class ModuleTest {
                        "package test;", //
                        "public class Foo {",//
                        "@javax.inject.Inject public String s;", //
-                       "@javax.inject.Inject public String m() {return \"\";}", //
+                       "@javax.inject.Inject public void m() {}", //
+                       "@javax.inject.Inject public int n() {return 4;}", //
                        "}" //
         );
 

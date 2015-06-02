@@ -70,8 +70,15 @@ public class Main {
 
         System.out.println(((Method) clazz.getMethods().get(0)).getName()); //should be m
         System.out.println(((Method) clazz.getMethods().get(0)).toString()); //should be m
+        System.out.println(((Method) clazz.getMethods().get(0)).getReturnType().getName()); //should be void
         ((Method) clazz.getMethods().get(0)).invoke(a);
         System.out.println(a.e); //should be 3
+
+        System.out.println(((Method) clazz.getMethods().get(1)).getName()); //should be n
+        System.out.println(((Method) clazz.getMethods().get(1)).toString()); //should be n
+        System.out.println(((Method) clazz.getMethods().get(1)).getReturnType().getName()); //should be int
+        Object o = ((Method) clazz.getMethods().get(1)).invoke(a);
+        System.out.println(o); //should be 4
 
     }
 }

@@ -50,9 +50,12 @@ public class IntrospectorMethodInvokerCreator {
                 }
             }
 
-            invokeMethodBuilder.addStatement("  (($T) instance).$L($L)", enclosingClassName, method.getName(), paramBlock.build().toString());
-            //TODO should vary with return type
-            invokeMethodBuilder.addStatement("return null");
+            if (!method.getReturnType().getName().equals("void")) {
+                invokeMethodBuilder.addStatement("  return  (($T) instance).$L($L)", enclosingClassName, method.getName(), paramBlock.build().toString());
+            } else {
+                invokeMethodBuilder.addStatement("  (($T) instance).$L($L)", enclosingClassName, method.getName(), paramBlock.build().toString());
+                invokeMethodBuilder.addStatement("  return null");
+            }
         }
         invokeMethodBuilder.addCode("}\n");
         invokeMethodBuilder.addStatement("return null");
