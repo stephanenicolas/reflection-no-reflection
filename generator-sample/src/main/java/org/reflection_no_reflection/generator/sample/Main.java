@@ -80,5 +80,11 @@ public class Main {
         Object o = ((Method) clazz.getMethods().get(1)).invoke(a);
         System.out.println(o); //should be 4
 
+        System.out.println(((Method) clazz.getMethods().get(2)).getName()); //should be o
+        System.out.println(((Method) clazz.getMethods().get(2)).toString()); //should be o
+        System.out.println(((Method) clazz.getMethods().get(2)).getReturnType().getName()); //should be int
+        o = ((Method) clazz.getMethods().get(2)).invoke(a);
+        System.out.println(o); //should be 4
+
     }
 }

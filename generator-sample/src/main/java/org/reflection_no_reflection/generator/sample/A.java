@@ -13,8 +13,7 @@ public class A {
     @Inject public char i;
     @Inject public boolean j;
 
-    @Inject public void m() {
-        e=3;}
-    @Inject public String n() {
-        return "4";}
+    @Inject public void m() {e=3;}
+    @Inject public String n() {return "4";}
+    @Inject public int o() {return 4;}
 }
