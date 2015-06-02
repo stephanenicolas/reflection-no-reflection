@@ -51,11 +51,17 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
             throw new RuntimeException("Class has null name");
         }
         this.name = name;
-        //TODO check primitives, arrays etc.
         if (isPrimitive(name)) {
             this.isPrimitive = true;
         }
+        if (isArray(name)) {
+            this.isArray = true;
+        }
         CLASS_POOL.add(this);
+    }
+
+    private boolean isArray(String name) {
+        return name.endsWith("[]");
     }
 
     private boolean isPrimitive(String name) {

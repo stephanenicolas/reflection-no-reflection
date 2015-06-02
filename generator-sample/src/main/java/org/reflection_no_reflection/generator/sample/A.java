@@ -16,4 +16,5 @@ public class A {
     @Inject public void m() {e=3;}
     @Inject public String n() {return "4";}
     @Inject public int o() {return 4;}
+    @Inject public int[] p() {return new int[] {4};}
 }
