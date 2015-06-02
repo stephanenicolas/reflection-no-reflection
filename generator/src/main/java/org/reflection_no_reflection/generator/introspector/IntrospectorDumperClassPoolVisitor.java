@@ -27,6 +27,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
 
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
     public static final ClassName BASE_REFLECTOR_TYPE_NAME = ClassName.get("org.reflection_no_reflection.runtime", "BaseReflector");
+    public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName OBJECT_TYPE_NAME = ClassName.get("java.lang", "Object");
     public static final TypeName BYTE_TYPE_NAME = TypeName.get(byte.class);
     public static final TypeName SHORT_TYPE_NAME = TypeName.get(short.class);
@@ -86,6 +87,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
 
     private JavaFile buildReflector(Class<?> aClass) {
         IntrospectorFieldSetterMethodCreator setterCreator = new IntrospectorFieldSetterMethodCreator();
+        IntrospectorMethodInvokerCreator methodInvokerCreator = new IntrospectorMethodInvokerCreator();
         final MethodSpec setObjectFieldMethod = setterCreator.createSetObjectFieldMethod(aClass);
         final MethodSpec setByteFieldMethod = setterCreator.createSetByteFieldMethod(aClass);
         final MethodSpec setShortFieldMethod = setterCreator.createSetShortFieldMethod(aClass);
@@ -95,6 +97,9 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         final MethodSpec setDoubleFieldMethod = setterCreator.createSetDoubleFieldMethod(aClass);
         final MethodSpec setCharFieldMethod = setterCreator.createSetCharFieldMethod(aClass);
         final MethodSpec setBooleanFieldMethod = setterCreator.createSetBooleanFieldMethod(aClass);
+
+        final MethodSpec methodInvokerMethod = methodInvokerCreator.createMethodInvoker(aClass);
+
 
         TypeSpec.Builder reflectorType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Reflector")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -109,6 +114,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         doAddMethod(reflectorType, setDoubleFieldMethod);
         doAddMethod(reflectorType, setCharFieldMethod);
         doAddMethod(reflectorType, setBooleanFieldMethod);
+        doAddMethod(reflectorType, methodInvokerMethod);
         final String aClassName = aClass.getName();
         return JavaFile.builder(aClassName.substring(0, aClassName.lastIndexOf('.')), reflectorType.build()).build();
     }

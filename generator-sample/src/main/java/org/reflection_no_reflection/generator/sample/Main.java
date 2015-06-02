@@ -4,6 +4,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.Method;
 import org.reflection_no_reflection.runtime.Module;
 
 /**
@@ -66,5 +67,11 @@ public class Main {
         System.out.println(a.j); //should be true
 
         System.out.println(fields[0].getAnnotation(Inject.class).annotationType().getName()); //should be javax.inject.Inject
+
+        System.out.println(((Method) clazz.getMethods().get(0)).getName()); //should be m
+        System.out.println(((Method) clazz.getMethods().get(0)).toString()); //should be m
+        ((Method) clazz.getMethods().get(0)).invoke(a);
+        System.out.println(a.e); //should be 3
+
     }
 }

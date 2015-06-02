@@ -155,7 +155,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                 Method method = (Method) methodObj;
 
                 //params
-                constructorSpecBuilder.addStatement("$T[] paramTypeTab$L = null", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter);
+                constructorSpecBuilder.addStatement("$T[] paramTypeTab$L = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME);
                 if (method.getParameterTypes().length != 0) {
                     constructorSpecBuilder.addStatement("paramTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
                     int indexParam = 0;
@@ -166,7 +166,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                 }
 
                 //exceptions
-                constructorSpecBuilder.addStatement("$T[] exceptionTypeTab$L = null", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter);
+                constructorSpecBuilder.addStatement("$T[] exceptionTypeTab$L = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME);
                 if (method.getParameterTypes().length != 0) {
                     constructorSpecBuilder.addStatement("exceptionTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
                     int indexException = 0;

@@ -13,5 +13,5 @@ public class A {
     @Inject public char i;
     @Inject public boolean j;
 
-    @Inject public void m() {}
+    @Inject public void m() {e=3;}
 }

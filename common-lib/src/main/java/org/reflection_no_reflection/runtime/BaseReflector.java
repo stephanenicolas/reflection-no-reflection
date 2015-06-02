@@ -40,4 +40,8 @@ public class BaseReflector {
     public void setBooleanField(Object instance, String fieldName, boolean value) {
         throw new UnsupportedOperationException();
     }
+
+    public Object invokeMethod(Object instance, String methodName, String signature, Object...params) {
+        throw new UnsupportedOperationException();
+    }
 }

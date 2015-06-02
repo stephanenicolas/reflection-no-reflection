@@ -114,7 +114,7 @@ public class IntrospectorFieldSetterMethodCreator {
                 hasFieldOfThatType = true;
                 final TypeName enclosingClassName = util.getClassName(aClass);
                 setFieldMethodBuilder
-                    .addCode("case($S) :", field.getName());
+                    .addCode("case($S) :\n", field.getName());
                 TypeName fieldTypeName = util.getClassName(field.getType());
                 if (isPrimitive) {
                     setFieldMethodBuilder.addStatement("(($T) instance).$L = value", enclosingClassName, field.getName());
@@ -129,7 +129,7 @@ public class IntrospectorFieldSetterMethodCreator {
             return null;
         }
 
-        setFieldMethodBuilder.addStatement("}");
+        setFieldMethodBuilder.addCode("}\n");
         return setFieldMethodBuilder.build();
     }
 

@@ -274,6 +274,10 @@ public class Method extends GenericDeclaration {
         return false;
     }
 
+    public Object invoke(Object obj, Object... args) {
+        return getDeclaringClass().getReflector().invokeMethod(obj, getName(), toString(), args);
+    }
+
     /**
      * Returns a hashcode for this {@code Method}.  The hashcode is computed
      * as the exclusive-or of the hashcodes for the underlying
