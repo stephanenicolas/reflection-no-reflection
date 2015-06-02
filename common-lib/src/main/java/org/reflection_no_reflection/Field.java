@@ -26,7 +26,7 @@ public class Field {
         this.annotationList = annotationList;
     }
 
-    @SuppressWarnings("called by generated code")
+    @SuppressWarnings({"unused", "called by generated code"})
     public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
         this.annotationImplList = annotationImplList;
     }

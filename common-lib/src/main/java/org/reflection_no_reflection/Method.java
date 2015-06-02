@@ -27,6 +27,7 @@ public class Method extends GenericDeclaration {
     private byte[] parameterAnnotations;
     private byte[] annotationDefault;
     private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
+    private List<java.lang.annotation.Annotation> annotationImplList;
 
     // Modifiers that can be applied to a method in source code
     private static final int LANGUAGE_MODIFIERS =
@@ -495,6 +496,11 @@ public class Method extends GenericDeclaration {
 
     private synchronized Map<Class, Annotation> declaredAnnotations() {
         return declaredAnnotations;
+    }
+
+    @SuppressWarnings({"unused", "called by generated code"})
+    public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
+        this.annotationImplList = annotationImplList;
     }
 
     /**

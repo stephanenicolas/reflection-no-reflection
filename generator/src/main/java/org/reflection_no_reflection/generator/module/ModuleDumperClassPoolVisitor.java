@@ -1,5 +1,6 @@
 package org.reflection_no_reflection.generator.module;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -32,8 +33,10 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final ClassName MODULE_TYPE_NAME = ClassName.get("org.reflection_no_reflection.runtime", "Module");
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
+    public static final ClassName METHOD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Method");
     public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
     public static final ClassName LIST_TYPE_NAME = ClassName.get("java.util", "List");
+    public static final TypeName ARRAY_OF_CLASSES_TYPE_NAME = ArrayTypeName.get(Class.class);
     public static final ClassName ARRAYLIST_TYPE_NAME = ClassName.get("java.util", "ArrayList");
 
     private String targetPackageName;
@@ -120,6 +123,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         int annotationCounter = 0;
         int classCounter = 0;
         int fieldCounter = 0;
+        int methodCounter = 0;
         //fill class list
         for (Class clazz : classList) {
             final String clazzName = clazz.getName();
@@ -144,8 +148,63 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                         constructorSpecBuilder.addCode("}\n");
                     }
                 }
-
                 fieldCounter++;
+            }
+
+            for (Object methodObj : clazz.getMethods()) {
+                Method method = (Method) methodObj;
+
+                //params
+                constructorSpecBuilder.addStatement("$T[] paramTypeTab$L = null", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter);
+                if (method.getParameterTypes().length != 0) {
+                    constructorSpecBuilder.addStatement("paramTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
+                    int indexParam = 0;
+                    for (Class<?> paramClass : method.getParameterTypes()) {
+                        constructorSpecBuilder.addStatement("paramTypeTab$L[$L] = Class.forNameSafe($S)", methodCounter, indexParam++, paramClass.getName());
+                        indexParam++;
+                    }
+                }
+
+                //exceptions
+                constructorSpecBuilder.addStatement("$T[] exceptionTypeTab$L = null", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter);
+                if (method.getParameterTypes().length != 0) {
+                    constructorSpecBuilder.addStatement("exceptionTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
+                    int indexException = 0;
+                    for (Class<?> exceptionClass : method.getExceptionTypes()) {
+                        constructorSpecBuilder.addStatement("exceptionTypeTab$L[$L] = Class.forNameSafe($S)", methodCounter, indexException++, exceptionClass.getName());
+                        indexException++;
+                    }
+                }
+
+                constructorSpecBuilder.addStatement("$T m$L = new $T(Class.forNameSafe($S),$S,paramTypeTab$L,Class.forNameSafe($S),exceptionTypeTab$L, $L)",
+                                                    METHOD_TYPE_NAME,
+                                                    fieldCounter,
+                                                    METHOD_TYPE_NAME,
+                                                    method.getDeclaringClass().getName(),
+                                                    method.getName(),
+                                                    methodCounter,
+                                                    method.getReturnType().getName(),
+                                                    methodCounter,
+                                                    method.getModifiers());
+                constructorSpecBuilder.addStatement("c$L.addMethod(m$L)", classCounter, fieldCounter);
+
+                if (method.getDeclaredAnnotations().length != 0) {
+                    for (Annotation annotation : method.getDeclaredAnnotations()) {
+                        constructorSpecBuilder.addCode("{\n");
+                        constructorSpecBuilder.addStatement("int indexAnnotation = 0");
+                        constructorSpecBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, method.getDeclaredAnnotations().length);
+                        constructorSpecBuilder.addStatement("$T a$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
+                        constructorSpecBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
+                        constructorSpecBuilder.addStatement("classSet.add(a$L)", annotationCounter);
+                        annotationCounter++;
+                        constructorSpecBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
+                        constructorSpecBuilder.addStatement("indexAnnotation++");
+                        constructorSpecBuilder.addStatement("m$L.setAnnotationImplList(annotationImplTab)", fieldCounter);
+                        constructorSpecBuilder.addCode("}\n");
+                    }
+                }
+
+                methodCounter++;
             }
             TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName() + "$$Reflector");
             //TODO add all protected java & android packages
