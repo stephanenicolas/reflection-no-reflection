@@ -14,6 +14,8 @@ public class FieldTestCase {
     @Inject public char i;
     @Inject public boolean j;
 
+    @Inject public String[] k;
+
     //TODO generics, arrays 1&2D, static
     //oosh final
     //private

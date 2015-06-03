@@ -58,5 +58,13 @@ public class ClassTest {
         //THEN
     }
 
+    @Test
+    public void classForNameSafeShouldNotFailIfClassDoesNotExist() throws Exception {
+        //GIVEN
+        //WHEN
+        final Class stringClass = Class.forNameSafe("java.lang.String");
+        //THEN
+    }
+
 
 }

@@ -32,7 +32,7 @@ public class FieldTest {
 
         final Field[] fields = classFoo.getFields();
         assertNotNull(fields);
-        assertThat(fields.length, is(10));
+        assertThat(fields.length, is(11));
     }
 
     @Test
@@ -223,6 +223,26 @@ public class FieldTest {
         assertThat(fieldTestCase.j, is(false));
         field.setBoolean(fieldTestCase, true);
         assertThat(fieldTestCase.j, is(true));
+        //TODO getter
+    }
+
+    @Test
+    public void shouldReflectStringArrayField() throws ClassNotFoundException {
+        //GIVEN
+
+        //WHEN
+        Class<?> classFoo = Class.forName("org.reflection_no_reflection.generator.sample.FieldTestCase");
+
+        //THEN
+        final Field[] fields = classFoo.getFields();
+        final Field field = fields[10];
+        assertThat(field.getName(), is("k"));
+        assertThat(field.getType().getName(), is("java.lang.String[]"));
+        FieldTestCase fieldTestCase = new FieldTestCase();
+        assertNull(fieldTestCase.k);
+        field.set(fieldTestCase, new String[] {"3"});
+        assertNotNull(fieldTestCase.k);
+        assertThat(fieldTestCase.k, is(new String[] {"3"}));
         //TODO getter
     }
 }
