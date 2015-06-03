@@ -1,4 +1,4 @@
-Reflection No Reflection
+Reflection No Reflection [![Build Status](https://travis-ci.org/stephanenicolas/reflection-no-reflection.svg?branch=annotation-via-rnr)](https://travis-ci.org/stephanenicolas/reflection-no-reflection)
 ------------------------
 
 <img src="https://raw.githubusercontent.com/stephanenicolas/reflection-no-reflection/master/assets/prism.jpg">
