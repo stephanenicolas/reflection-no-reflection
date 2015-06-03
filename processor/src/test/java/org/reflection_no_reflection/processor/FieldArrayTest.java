@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 
 public class FieldArrayTest extends AbstractRnRTest {
 
-    @Test @Ignore("Wow, I did that !")
+    @Test
     public void mapsAnnotatedObjectArrayField() throws ClassNotFoundException {
         javaSourceCode("test.Foo", //
                        "package test;", //
@@ -47,7 +47,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
     }
 
-    @Test @Ignore("Wow, I did that !")
+    @Test
     public void mapsAnnotatedPrimitiveArrayField() throws ClassNotFoundException {
         javaSourceCode("test.Foo", //
                        "package test;", //

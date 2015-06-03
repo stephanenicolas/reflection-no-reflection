@@ -269,13 +269,14 @@ public class Processor extends AbstractProcessor {
                     mapElementToReflection(enclosedElement, level + 1);
                 }
             }
-        } else if (typeMirror instanceof PrimitiveType) {
-            isPrimitive = true;
-            className = typeMirror.toString();
         } else if (typeMirror instanceof ArrayType) {
+            //warning, this must come before Primitive as arrays are also primitives (here)
             isArray = true;
             className = ((ArrayType) typeMirror).getComponentType().toString() + "[]";
             component = createClass(((ArrayType) typeMirror).getComponentType(), level);
+        } else if (typeMirror instanceof PrimitiveType) {
+            isPrimitive = true;
+            className = typeMirror.toString();
         }
 
         result = Class.forNameSafe(className, level);
