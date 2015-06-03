@@ -39,7 +39,6 @@ import org.reflection_no_reflection.TypeVariableImpl;
  *
  * @author SNI
  */
-//TODO ANNOTATION TYPES SHOULD BE DYNAMIC
 @SupportedOptions({"targetAnnotatedClasses"})
 public class Processor extends AbstractProcessor {
 

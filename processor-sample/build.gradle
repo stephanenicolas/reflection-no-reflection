@@ -13,3 +13,8 @@ dependencies {
   testCompile 'org.easytesting:fest:1.0.7'
   testCompile 'com.google.testing.compile:compile-testing:0.4'
 }
+
+compileJava {
+  //enable incremental compilation
+  options.compilerArgs = ["-processor", "org.reflection_no_reflection.processor.Processor"]
+}

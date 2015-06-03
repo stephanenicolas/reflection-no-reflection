@@ -12,6 +12,7 @@ apply plugin: 'java'
 apply plugin: 'plantuml'
 
 dependencies {
+  compile files("${System.properties['java.home']}/../lib/tools.jar")
   testCompile 'junit:junit:4.11'
 }
 
