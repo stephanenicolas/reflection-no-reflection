@@ -4,7 +4,6 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'be.jlr-home.gradle:plantumlPlugin:0.1.1.SNAPSHOT'
     classpath 'org.ajoberstar:gradle-git:0.13.0-milestone.1'
   }
 }
@@ -29,81 +28,6 @@ allprojects {
 
   apply plugin: 'maven'
   apply plugin: 'idea'
-}
-
-import net.sourceforge.plantuml.GeneratedImage
-import net.sourceforge.plantuml.Option
-import net.sourceforge.plantuml.SourceFileReader
-import net.sourceforge.plantuml.preproc.Defines
-import org.gradle.api.DefaultTask
-import be.jlrhome.gradle.plantuml.GeneratePlantumlTask;
-
-
-//from http://stackoverflow.com/a/15361666/693752
-gradle.projectsEvaluated {
-  //from http://gradle.1045684.n5.nabble.com/aggregating-javadocs-td1433469.html
-  task javadocAllJavaFiles(type: Javadoc) {
-    source subprojects.findAll({ project -> !project.name.contains('sample') && !project.name.contains('tests') })
-        .collect {project -> project.sourceSets.main.allJava}
-    destinationDir = new File(buildDir, 'javadoc')
-    // Might need a classpath
-    classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath})
-    options.overview = "overview.html" // relative to source root
-    doLast {
-      subprojects.findAll({ project -> !project.name.contains('sample') && !project.name.contains('tests') }).each {
-        project ->
-          copy {
-            from project.file('src/main/java')
-            into "$buildDir/javadoc/"
-            includes = ['**/doc-files/']
-          }
-      }
-    }
-  }
-
-  task javadoc {
-  }
-
-  createOverviewWithPlantUmlTask.dependsOn javadocAllJavaFiles
-  javadoc.dependsOn javadocAllJavaFiles, createOverviewWithPlantUmlTask
-
-}
-
-task createOverviewWithPlantUmlTask(type: ParseFileWithPlantUmlTask) {
-  sources = [project.file('overview.html')]
-  destDir = project.file("$buildDir/javadoc/")
-}
-
-//from http://forums.gradle.org/gradle/topics/accessing_the_buildscript_classpath
-//and from http://forums.gradle.org/gradle/topics/how_to_get_absolute_path_of_a_file_declared_in_dependencies
-//and https://gradle.org/docs/current/userguide/custom_tasks.html
-class ParseFileWithPlantUmlTask extends DefaultTask {
-  String plantumlJarPath
-  @OutputDirectory
-  File destDir
-  @InputFiles
-  List<File> sources
-
-  @TaskAction
-  def parseFiles(IncrementalTaskInputs inputs) {
-    project.buildscript.configurations.classpath.each {
-      String absolutePath = it.getAbsolutePath();
-      if (absolutePath.contains("plantuml-")) {
-        plantumlJarPath = absolutePath
-      }
-    }
-    if (plantumlJarPath == null) {
-      throw new RuntimeException("Could not find plant uml jar.");
-    }
-
-    String execPlantUml = 'java -jar ' + plantumlJarPath + ' '
-    String execPlantUmlSuffix = ' -o ' + destDir
-    inputs.outOfDate {
-      String execGeneratePlantUml = execPlantUml + it.file.getAbsolutePath() + execPlantUmlSuffix
-      execGeneratePlantUml.execute();
-      getLogger().debug('executed ' + execGeneratePlantUml)
-    }
-  }
 }
 
 wrapper {
