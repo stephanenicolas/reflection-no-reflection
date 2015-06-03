@@ -59,7 +59,7 @@ public class Processor extends AbstractProcessor {
         if (annotatedClassesString != null) {
             targetAnnotatedClasses.addAll(Arrays.asList(annotatedClassesString.split(",")));
         }
-        Class.purgeAllClasses();
+        Class.clearAllClasses();
     }
 
     @Override

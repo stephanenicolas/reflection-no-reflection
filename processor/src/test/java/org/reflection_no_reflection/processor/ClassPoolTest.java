@@ -14,7 +14,7 @@ public class ClassPoolTest {
 
     @Before
     public void setup() {
-        Class.purgeAllClasses();
+        Class.clearAllClasses();
     }
 
     @Test

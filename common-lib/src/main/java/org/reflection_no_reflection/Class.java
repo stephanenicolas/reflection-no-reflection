@@ -731,7 +731,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         constructors.add(constructor);
     }
 
-    public static void purgeAllClasses() {
+    public static void clearAllClasses() {
         CLASS_POOL.clear();
     }
 

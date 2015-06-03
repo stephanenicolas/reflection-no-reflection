@@ -2,8 +2,9 @@ package org.reflection_no_reflection.generator.sample;
 
 import javax.inject.Inject;
 
-public class A {
-    @Inject public B b;
+public class FieldTestCase {
+    @Inject public String a;
+    @Inject public Foo foo;
     @Inject public byte c;
     @Inject public short d;
     @Inject public int e;
@@ -13,8 +14,7 @@ public class A {
     @Inject public char i;
     @Inject public boolean j;
 
-    @Inject public void m() {e=3;}
-    @Inject public String n() {return "4";}
-    @Inject public int o() {return 4;}
-    @Inject public int[] p() {return new int[] {4};}
+    //TODO generics, arrays 1&2D, static
+    //oosh final
+    //private
 }

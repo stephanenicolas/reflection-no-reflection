@@ -10,8 +10,6 @@ dependencies {
   compile project(':generator')
   compile 'javax.inject:javax.inject:1'
   testCompile 'junit:junit:4.10'
-  testCompile 'org.easytesting:fest:1.0.7'
-  testCompile 'com.google.testing.compile:compile-testing:0.4'
 }
 
 task wrapper(type: Wrapper) {

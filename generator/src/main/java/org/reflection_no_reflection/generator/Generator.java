@@ -38,47 +38,43 @@ public class Generator extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        //TODO
         boolean processed = processor.process(annotations, roundEnv);
 
-        if (!roundEnv.processingOver()) {
-            return processed;
+        if (annotations.isEmpty() || roundEnv.processingOver()) {
+            //module creation
+            HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
+            ModuleDumperClassPoolVisitor moduleDumper = new ModuleDumperClassPoolVisitor();
+            moduleDumper.setTargetPackageName(targetPackageName);
+            moduleDumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
+            JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, moduleDumper);
+            writeJavaFile(rnRModuleJavaFile);
+            System.out.println("Dumping all collected data: \n");
+            printJavaFile(rnRModuleJavaFile);
+
+            //reflectors creation
+            IntrospectorDumperClassPoolVisitor reflectorsDumper = new IntrospectorDumperClassPoolVisitor();
+            ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
+            visitor.visit(annotatedClassSet, reflectorsDumper);
+
+            for (JavaFile javaFile : reflectorsDumper.getJavaFiles()) {
+                writeJavaFile(javaFile);
+                System.out.println("Dumping reflector: \n");
+                printJavaFile(javaFile);
+            }
+
+            //annotation implementations creation
+            AnnotationCreatorClassPoolVisitor annotationDumper = new AnnotationCreatorClassPoolVisitor();
+            annotationDumper.setTargetPackageName(targetPackageName);
+            ClassPoolVisitStrategy visitor2 = new ClassPoolVisitStrategy();
+            final Set<Class> annotationClasses = processor.getAnnotationClasses();
+            visitor2.visit(annotationClasses, annotationDumper);
+
+            for (JavaFile javaFile : annotationDumper.getJavaFiles()) {
+                writeJavaFile(javaFile);
+                System.out.println("Dumping Annotations implementations: \n");
+                printJavaFile(javaFile);
+            }
         }
-        //module creation
-        HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
-        ModuleDumperClassPoolVisitor moduleDumper = new ModuleDumperClassPoolVisitor();
-        moduleDumper.setTargetPackageName(targetPackageName);
-        moduleDumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
-        JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, moduleDumper);
-        writeJavaFile(rnRModuleJavaFile);
-        System.out.println("Dumping all collected data: \n");
-        printJavaFile(rnRModuleJavaFile);
-
-        //reflectors creation
-        IntrospectorDumperClassPoolVisitor reflectorsDumper = new IntrospectorDumperClassPoolVisitor();
-        ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
-        visitor.visit(annotatedClassSet, reflectorsDumper);
-
-        for (JavaFile javaFile : reflectorsDumper.getJavaFiles()) {
-            writeJavaFile(javaFile);
-            System.out.println("Dumping reflector: \n");
-            printJavaFile(javaFile);
-
-        }
-
-        //annotation implementations creation
-        AnnotationCreatorClassPoolVisitor annotationDumper = new AnnotationCreatorClassPoolVisitor();
-        annotationDumper.setTargetPackageName(targetPackageName);
-        ClassPoolVisitStrategy visitor2 = new ClassPoolVisitStrategy();
-        final Set<Class> annotationClasses = processor.getAnnotationClasses();
-        visitor2.visit(annotationClasses, annotationDumper);
-
-        for (JavaFile javaFile : annotationDumper.getJavaFiles()) {
-            writeJavaFile(javaFile);
-            System.out.println("Dumping Annotations implementations: \n");
-            printJavaFile(javaFile);
-        }
-
         return processed;
     }
 
