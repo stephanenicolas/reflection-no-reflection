@@ -108,6 +108,7 @@ public class ClassTest {
         //WHEN
         final Class shortArrayClass = Class.forNameSafe("short[]");
         final Class objectArrayClass = Class.forNameSafe("java.lang.Object[]");
+        final Class objectClass = Class.forNameSafe("java.lang.Object");
 
         //THEN
         assertThat(shortArrayClass.getName(),is("short[]"));
@@ -115,8 +116,20 @@ public class ClassTest {
 
         assertThat(shortArrayClass.isArray(),is(true));
         assertThat(objectArrayClass.isArray(),is(true));
+        assertThat(objectClass.isArray(),is(false));
 
         assertThat(shortArrayClass.getComponentType(), sameInstance((Class) Class.forNameSafe("short")));
-        assertThat(objectArrayClass.getComponentType(),sameInstance((Class) Class.forNameSafe("java.lang.Object")));
+        assertThat(objectArrayClass.getComponentType(),sameInstance(objectClass));
     }
+
+    @Test
+    public void genericsClassesShouldBeWellDefined() {
+        //GIVEN
+        //WHEN
+        final Class stringList = Class.forNameSafe("java.util.List<String>");
+
+        //THEN
+        assertThat(stringList.getName(),is("java.util.List<String>"));
+    }
+
 }
