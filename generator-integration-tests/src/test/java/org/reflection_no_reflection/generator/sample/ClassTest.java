@@ -123,6 +123,29 @@ public class ClassTest {
     }
 
     @Test
+    public void array2DClassesShouldBeWellDefined() {
+        //GIVEN
+        //WHEN
+        final Class shortArray2DClass = Class.forNameSafe("short[][]");
+        final Class objectArray2DClass = Class.forNameSafe("java.lang.Object[][]");
+        final Class shortArrayClass = Class.forNameSafe("short[]");
+        final Class objectArrayClass = Class.forNameSafe("java.lang.Object[]");
+        final Class objectClass = Class.forNameSafe("java.lang.Object");
+
+        //THEN
+        assertThat(shortArray2DClass.getName(),is("short[][]"));
+        assertThat(objectArray2DClass.getName(),is("java.lang.Object[][]"));
+
+        assertThat(shortArray2DClass.isArray(),is(true));
+        assertThat(objectArray2DClass.isArray(),is(true));
+
+        assertThat(shortArray2DClass.getComponentType(), sameInstance(shortArrayClass));
+        assertThat(objectArray2DClass.getComponentType(),sameInstance(objectArrayClass));
+        assertThat(shortArrayClass.getComponentType(), sameInstance((Class) Class.forNameSafe("short")));
+        assertThat(objectArrayClass.getComponentType(),sameInstance(objectClass));
+    }
+
+    @Test
     public void genericsClassesShouldBeWellDefined() {
         //GIVEN
         //WHEN
