@@ -4,13 +4,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.reflection_no_reflection.Class;
-import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.Method;
 import org.reflection_no_reflection.runtime.Module;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 public class MethodTest {
@@ -105,6 +103,4 @@ public class MethodTest {
         Object obj = method.invoke(methodTestCase);
         assertThat((int[]) obj, is(new int[] {3}));
     }
-
-
 }
