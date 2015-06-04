@@ -1,5 +1,6 @@
 package org.reflection_no_reflection.generator.sample;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.reflection_no_reflection.Class;
@@ -99,5 +100,23 @@ public class ClassTest {
         assertThat(charClass.isPrimitive(),is(true));
         assertThat(booleanClass.isPrimitive(),is(true));
         assertThat(objectClass.isPrimitive(),is(false));
+    }
+
+    @Test
+    public void arrayClassesShouldBeWellDefined() {
+        //GIVEN
+        //WHEN
+        final Class shortArrayClass = Class.forNameSafe("short[]");
+        final Class objectArrayClass = Class.forNameSafe("java.lang.Object[]");
+
+        //THEN
+        assertThat(shortArrayClass.getName(),is("short[]"));
+        assertThat(objectArrayClass.getName(),is("java.lang.Object[]"));
+
+        assertThat(shortArrayClass.isArray(),is(true));
+        assertThat(objectArrayClass.isArray(),is(true));
+
+        assertThat(shortArrayClass.getComponentType(), sameInstance((Class) Class.forNameSafe("short")));
+        assertThat(objectArrayClass.getComponentType(),sameInstance((Class) Class.forNameSafe("java.lang.Object")));
     }
 }

@@ -56,6 +56,8 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         }
         if (isArray(name)) {
             this.isArray = true;
+            String componentName = name.substring(0, name.lastIndexOf('['));
+            setComponentType(Class.forNameSafe(componentName));
         }
         CLASS_POOL.add(this);
     }
