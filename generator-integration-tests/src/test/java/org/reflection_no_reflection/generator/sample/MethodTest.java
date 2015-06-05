@@ -2,16 +2,20 @@ package org.reflection_no_reflection.generator.sample;
 
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Method;
 import org.reflection_no_reflection.runtime.Module;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public class MethodTest {
+
+    public static final String METHOD_TEST_CASE_CLASS_NAME = "org.reflection_no_reflection.generator.sample.MethodTestCase";
 
     @Before
     public void setUp() throws Exception {
@@ -33,6 +37,20 @@ public class MethodTest {
         final List<Method> methods = classFoo.getMethods();
         assertNotNull(methods);
         assertThat(methods.size(), is(4));
+    }
+
+    @Test @Ignore
+    public void shouldDetectAnnotationsOfMethod() throws ClassNotFoundException {
+        //GIVEN
+
+        //WHEN
+        Class<?> classFoo = Class.forName("org.reflection_no_reflection.generator.sample.MethodTestCase");
+
+        //THEN
+        final List<Method> methods = classFoo.getMethods();
+        final Method method = methods.get(0);
+        assertThat(method.getAnnotations().length, is(1));
+        assertThat((Class) method.getAnnotations()[0].annotationType(), sameInstance((Class) Class.forNameSafe("javax.inject.Inject")));
     }
 
     @Test
@@ -92,7 +110,7 @@ public class MethodTest {
         //GIVEN
 
         //WHEN
-        Class<?> classFoo = Class.forName("org.reflection_no_reflection.generator.sample.MethodTestCase");
+        Class<?> classFoo = Class.forName(METHOD_TEST_CASE_CLASS_NAME);
 
         //THEN
         final List<Method> methods = classFoo.getMethods();

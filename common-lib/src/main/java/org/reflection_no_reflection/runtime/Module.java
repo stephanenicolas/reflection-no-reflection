@@ -13,5 +13,7 @@ import org.reflection_no_reflection.Class;
 public interface Module {
     Set<org.reflection_no_reflection.Class> getClassSet();
 
-    Map<Class<? extends Annotation>, Set<Class>> getMapOfAnnotationTypeToClassesContainingAnnotation();
+    Map<String, Set<String>> getMapAnnotationNameToNameOfClassesContainingAnnotation();
+
+    Class<?> loadClass(String className);
 }

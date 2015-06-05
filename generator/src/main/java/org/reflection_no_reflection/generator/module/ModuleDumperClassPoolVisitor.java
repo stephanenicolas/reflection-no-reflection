@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -31,6 +32,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
     private final TypeSpec.Builder moduleType;
     public static final ClassName MODULE_TYPE_NAME = ClassName.get("org.reflection_no_reflection.runtime", "Module");
+    public static final ClassName STRING_TYPE_NAME = ClassName.get("java.lang", "String");
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
     public static final ClassName METHOD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Method");
@@ -59,21 +61,21 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             .addStatement("return $L", "classSet")
             .build();
 
-        //build map of annotation type names to class set
+        //build map of annotation type names to class name set
+        TypeName setOfStringTypeName = ParameterizedTypeName.get(setTypeName, STRING_TYPE_NAME);
+
         ClassName mapTypeName = ClassName.get("java.util", "Map");
         ClassName hashMapTypeName = ClassName.get("java.util", "HashMap");
-        WildcardTypeName subClassOfAnnotationTypeName = WildcardTypeName.subtypeOf(ANNOTATION_TYPE_NAME);
-        TypeName classesOfAnnotationTypeName = ParameterizedTypeName.get(CLASS_TYPE_NAME, subClassOfAnnotationTypeName);
-        TypeName mapOfAnnotationTypeToClassesContainingAnnotationTypeName = ParameterizedTypeName.get(mapTypeName, classesOfAnnotationTypeName, setOfClassesTypeName);
+        TypeName mapAnnotationNameToNameOfClassesContainingAnnotation = ParameterizedTypeName.get(mapTypeName, STRING_TYPE_NAME, setOfStringTypeName);
 
-        FieldSpec mapOfAnnotationTypeToClassesContainingAnnotationField = FieldSpec.builder(mapOfAnnotationTypeToClassesContainingAnnotationTypeName, "mapOfAnnotationTypeToClassesContainingAnnotation", Modifier.PRIVATE)
+        FieldSpec mapOfAnnotationTypeToClassesContainingAnnotationField = FieldSpec.builder(mapAnnotationNameToNameOfClassesContainingAnnotation, "mapAnnotationNameToNameOfClassesContainingAnnotation", Modifier.PRIVATE)
             .initializer("new $T<>()", hashMapTypeName)
             .build();
 
-        MethodSpec getMapOfAnnotationTypeToClassesContainingAnnotationMethod = MethodSpec.methodBuilder("getMapOfAnnotationTypeToClassesContainingAnnotation")
+        MethodSpec getMapOfAnnotationTypeToClassesContainingAnnotationMethod = MethodSpec.methodBuilder("getMapAnnotationNameToNameOfClassesContainingAnnotation")
             .addModifiers(Modifier.PUBLIC)
-            .returns(mapOfAnnotationTypeToClassesContainingAnnotationTypeName)
-            .addStatement("return $L", "mapOfAnnotationTypeToClassesContainingAnnotation")
+            .returns(mapAnnotationNameToNameOfClassesContainingAnnotation)
+            .addStatement("return $L", "mapAnnotationNameToNameOfClassesContainingAnnotation")
             .build();
 
         moduleType = TypeSpec.classBuilder("ModuleImpl")
@@ -118,34 +120,41 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     }
 
     public JavaFile getJavaFile() {
-        MethodSpec.Builder constructorSpecBuilder = MethodSpec.constructorBuilder();
-        constructorSpecBuilder.addModifiers(Modifier.PUBLIC);
+        MethodSpec.Builder loadClassMethodBuilder = MethodSpec.methodBuilder("loadClass");
+        ParameterSpec paramClassName = ParameterSpec.builder(STRING_TYPE_NAME, "className").build();
+        loadClassMethodBuilder
+            .addModifiers(Modifier.PUBLIC)
+            .returns(CLASS_TYPE_NAME)
+            .addParameter(paramClassName);
         int annotationCounter = 0;
         int classCounter = 0;
         int fieldCounter = 0;
         int methodCounter = 0;
+
         //fill class list
+        loadClassMethodBuilder.beginControlFlow("switch(className)");
         for (Class clazz : classList) {
             final String clazzName = clazz.getName();
-            constructorSpecBuilder.addStatement("$T c$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, classCounter, clazzName);
-            constructorSpecBuilder.addStatement("classSet.add(c$L)", classCounter);
+            loadClassMethodBuilder.beginControlFlow("case $S:", clazzName);
+            loadClassMethodBuilder.addStatement("$T c$L = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, classCounter, clazzName);
+            loadClassMethodBuilder.addStatement("classSet.add(c$L)", classCounter);
             for (Field field : clazz.getFields()) {
-                constructorSpecBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
-                constructorSpecBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
+                loadClassMethodBuilder.addStatement("$T f$L = new $T($S,Class.forNameSafe($S, true),c$L,$L,null)", FIELD_TYPE_NAME, fieldCounter, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), classCounter, field.getModifiers());
+                loadClassMethodBuilder.addStatement("c$L.addField(f$L)", classCounter, fieldCounter);
 
                 if (field.getDeclaredAnnotations().length != 0) {
                     for (Annotation annotation : field.getDeclaredAnnotations()) {
-                        constructorSpecBuilder.addCode("{\n");
-                        constructorSpecBuilder.addStatement("int indexAnnotation = 0");
-                        constructorSpecBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, field.getDeclaredAnnotations().length);
-                        constructorSpecBuilder.addStatement("$T a$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
-                        constructorSpecBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
-                        constructorSpecBuilder.addStatement("classSet.add(a$L)", annotationCounter);
+                        loadClassMethodBuilder.addCode("{\n");
+                        loadClassMethodBuilder.addStatement("int indexAnnotation = 0");
+                        loadClassMethodBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, field.getDeclaredAnnotations().length);
+                        loadClassMethodBuilder.addStatement("$T a$L = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
+                        loadClassMethodBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
+                        loadClassMethodBuilder.addStatement("classSet.add(a$L)", annotationCounter);
                         annotationCounter++;
-                        constructorSpecBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
-                        constructorSpecBuilder.addStatement("indexAnnotation++");
-                        constructorSpecBuilder.addStatement("f$L.setAnnotationImplList(annotationImplTab)", fieldCounter);
-                        constructorSpecBuilder.addCode("}\n");
+                        loadClassMethodBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
+                        loadClassMethodBuilder.addStatement("indexAnnotation++");
+                        loadClassMethodBuilder.addStatement("f$L.setAnnotationImplList(annotationImplTab)", fieldCounter);
+                        loadClassMethodBuilder.addCode("}\n");
                     }
                 }
                 fieldCounter++;
@@ -155,28 +164,28 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                 Method method = (Method) methodObj;
 
                 //params
-                constructorSpecBuilder.addStatement("$T[] paramTypeTab$L = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME);
+                loadClassMethodBuilder.addStatement("$T[] paramTypeTab$L = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME);
                 if (method.getParameterTypes().length != 0) {
-                    constructorSpecBuilder.addStatement("paramTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
+                    loadClassMethodBuilder.addStatement("paramTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
                     int indexParam = 0;
                     for (Class<?> paramClass : method.getParameterTypes()) {
-                        constructorSpecBuilder.addStatement("paramTypeTab$L[$L] = Class.forNameSafe($S)", methodCounter, indexParam++, paramClass.getName());
+                        loadClassMethodBuilder.addStatement("paramTypeTab$L[$L] = Class.forNameSafe($S, true)", methodCounter, indexParam++, paramClass.getName());
                         indexParam++;
                     }
                 }
 
                 //exceptions
-                constructorSpecBuilder.addStatement("$T[] exceptionTypeTab$L = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME);
+                loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab$L = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME);
                 if (method.getParameterTypes().length != 0) {
-                    constructorSpecBuilder.addStatement("exceptionTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
+                    loadClassMethodBuilder.addStatement("exceptionTypeTab$L = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, methodCounter, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
                     int indexException = 0;
                     for (Class<?> exceptionClass : method.getExceptionTypes()) {
-                        constructorSpecBuilder.addStatement("exceptionTypeTab$L[$L] = Class.forNameSafe($S)", methodCounter, indexException++, exceptionClass.getName());
+                        loadClassMethodBuilder.addStatement("exceptionTypeTab$L[$L] = Class.forNameSafe($S, true)", methodCounter, indexException++, exceptionClass.getName());
                         indexException++;
                     }
                 }
 
-                constructorSpecBuilder.addStatement("$T m$L = new $T(Class.forNameSafe($S),$S,paramTypeTab$L,Class.forNameSafe($S),exceptionTypeTab$L, $L)",
+                loadClassMethodBuilder.addStatement("$T m$L = new $T(Class.forNameSafe($S, true),$S,paramTypeTab$L,Class.forNameSafe($S, true),exceptionTypeTab$L, $L)",
                                                     METHOD_TYPE_NAME,
                                                     methodCounter,
                                                     METHOD_TYPE_NAME,
@@ -186,21 +195,21 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                                                     method.getReturnType().getName(),
                                                     methodCounter,
                                                     method.getModifiers());
-                constructorSpecBuilder.addStatement("c$L.addMethod(m$L)", classCounter, methodCounter);
+                loadClassMethodBuilder.addStatement("c$L.addMethod(m$L)", classCounter, methodCounter);
 
                 if (method.getDeclaredAnnotations().length != 0) {
                     for (Annotation annotation : method.getDeclaredAnnotations()) {
-                        constructorSpecBuilder.addCode("{\n");
-                        constructorSpecBuilder.addStatement("int indexAnnotation = 0");
-                        constructorSpecBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, method.getDeclaredAnnotations().length);
-                        constructorSpecBuilder.addStatement("$T a$L = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
-                        constructorSpecBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
-                        constructorSpecBuilder.addStatement("classSet.add(a$L)", annotationCounter);
+                        loadClassMethodBuilder.addCode("{\n");
+                        loadClassMethodBuilder.addStatement("int indexAnnotation = 0");
+                        loadClassMethodBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, method.getDeclaredAnnotations().length);
+                        loadClassMethodBuilder.addStatement("$T a$L = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, annotationCounter, annotation.annotationType().getName());
+                        loadClassMethodBuilder.addStatement("a$L.setModifiers($L)", annotationCounter, annotation.annotationType().getModifiers());
+                        loadClassMethodBuilder.addStatement("classSet.add(a$L)", annotationCounter);
                         annotationCounter++;
-                        constructorSpecBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
-                        constructorSpecBuilder.addStatement("indexAnnotation++");
-                        constructorSpecBuilder.addStatement("m$L.setAnnotationImplList(annotationImplTab)", methodCounter);
-                        constructorSpecBuilder.addCode("}\n");
+                        loadClassMethodBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
+                        loadClassMethodBuilder.addStatement("indexAnnotation++");
+                        loadClassMethodBuilder.addStatement("m$L.setAnnotationImplList(annotationImplTab)", methodCounter);
+                        loadClassMethodBuilder.addCode("}\n");
                     }
                 }
 
@@ -211,37 +220,47 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             //TODO the test should be done at the introspector level, there is a dependency
             //TODO avoid dependency: introduce 3rd party
             if (!clazz.getName().startsWith("java")) {
-                constructorSpecBuilder.addStatement("c$L.setReflector(new $T())", classCounter, reflectorTypeName);
+                loadClassMethodBuilder.addStatement("c$L.setReflector(new $T())", classCounter, reflectorTypeName);
             }
-            constructorSpecBuilder.addStatement("c$L.setModifiers($L)", classCounter, clazz.getModifiers());
+            loadClassMethodBuilder.addStatement("c$L.setModifiers($L)", classCounter, clazz.getModifiers());
 
+            loadClassMethodBuilder.addStatement("return c$L", classCounter);
+            loadClassMethodBuilder.endControlFlow();
             classCounter++;
-            constructorSpecBuilder.addCode("\n");
         }
 
-        //fill class list
-        ClassName setTypeName = ClassName.get("java.util", "Set");
-        TypeName setOfClassesTypeName = ParameterizedTypeName.get(setTypeName, CLASS_TYPE_NAME);
-        ClassName hashSetTypeName = ClassName.get("java.util", "HashSet");
-        WildcardTypeName subClassOfAnnotationTypeName = WildcardTypeName.subtypeOf(ANNOTATION_TYPE_NAME);
-        TypeName classesOfAnnotationTypeName = ParameterizedTypeName.get(CLASS_TYPE_NAME, subClassOfAnnotationTypeName);
+        loadClassMethodBuilder.addStatement("default : return null");
 
-        classCounter = 0;
+        loadClassMethodBuilder.endControlFlow();
+
+        MethodSpec loadClassMethod = loadClassMethodBuilder.build();
+        moduleType.addMethod(loadClassMethod);
+
+        //fill class list
+        MethodSpec.Builder constructorSpecBuilder = MethodSpec.constructorBuilder();
+        constructorSpecBuilder.addModifiers(Modifier.PUBLIC);
+
+        ClassName setTypeName = ClassName.get("java.util", "Set");
+        TypeName setOfStringTypeName = ParameterizedTypeName.get(setTypeName, STRING_TYPE_NAME);
+        ClassName hashSetTypeName = ClassName.get("java.util", "HashSet");
+
+        int annotationClassCounter = 0;
         for (Map.Entry<Class<? extends Annotation>, Set<Class<?>>> entry : mapAnnotationTypeToClassContainingAnnotation.entrySet()) {
-            constructorSpecBuilder.addStatement("$T s$L = new $T()", setOfClassesTypeName, classCounter, hashSetTypeName);
+            constructorSpecBuilder.addStatement("$T s$L = new $T()", setOfStringTypeName, annotationClassCounter, hashSetTypeName);
             for (Class<?> clazz : entry.getValue()) {
-                constructorSpecBuilder.addStatement("s$L.add(Class.forNameSafe($S))", classCounter, clazz.getName());
+                constructorSpecBuilder.addStatement("s$L.add($S)", annotationClassCounter, clazz.getName());
             }
             String annotationTypeName = entry.getKey().getName();
-            constructorSpecBuilder.addStatement("mapOfAnnotationTypeToClassesContainingAnnotation.put(($T) Class.forNameSafe($S),s$L)", classesOfAnnotationTypeName, annotationTypeName, classCounter);
+            constructorSpecBuilder.addStatement("mapAnnotationNameToNameOfClassesContainingAnnotation.put($S,s$L)", annotationTypeName, annotationClassCounter);
             constructorSpecBuilder.addCode("\n");
-            classCounter++;
+            annotationClassCounter++;
         }
 
         MethodSpec constructorSpec = constructorSpecBuilder.build();
         moduleType.addMethod(constructorSpec);
 
-        javaFile = JavaFile.builder(targetPackageName, moduleType.build()).build();
+
+        javaFile = JavaFile.builder(targetPackageName, moduleType.build()).indent("\t").build();
 
         return javaFile;
     }

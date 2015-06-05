@@ -21,6 +21,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     public static final int ANNOTATION = 0x00002000;
     private static final int ENUM = 0x00004000;
     private static final int SYNTHETIC = 0x00001000;
+    private static List<Module> modules = new ArrayList<>();
     private boolean isInterface;
     private boolean isArray;
     private boolean isPrimitive;
@@ -130,20 +131,23 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
      */
     public static Class<?> forName(String className)
         throws ClassNotFoundException {
-        for (Class aClass : CLASS_POOL) {
-            if (aClass.getName().equals(className)) {
-                return aClass;
-            }
-        }
+        Class result = lookupClass(className, false);
 
+        if (result!= null) {
+            return result;
+        }
         throw new ClassNotFoundException(className);
     }
 
     public static Class<?> forNameSafe(String className) {
-        for (Class aClass : CLASS_POOL) {
-            if (aClass.getName().equals(className)) {
-                return aClass;
-            }
+        return forNameSafe(className, false);
+    }
+
+    public static Class<?> forNameSafe(String className, boolean skipModules) {
+        Class result = lookupClass(className, skipModules);
+
+        if (result!= null) {
+            return result;
         }
 
         final Class aClass = new Class(className);
@@ -168,6 +172,29 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         CLASS_POOL.add(aClass);
         aClass.level = level;
         return aClass;
+    }
+
+    private static Class lookupClass(String className, boolean skipModules) {Class result = null;
+        for (Class aClass : CLASS_POOL) {
+            if (aClass.getName().equals(className)) {
+                result = aClass;
+                break;
+            }
+        }
+
+        if (result!= null || skipModules) {
+            return result;
+        }
+
+        for (Module module : modules) {
+            final Class aClass = module.loadClass(className);
+            if (aClass != null) {
+                result = aClass;
+                CLASS_POOL.add(aClass);
+                break;
+            }
+        }
+        return result;
     }
 
     public static void visit(ClassPoolVisitor classPoolVisitor) {
@@ -742,11 +769,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     }
 
     public static void loadModule(Module module) {
-        for (Class aClass : module.getClassSet()) {
-            //TODO all classes have already been registered when instanciating the module
-            //TODO we should have more control here, even possible dynamic class loading
-            //TODO how to manage conflicts ? It looks like JNDI.. oh no !
-        }
+        modules.add(module);
     }
 
     public BaseReflector getReflector() {
