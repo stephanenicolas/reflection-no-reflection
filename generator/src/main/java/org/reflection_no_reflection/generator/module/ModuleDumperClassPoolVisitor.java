@@ -166,69 +166,23 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.beginControlFlow("switch(className)");
         for (Class clazz : classList) {
             final String clazzName = clazz.getName();
+            final String simpleClazzName = clazz.getSimpleName();
+            final String packageName = clazzName.substring(0, clazzName.lastIndexOf('.'));
+
             loadClassMethodBuilder.beginControlFlow("case $S:", clazzName);
             loadClassMethodBuilder.addStatement("$T c = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, clazzName);
             loadClassMethodBuilder.addStatement("classSet.add(c)");
-            for (Field field : clazz.getFields()) {
-                loadClassMethodBuilder.beginControlFlow("");
-                loadClassMethodBuilder.addStatement("$T f = new $T($S,Class.forNameSafe($S, true),c,$L,null)", FIELD_TYPE_NAME, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), field.getModifiers());
-                loadClassMethodBuilder.addStatement("c.addField(f)");
 
-                final String memberInGenCode = "f";
-                final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
-                doGenerateAnnotationsForMember(loadClassMethodBuilder, memberInGenCode, declaredAnnotations);
-                loadClassMethodBuilder.endControlFlow();
+            for (Field field : clazz.getFields()) {
+                generateField(loadClassMethodBuilder, field);
             }
 
             for (Object methodObj : clazz.getMethods()) {
-                loadClassMethodBuilder.beginControlFlow("");
-
-                Method method = (Method) methodObj;
-
-                //params
-                loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
-                if (method.getParameterTypes().length != 0) {
-                    loadClassMethodBuilder.addStatement("paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
-                    int indexParam = 0;
-                    for (Class<?> paramClass : method.getParameterTypes()) {
-                        loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam++, paramClass.getName());
-                        indexParam++;
-                    }
-                }
-
-                //exceptions
-                loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
-                if (method.getParameterTypes().length != 0) {
-                    loadClassMethodBuilder.addStatement("exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
-                    int indexException = 0;
-                    for (Class<?> exceptionClass : method.getExceptionTypes()) {
-                        loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S, true)", indexException++, exceptionClass.getName());
-                        indexException++;
-                    }
-                }
-
-                loadClassMethodBuilder.addStatement("$T m = new $T(Class.forNameSafe($S, true),$S,paramTypeTab,Class.forNameSafe($S, true),exceptionTypeTab, $L)",
-                                                    METHOD_TYPE_NAME,
-                                                    METHOD_TYPE_NAME,
-                                                    method.getDeclaringClass().getName(),
-                                                    method.getName(),
-                                                    method.getReturnType().getName(),
-                                                    method.getModifiers());
-                loadClassMethodBuilder.addStatement("c.addMethod(m)");
-
-               doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getDeclaredAnnotations());
-
-                loadClassMethodBuilder.endControlFlow("");
+                generateMethod(loadClassMethodBuilder, (Method) methodObj);
             }
-            TypeName reflectorTypeName = ClassName.get(clazzName.substring(0, clazzName.lastIndexOf('.')), clazz.getSimpleName() + "$$Reflector");
-            //TODO add all protected java & android packages
-            //TODO the test should be done at the introspector level, there is a dependency
-            //TODO avoid dependency: introduce 3rd party
-            if (!clazz.getName().startsWith("java")) {
-                loadClassMethodBuilder.addStatement("c.setReflector(new $T())", reflectorTypeName);
-            }
+
+            doGenerateSetReflector(loadClassMethodBuilder, clazz, simpleClazzName, packageName);
             loadClassMethodBuilder.addStatement("c.setModifiers($L)", clazz.getModifiers());
-
             loadClassMethodBuilder.addStatement("return c");
             loadClassMethodBuilder.endControlFlow();
         }
@@ -238,6 +192,71 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.endControlFlow();
 
         return loadClassMethodBuilder.build();
+    }
+
+    private void doGenerateSetReflector(MethodSpec.Builder loadClassMethodBuilder, Class clazz, String simpleClazzName, String packageName) {//TODO add all protected java & android packages
+        //TODO the test should be done at the introspector level, there is a dependency
+        //TODO avoid dependency: introduce 3rd party
+        if (!clazz.getName().startsWith("java")) {
+            TypeName reflectorTypeName = createReflectorTypeName(packageName, simpleClazzName);
+            loadClassMethodBuilder.addStatement("c.setReflector(new $T())", reflectorTypeName);
+        }
+    }
+
+    private ClassName createReflectorTypeName(String packageName, String simpleClassName) {
+        return ClassName.get(packageName, simpleClassName + "$$Reflector");
+    }
+
+    private void generateMethod(MethodSpec.Builder loadClassMethodBuilder, Method method) {
+        loadClassMethodBuilder.beginControlFlow("");
+
+        //params
+        if (method.getParameterTypes().length != 0) {
+            loadClassMethodBuilder.addStatement("paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
+            int indexParam = 0;
+            for (Class<?> paramClass : method.getParameterTypes()) {
+                loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam++, paramClass.getName());
+                indexParam++;
+            }
+        } else {
+            loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
+        }
+
+        //exceptions
+        if (method.getParameterTypes().length != 0) {
+            loadClassMethodBuilder.addStatement("exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
+            int indexException = 0;
+            for (Class<?> exceptionClass : method.getExceptionTypes()) {
+                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S, true)", indexException++, exceptionClass.getName());
+                indexException++;
+            }
+        } else {
+            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
+        }
+
+        loadClassMethodBuilder.addStatement("$T m = new $T(Class.forNameSafe($S, true),$S,paramTypeTab,Class.forNameSafe($S, true),exceptionTypeTab, $L)",
+                                            METHOD_TYPE_NAME,
+                                            METHOD_TYPE_NAME,
+                                            method.getDeclaringClass().getName(),
+                                            method.getName(),
+                                            method.getReturnType().getName(),
+                                            method.getModifiers());
+        loadClassMethodBuilder.addStatement("c.addMethod(m)");
+
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getDeclaredAnnotations());
+
+        loadClassMethodBuilder.endControlFlow("");
+    }
+
+    private void generateField(MethodSpec.Builder loadClassMethodBuilder, Field field) {
+        loadClassMethodBuilder.beginControlFlow("");
+        loadClassMethodBuilder.addStatement("$T f = new $T($S,Class.forNameSafe($S, true),c,$L,null)", FIELD_TYPE_NAME, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), field.getModifiers());
+        loadClassMethodBuilder.addStatement("c.addField(f)");
+
+        final String memberInGenCode = "f";
+        final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, memberInGenCode, declaredAnnotations);
+        loadClassMethodBuilder.endControlFlow();
     }
 
     private void doGenerateAnnotationsForMember(MethodSpec.Builder loadClassMethodBuilder, String memberInGenCode, Annotation[] declaredAnnotations) {
