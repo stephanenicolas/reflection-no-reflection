@@ -47,9 +47,9 @@ public class Generator extends AbstractProcessor {
             moduleDumper.setTargetPackageName(targetPackageName);
             moduleDumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
             JavaFile rnRModuleJavaFile = createRnRModuleJavaFile(annotatedClassSet, moduleDumper);
-            writeJavaFile(rnRModuleJavaFile);
             System.out.println("Dumping all collected data: \n");
             printJavaFile(rnRModuleJavaFile);
+            writeJavaFile(rnRModuleJavaFile);
 
             //reflectors creation
             IntrospectorDumperClassPoolVisitor reflectorsDumper = new IntrospectorDumperClassPoolVisitor();
@@ -57,9 +57,9 @@ public class Generator extends AbstractProcessor {
             visitor.visit(annotatedClassSet, reflectorsDumper);
 
             for (JavaFile javaFile : reflectorsDumper.getJavaFiles()) {
-                writeJavaFile(javaFile);
                 System.out.println("Dumping reflector: \n");
                 printJavaFile(javaFile);
+                writeJavaFile(javaFile);
             }
 
             //annotation implementations creation

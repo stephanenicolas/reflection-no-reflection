@@ -128,7 +128,6 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
 
         javaFile = JavaFile.builder(targetPackageName, moduleType.build()).indent("\t").build();
-
         return javaFile;
     }
 
@@ -212,10 +211,11 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
         //params
         if (method.getParameterTypes().length != 0) {
-            loadClassMethodBuilder.addStatement("paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
+            loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
             int indexParam = 0;
             for (Class<?> paramClass : method.getParameterTypes()) {
-                loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam++, paramClass.getName());
+                System.out.println("param " + paramClass);
+                loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam, paramClass.getName());
                 indexParam++;
             }
         } else {
@@ -223,21 +223,20 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         }
 
         //exceptions
-        if (method.getParameterTypes().length != 0) {
-            loadClassMethodBuilder.addStatement("exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
+        if (method.getExceptionTypes().length != 0) {
+            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
             int indexException = 0;
             for (Class<?> exceptionClass : method.getExceptionTypes()) {
-                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S, true)", indexException++, exceptionClass.getName());
+                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S, true)", indexException, exceptionClass.getName());
                 indexException++;
             }
         } else {
             loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
         }
 
-        loadClassMethodBuilder.addStatement("$T m = new $T(Class.forNameSafe($S, true),$S,paramTypeTab,Class.forNameSafe($S, true),exceptionTypeTab, $L)",
+        loadClassMethodBuilder.addStatement("$T m = new $T(c,$S,paramTypeTab,Class.forNameSafe($S, true),exceptionTypeTab, $L)",
                                             METHOD_TYPE_NAME,
                                             METHOD_TYPE_NAME,
-                                            method.getDeclaringClass().getName(),
                                             method.getName(),
                                             method.getReturnType().getName(),
                                             method.getModifiers());

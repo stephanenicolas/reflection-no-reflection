@@ -1,5 +1,7 @@
 package org.reflection_no_reflection.runtime;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * @author SNI.
  */
@@ -41,7 +43,7 @@ public class BaseReflector {
         throw new UnsupportedOperationException();
     }
 
-    public Object invokeMethod(Object instance, String methodName, String signature, Object...params) {
+    public Object invokeMethod(Object instance, String methodName, String signature, Object...params) throws InvocationTargetException {
         throw new UnsupportedOperationException();
     }
 }

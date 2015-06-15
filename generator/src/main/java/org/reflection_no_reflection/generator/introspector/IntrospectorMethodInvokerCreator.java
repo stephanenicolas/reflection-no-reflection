@@ -1,16 +1,14 @@
 package org.reflection_no_reflection.generator.introspector;
 
 import com.squareup.javapoet.ArrayTypeName;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
+import java.lang.reflect.InvocationTargetException;
 import javax.lang.model.element.Modifier;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Method;
 
-import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.CLASS_TYPE_NAME;
 import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.OBJECT_TYPE_NAME;
 import static org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor.STRING_TYPE_NAME;
 
@@ -33,6 +31,7 @@ public class IntrospectorMethodInvokerCreator {
             .addParameter(parameterSpec2)
             .addParameter(parameterSpec3)
             .addParameter(parameterSpec4)
+            .addException(InvocationTargetException.class)
             .varargs()
             .returns(OBJECT_TYPE_NAME)
             .addCode("switch(signature) {\n");
@@ -41,25 +40,46 @@ public class IntrospectorMethodInvokerCreator {
             Method method = (Method) methodObj;
             final TypeName enclosingClassName = util.getClassName(aClass);
             invokeMethodBuilder.addCode("  case($S) :\n", method.toString());
-            int indexParam = 0;
-            CodeBlock.Builder paramBlock = CodeBlock.builder();
-            for (Class<?> paramClass : method.getParameterTypes()) {
-                paramBlock.add("($T) params[$L]", paramClass, indexParam);
-                if (indexParam != method.getParameterTypes().length) {
-                    paramBlock.add(",");
-                }
+
+            boolean hasExceptions = method.getExceptionTypes().length != 0;
+            if (hasExceptions) {
+                invokeMethodBuilder.beginControlFlow("try");
             }
 
             if (!method.getReturnType().getName().equals("void")) {
-                invokeMethodBuilder.addStatement("  return  (($T) instance).$L($L)", enclosingClassName, method.getName(), paramBlock.build().toString());
+                invokeMethodBuilder.addCode("  return  (($T) instance).$L(", enclosingClassName, method.getName());
+                createInvocationParameters(invokeMethodBuilder, method);
+                invokeMethodBuilder.addCode(");\n");
             } else {
-                invokeMethodBuilder.addStatement("  (($T) instance).$L($L)", enclosingClassName, method.getName(), paramBlock.build().toString());
+                invokeMethodBuilder.addCode("  (($T) instance).$L(", enclosingClassName, method.getName());
+                createInvocationParameters(invokeMethodBuilder, method);
+                invokeMethodBuilder.addCode(");\n");
                 invokeMethodBuilder.addStatement("  return null");
             }
+
+            if (hasExceptions) {
+                invokeMethodBuilder.endControlFlow();
+                invokeMethodBuilder.beginControlFlow("catch(Exception e)");
+                invokeMethodBuilder.addStatement("throw new InvocationTargetException(e)");
+                invokeMethodBuilder.endControlFlow();
+            }
+
         }
         invokeMethodBuilder.addCode("}\n");
         invokeMethodBuilder.addStatement("return null");
 
         return invokeMethodBuilder.build();
+    }
+
+    private void createInvocationParameters(MethodSpec.Builder invokeMethodBuilder, Method method) {
+        int indexParam = 0;
+        for (Class<?> paramClass : method.getParameterTypes()) {
+            final boolean isLast = indexParam != method.getParameterTypes().length - 1;
+            invokeMethodBuilder.addCode("($T) params[$L]", util.getClassName(paramClass), indexParam);
+            if (isLast) {
+                invokeMethodBuilder.addCode(",");
+            }
+            indexParam++;
+        }
     }
 }

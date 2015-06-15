@@ -1,6 +1,7 @@
 package org.reflection_no_reflection;
 
 import java.lang.reflect.GenericSignatureFormatError;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -274,7 +275,7 @@ public class Method extends GenericDeclaration {
         return false;
     }
 
-    public Object invoke(Object obj, Object... args) {
+    public Object invoke(Object obj, Object... args) throws InvocationTargetException {
         return getDeclaringClass().getReflector().invokeMethod(obj, getName(), toString(), args);
     }
 

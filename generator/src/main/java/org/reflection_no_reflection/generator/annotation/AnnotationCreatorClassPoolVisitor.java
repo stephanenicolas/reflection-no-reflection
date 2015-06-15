@@ -70,7 +70,7 @@ public class AnnotationCreatorClassPoolVisitor implements ClassPoolVisitor {
         MethodSpec annotationTypeMethod = MethodSpec.methodBuilder("annotationType")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .returns(ClassName.get(java.lang.Class.class))
-            .addStatement("return $L.class",aClass.getName())
+            .addStatement("return $L.class",aClassName)
             .build();
 
         //TODO add other methods define by the annotations
