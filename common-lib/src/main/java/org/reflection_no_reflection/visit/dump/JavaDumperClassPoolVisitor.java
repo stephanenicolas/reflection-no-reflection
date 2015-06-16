@@ -21,6 +21,9 @@ public class JavaDumperClassPoolVisitor implements ClassPoolVisitor {
         if(aClass.isAnnotation()) {
             buffer.append("@");
         }
+        if(aClass.isInterface()) {
+            buffer.append("interface ");
+        }
         if(aClass.isArray()) {
             buffer.append("[]");
         }

@@ -65,4 +65,31 @@ public class MethodParameterTest extends AbstractRnRTest {
         //TODO test annotations of params
     }
 
+    @Test
+    public void mapsMethodWithInterfaceParam() throws ClassNotFoundException {
+        javaSourceCode("test.Foo", //
+                       "package test;", //
+                       "public class Foo {",//
+                       "protected void s(@Deprecated java.util.List<String> a) {}", //
+                       "}" //
+        );
+
+        configureProcessor(new String[] {"java.lang.Deprecated"});
+        assertJavaSourceCompileWithoutError();
+
+        final Set<Class> annotatedClasses = getProcessedClasses();
+        assertThat(annotatedClasses.contains(Class.forNameSafe("test.Foo")), is(true));
+
+        final Class expectedParamType = Class.forNameSafe("java.util.List");
+        final Class aClass = Class.forName("test.Foo");
+        assertThat(aClass.getMethods().size(), is(1));
+
+        final Method method = (Method) aClass.getMethods().get(0);
+        final Method expected = new Method(aClass, "s", new Class[] {expectedParamType}, Class.forNameSafe("void"), new Class[0], Modifier.PROTECTED);
+        assertThat(method, is(expected));
+        assertThat(method.getParameterTypes()[0].isInterface(), is(true));
+
+        //TODO test annotations of params
+    }
+
 }

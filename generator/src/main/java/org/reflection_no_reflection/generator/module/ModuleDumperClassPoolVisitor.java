@@ -9,9 +9,9 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Modifier;
@@ -27,7 +27,7 @@ import org.reflection_no_reflection.visit.ClassPoolVisitor;
 public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
     private JavaFile javaFile;
-    private List<Class<?>> classList = new ArrayList<>();
+    private Collection<Class<?>> classList = new HashSet<>();
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
     private final TypeSpec.Builder moduleType;
     public static final ClassName MODULE_TYPE_NAME = ClassName.get("org.reflection_no_reflection.runtime", "Module");
@@ -86,7 +86,8 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             .addMethod(getMapOfAnnotationTypeToClassesContainingAnnotationMethod);
     }
 
-    @Override public <T> void visit(Class<T> clazz) {
+    @Override
+    public <T> void visit(Class<T> clazz) {
         classList.add(clazz);
     }
 
@@ -126,7 +127,6 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         MethodSpec constructorSpec = createConstructor();
         moduleType.addMethod(constructorSpec);
 
-
         javaFile = JavaFile.builder(targetPackageName, moduleType.build()).indent("\t").build();
         return javaFile;
     }
@@ -164,7 +164,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         //fill class list
         loadClassMethodBuilder.beginControlFlow("switch(className)");
         for (Class clazz : classList) {
-            final String clazzName = clazz.getName();
+            String clazzName = clazz.getName();
             final String simpleClazzName = clazz.getSimpleName();
             final String packageName = clazzName.substring(0, clazzName.lastIndexOf('.'));
 
@@ -182,6 +182,8 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
             doGenerateSetReflector(loadClassMethodBuilder, clazz, simpleClazzName, packageName);
             loadClassMethodBuilder.addStatement("c.setModifiers($L)", clazz.getModifiers());
+            System.out.println("Generating " + clazz.getName() + " is interface " + clazz.isInterface());
+            loadClassMethodBuilder.addStatement("c.setIsInterface($L)", clazz.isInterface());
             loadClassMethodBuilder.addStatement("return c");
             loadClassMethodBuilder.endControlFlow();
         }
@@ -214,9 +216,13 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
             int indexParam = 0;
             for (Class<?> paramClass : method.getParameterTypes()) {
-                System.out.println("param " + paramClass);
-                loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam, paramClass.getName());
-                indexParam++;
+                //TODO handle generics T[]
+                //type is null
+                if (paramClass != null) {
+                    System.out.println("param " + paramClass);
+                    loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam, paramClass.getName());
+                    indexParam++;
+                }
             }
         } else {
             loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
@@ -270,7 +276,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                 loadClassMethodBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
                 loadClassMethodBuilder.endControlFlow();
             }
-            loadClassMethodBuilder.addStatement(memberInGenCode +".setAnnotationImplList(annotationImplTab)");
+            loadClassMethodBuilder.addStatement(memberInGenCode + ".setAnnotationImplList(annotationImplTab)");
         }
     }
 

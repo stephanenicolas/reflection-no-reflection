@@ -92,7 +92,6 @@ public class Processor extends AbstractProcessor {
 
     private void addClassToAnnotationDatabase(Element classElement, int level) {
         Class newClass = createClass(classElement.asType(), level);
-        //System.out.printf("Type: %s, is injected\n",typeElementName);
         annotatedClassSet.add(newClass);
         final List<Annotation> annotations = extractAnnotations(classElement, level);
         newClass.setAnnotations(annotations);
@@ -247,6 +246,7 @@ public class Processor extends AbstractProcessor {
         Class component = null;
         GenericDeclaration declaration = null;
 
+        System.out.println("Creating class by element for " + typeMirror.toString());
         if (typeMirror instanceof DeclaredType) {
             className = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getQualifiedName().toString();
             if (!((DeclaredType) typeMirror).getTypeArguments().isEmpty()) {
@@ -263,6 +263,12 @@ public class Processor extends AbstractProcessor {
                 declaration.setTypeParameters(typesVariables);
             }
             isInterface = ((com.sun.tools.javac.code.Type) typeMirror).isInterface();
+            final int indexOfChevron = className.indexOf('<');
+            if (indexOfChevron != -1) {
+                System.out.println("Processing with chevron");
+                className = className.substring(0, indexOfChevron);
+            }
+            System.out.println("Processing " + className + " is interface " + isInterface);
             if (level + 1 <= maxLevel) {
                 final List<? extends Element> enclosedElements = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getEnclosedElements();
                 for (Element enclosedElement : enclosedElements) {
@@ -280,12 +286,23 @@ public class Processor extends AbstractProcessor {
         }
 
         result = Class.forNameSafe(className, level);
-        if (result != null) {
-            result.setIsArray(isArray);
-            result.setIsPrimitive(isPrimitive);
+        System.out.println("Created class by element for " + typeMirror.toString() + ":" + result);
+
+        if (isArray) {
+            result.setIsArray(true);
+        }
+        if (isPrimitive) {
+            result.setIsPrimitive(true);
+        }
+        if (component != null) {
             result.setComponentType(component);
+        }
+
+        if (declaration != null) {
             result.setGenericInfo(declaration);
-            result.setIsInterface(isInterface);
+        }
+        if (isInterface) {
+            result.setIsInterface(true);
         }
         return result;
     }

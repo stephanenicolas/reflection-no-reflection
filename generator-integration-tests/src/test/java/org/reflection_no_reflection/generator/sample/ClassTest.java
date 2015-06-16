@@ -154,5 +154,4 @@ public class ClassTest {
         //THEN
         assertThat(stringList.getName(),is("java.util.List<String>"));
     }
-
 }

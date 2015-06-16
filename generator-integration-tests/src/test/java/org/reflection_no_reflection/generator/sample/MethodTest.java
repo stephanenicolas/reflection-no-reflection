@@ -39,7 +39,7 @@ public class MethodTest {
 
         final List<Method> methods = classFoo.getMethods();
         assertNotNull(methods);
-        assertThat(methods.size(), is(11));
+        assertThat(methods.size(), is(12));
     }
 
     @Test @Ignore
@@ -236,7 +236,7 @@ public class MethodTest {
     }
 
     @Test
-    public void shouldReflectMethodThrowingException() throws ClassNotFoundException, InvocationTargetException {
+    public void shouldReflectMethodWithInterfaceParam() throws ClassNotFoundException, InvocationTargetException {
         //GIVEN
 
         //WHEN
@@ -245,6 +245,25 @@ public class MethodTest {
         //THEN
         final List<Method> methods = classFoo.getMethods();
         final Method method = methods.get(10);
+        assertThat(method.getName(), is("methodWithInterfaceParam"));
+        assertThat(method.getParameterTypes().length, is(1));
+        assertThat(method.getParameterTypes()[0].getName(), is("java.util.List"));
+        assertThat(method.getParameterTypes()[0].isInterface(), is(true));
+        MethodTestCase methodTestCase = new MethodTestCase();
+        method.invoke(methodTestCase, new ArrayList());
+        assertThat(methodTestCase.a, is(3));
+    }
+
+    @Test
+    public void shouldReflectMethodThrowingException() throws ClassNotFoundException, InvocationTargetException {
+        //GIVEN
+
+        //WHEN
+        Class<?> classFoo = Class.forName(METHOD_TEST_CASE_CLASS_NAME);
+
+        //THEN
+        final List<Method> methods = classFoo.getMethods();
+        final Method method = methods.get(11);
         assertThat(method.getName(), is("methodWithException"));
         assertThat(method.getParameterTypes().length, is(0));
         assertThat(method.getExceptionTypes().length, is(1));
