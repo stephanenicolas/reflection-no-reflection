@@ -74,9 +74,14 @@ public class IntrospectorMethodInvokerCreator {
     private void createInvocationParameters(MethodSpec.Builder invokeMethodBuilder, Method method) {
         int indexParam = 0;
         for (Class<?> paramClass : method.getParameterTypes()) {
-            final boolean isLast = indexParam != method.getParameterTypes().length - 1;
-            invokeMethodBuilder.addCode("($T) params[$L]", util.getClassName(paramClass), indexParam);
-            if (isLast) {
+            final boolean isLast = indexParam == method.getParameterTypes().length - 1;
+            System.out.println(method.getName());
+            if (isLast && paramClass.isArray() && !method.isVarArgs()) {
+                invokeMethodBuilder.addCode("($T) params", util.getClassName(paramClass));
+            } else {
+                invokeMethodBuilder.addCode("($T) params[$L]", util.getClassName(paramClass), indexParam);
+            }
+            if (!isLast) {
                 invokeMethodBuilder.addCode(",");
             }
             indexParam++;

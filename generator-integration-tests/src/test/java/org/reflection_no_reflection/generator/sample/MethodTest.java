@@ -1,6 +1,7 @@
 package org.reflection_no_reflection.generator.sample;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -187,12 +188,49 @@ public class MethodTest {
 
         //THEN
         final List<Method> methods = classFoo.getMethods();
-        final Method method = methods.get(6);
+        final Method method = methods.get(7);
         assertThat(method.getName(), is("methodWithArrayLastParam"));
-        assertThat(method.getParameterTypes().length, is(2));
+        assertThat(method.getParameterTypes().length, is(1));
         assertThat(method.getParameterTypes()[0].getName(), is("java.lang.String[]"));
         MethodTestCase methodTestCase = new MethodTestCase();
         method.invoke(methodTestCase, new String[] {"s"});
+        assertThat(methodTestCase.a, is(3));
+    }
+
+    @Test
+    public void shouldReflectMethodWithVarArgs() throws ClassNotFoundException, InvocationTargetException {
+        //GIVEN
+
+        //WHEN
+        Class<?> classFoo = Class.forName(METHOD_TEST_CASE_CLASS_NAME);
+
+        //THEN
+        final List<Method> methods = classFoo.getMethods();
+        final Method method = methods.get(8);
+        assertThat(method.getName(), is("methodWithVarArgsParam"));
+        assertThat(method.getParameterTypes().length, is(1));
+        assertThat(method.getParameterTypes()[0].getName(), is("java.lang.String[]"));
+        assertThat(method.isVarArgs(), is(true));
+        MethodTestCase methodTestCase = new MethodTestCase();
+        method.invoke(methodTestCase, new String[] {"s"});
+        assertThat(methodTestCase.a, is(3));
+    }
+
+    @Test
+    public void shouldReflectMethodWithGenericsParam() throws ClassNotFoundException, InvocationTargetException {
+        //GIVEN
+
+        //WHEN
+        Class<?> classFoo = Class.forName(METHOD_TEST_CASE_CLASS_NAME);
+
+        //THEN
+        final List<Method> methods = classFoo.getMethods();
+        final Method method = methods.get(9);
+        assertThat(method.getName(), is("methodWithGenericsParam"));
+        assertThat(method.getParameterTypes().length, is(1));
+        assertThat(method.getParameterTypes()[0].getName(), is("java.util.List"));
+        MethodTestCase methodTestCase = new MethodTestCase();
+        method.invoke(methodTestCase, new ArrayList());
         assertThat(methodTestCase.a, is(3));
     }
 

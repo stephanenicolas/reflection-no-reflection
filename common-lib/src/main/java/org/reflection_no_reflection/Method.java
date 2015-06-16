@@ -35,6 +35,7 @@ public class Method extends GenericDeclaration {
         Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE |
             Modifier.ABSTRACT | Modifier.STATIC | Modifier.FINAL |
             Modifier.SYNCHRONIZED | Modifier.NATIVE;
+    private boolean isVarArgs;
 
     // Generics infrastructure
 
@@ -456,7 +457,11 @@ public class Method extends GenericDeclaration {
      * @since 1.5
      */
     public boolean isVarArgs() {
-        throw new UnsupportedOperationException();
+        return isVarArgs;
+    }
+
+    public void setIsVarArgs(boolean isVarArgs) {
+        this.isVarArgs = isVarArgs;
     }
 
     /**
