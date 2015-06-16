@@ -243,6 +243,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.addStatement("c.addMethod(m)");
 
         doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getDeclaredAnnotations());
+        loadClassMethodBuilder.addStatement("m.setIsVarArgs($L)", method.isVarArgs());
 
         loadClassMethodBuilder.endControlFlow("");
     }
