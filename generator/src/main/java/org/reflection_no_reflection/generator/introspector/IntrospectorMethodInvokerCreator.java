@@ -38,31 +38,9 @@ public class IntrospectorMethodInvokerCreator {
 
         for (Object methodObj : aClass.getMethods()) {
             Method method = (Method) methodObj;
-            final TypeName enclosingClassName = util.getClassName(aClass);
             invokeMethodBuilder.addCode("  case($S) :\n", method.toString());
 
-            boolean hasExceptions = method.getExceptionTypes().length != 0;
-            if (hasExceptions) {
-                invokeMethodBuilder.beginControlFlow("try");
-            }
-
-            if (!method.getReturnType().getName().equals("void")) {
-                invokeMethodBuilder.addCode("  return  (($T) instance).$L(", enclosingClassName, method.getName());
-                createInvocationParameters(invokeMethodBuilder, method);
-                invokeMethodBuilder.addCode(");\n");
-            } else {
-                invokeMethodBuilder.addCode("  (($T) instance).$L(", enclosingClassName, method.getName());
-                createInvocationParameters(invokeMethodBuilder, method);
-                invokeMethodBuilder.addCode(");\n");
-                invokeMethodBuilder.addStatement("  return null");
-            }
-
-            if (hasExceptions) {
-                invokeMethodBuilder.endControlFlow();
-                invokeMethodBuilder.beginControlFlow("catch(Exception e)");
-                invokeMethodBuilder.addStatement("throw new InvocationTargetException(e)");
-                invokeMethodBuilder.endControlFlow();
-            }
+            invokeMethod(aClass, invokeMethodBuilder, method);
 
         }
         invokeMethodBuilder.addCode("}\n");
@@ -71,7 +49,33 @@ public class IntrospectorMethodInvokerCreator {
         return invokeMethodBuilder.build();
     }
 
-    private void createInvocationParameters(MethodSpec.Builder invokeMethodBuilder, Method method) {
+    private void invokeMethod(Class<?> aClass, MethodSpec.Builder invokeMethodBuilder, Method method) {
+        final TypeName enclosingClassName = util.getClassName(aClass);
+        boolean hasExceptions = method.getExceptionTypes().length != 0;
+        if (hasExceptions) {
+            invokeMethodBuilder.beginControlFlow("try");
+        }
+
+        if (!method.getReturnType().getName().equals("void")) {
+            invokeMethodBuilder.addCode("  return  (($T) instance).$L(", enclosingClassName, method.getName());
+            addInvocationParameters(invokeMethodBuilder, method);
+            invokeMethodBuilder.addCode(");\n");
+        } else {
+            invokeMethodBuilder.addCode("  (($T) instance).$L(", enclosingClassName, method.getName());
+            addInvocationParameters(invokeMethodBuilder, method);
+            invokeMethodBuilder.addCode(");\n");
+            invokeMethodBuilder.addStatement("  return null");
+        }
+
+        if (hasExceptions) {
+            invokeMethodBuilder.endControlFlow();
+            invokeMethodBuilder.beginControlFlow("catch(Exception e)");
+            invokeMethodBuilder.addStatement("throw new InvocationTargetException(e)");
+            invokeMethodBuilder.endControlFlow();
+        }
+    }
+
+    private void addInvocationParameters(MethodSpec.Builder invokeMethodBuilder, Method method) {
         int indexParam = 0;
         for (Class<?> paramClass : method.getParameterTypes()) {
             final boolean isLast = indexParam == method.getParameterTypes().length - 1;

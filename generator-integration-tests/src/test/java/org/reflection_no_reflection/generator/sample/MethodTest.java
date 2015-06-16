@@ -235,7 +235,7 @@ public class MethodTest {
     }
 
     @Test
-    public void shouldReflectMethodWithException() throws ClassNotFoundException, InvocationTargetException {
+    public void shouldReflectMethodThrowingException() throws ClassNotFoundException, InvocationTargetException {
         //GIVEN
 
         //WHEN
