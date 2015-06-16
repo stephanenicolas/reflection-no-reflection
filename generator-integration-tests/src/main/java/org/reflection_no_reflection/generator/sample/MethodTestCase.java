@@ -1,6 +1,6 @@
 package org.reflection_no_reflection.generator.sample;
 
-import java.util.List;
+import java.util.ArrayList;
 import javax.inject.Inject;
 
 public class MethodTestCase {
@@ -25,7 +25,7 @@ public class MethodTestCase {
 
     @Inject public void methodWithVarArgsParam(String... s) {a=3;}
 
-    @Inject public void methodWithGenericsParam(List<String> s) {a=3;}
+    @Inject public void methodWithGenericsParam(ArrayList<String> s) {a=3;}
 
     @Inject public void methodWithException() throws Exception {a=3;}
 

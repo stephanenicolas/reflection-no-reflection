@@ -1,6 +1,7 @@
 package org.reflection_no_reflection.generator.sample;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -228,7 +229,7 @@ public class MethodTest {
         final Method method = methods.get(9);
         assertThat(method.getName(), is("methodWithGenericsParam"));
         assertThat(method.getParameterTypes().length, is(1));
-        assertThat(method.getParameterTypes()[0].getName(), is("java.util.List"));
+        assertThat(method.getParameterTypes()[0].getName(), is("java.util.ArrayList"));
         MethodTestCase methodTestCase = new MethodTestCase();
         method.invoke(methodTestCase, new ArrayList());
         assertThat(methodTestCase.a, is(3));
@@ -252,4 +253,18 @@ public class MethodTest {
         method.invoke(methodTestCase, new String[] {"s"});
         assertThat(methodTestCase.a, is(3));
     }
+
+    @Test(expected = InvocationTargetException.class)
+    public void shouldThrowExceptionToReflectMethodThatDoesNotExist() throws ClassNotFoundException, InvocationTargetException {
+        //GIVEN
+
+        //WHEN
+        Class<?> classFoo = Class.forName(METHOD_TEST_CASE_CLASS_NAME);
+
+        //THEN
+        final Method expected = new Method(classFoo, "foo", new Class[0], Class.forNameSafe("void"), new Class[0], Modifier.PUBLIC);
+        MethodTestCase methodTestCase = new MethodTestCase();
+        expected.invoke(methodTestCase);
+    }
+
 }

@@ -43,8 +43,9 @@ public class IntrospectorMethodInvokerCreator {
             invokeMethod(aClass, invokeMethodBuilder, method);
 
         }
+        invokeMethodBuilder.addCode("  default :\n");
+        invokeMethodBuilder.addStatement("throw new InvocationTargetException(new java.lang.NoSuchMethodException(\"method:\" + signature + \" not found\"))");
         invokeMethodBuilder.addCode("}\n");
-        invokeMethodBuilder.addStatement("return null");
 
         return invokeMethodBuilder.build();
     }
