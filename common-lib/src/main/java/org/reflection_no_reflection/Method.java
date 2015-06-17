@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -476,16 +477,23 @@ public class Method extends GenericDeclaration {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws NullPointerException {@inheritDoc}
-     * @since 1.5
-     */
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        if (annotationClass == null) {
-            throw new NullPointerException();
+    public <A extends java.lang.annotation.Annotation> A getAnnotation(java.lang.Class<A> annotationType) {
+        for (java.lang.annotation.Annotation annotation : annotationImplList) {
+            if (annotation.annotationType().equals(annotationType)) {
+                return (A) annotation;
+            }
         }
 
-        return (T) declaredAnnotations().get(annotationClass);
+        return null;
+    }
+
+    public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
+        return (A) declaredAnnotations.get(annotationType);
+    }
+
+    public Annotation[] getAnnotations() {
+        final Collection<Annotation> annotations = declaredAnnotations.values();
+        return annotations.toArray(new Annotation[annotations.size()]);
     }
 
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];

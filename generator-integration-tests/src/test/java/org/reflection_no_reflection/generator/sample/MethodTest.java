@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class MethodTest {
         assertThat(methods.size(), is(12));
     }
 
-    @Test @Ignore
+    @Test
     public void shouldDetectAnnotationsOfMethod() throws ClassNotFoundException {
         //GIVEN
 
@@ -52,8 +53,7 @@ public class MethodTest {
         //THEN
         final List<Method> methods = classFoo.getMethods();
         final Method method = methods.get(0);
-        assertThat(method.getAnnotations().length, is(1));
-        assertThat((Class) method.getAnnotations()[0].annotationType(), sameInstance((Class) Class.forNameSafe("javax.inject.Inject")));
+        assertThat(method.getAnnotation(Inject.class).annotationType(), sameInstance((java.lang.Class) Inject.class));
     }
 
     @Test
