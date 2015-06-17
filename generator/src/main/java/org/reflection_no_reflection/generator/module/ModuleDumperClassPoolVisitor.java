@@ -37,7 +37,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
     public static final ClassName METHOD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Method");
-    public static final ClassName CONSTRUCTOR_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "CONSTRUCTOR");
+    public static final ClassName CONSTRUCTOR_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Constructor");
     public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
     public static final ClassName LIST_TYPE_NAME = ClassName.get("java.util", "List");
     public static final TypeName ARRAY_OF_CLASSES_TYPE_NAME = ArrayTypeName.get(Class.class);
@@ -246,14 +246,14 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
         generateExceptions(loadClassMethodBuilder, constructor);
 
-        loadClassMethodBuilder.addStatement("$T m = new $T(c,paramTypeTab,exceptionTypeTab, $L)",
+        loadClassMethodBuilder.addStatement("$T co = new $T(c,paramTypeTab,exceptionTypeTab, $L)",
                                             CONSTRUCTOR_TYPE_NAME,
                                             CONSTRUCTOR_TYPE_NAME,
                                             constructor.getModifiers());
-        loadClassMethodBuilder.addStatement("c.addConstructor(m)");
+        loadClassMethodBuilder.addStatement("c.addConstructor(co)");
 
-        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", constructor.getDeclaredAnnotations());
-        loadClassMethodBuilder.addStatement("m.setIsVarArgs($L)", constructor.isVarArgs());
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, "co", constructor.getDeclaredAnnotations());
+        loadClassMethodBuilder.addStatement("co.setIsVarArgs($L)", constructor.isVarArgs());
 
         loadClassMethodBuilder.endControlFlow("");
     }

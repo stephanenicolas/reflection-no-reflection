@@ -5,5 +5,5 @@ import javax.inject.Inject;
 public class ConstructorTestCase {
     int a;
 
-    @Inject public void ConstructorTestCase() {a = 3;}
+    @Inject public ConstructorTestCase() {a = 3;}
 }

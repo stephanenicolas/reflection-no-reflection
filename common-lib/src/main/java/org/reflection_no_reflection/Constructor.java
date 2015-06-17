@@ -22,6 +22,7 @@ public class Constructor<T> extends GenericDeclaration implements Invokable {
     private ConstructorRepository genericInfo;
     private byte[] annotations;
     private byte[] parameterAnnotations;
+    private List<java.lang.annotation.Annotation> annotationImplList;
 
     // For non-public members or members in package-private classes,
     // it is necessary to perform somewhat expensive security checks.
@@ -438,10 +439,26 @@ public class Constructor<T> extends GenericDeclaration implements Invokable {
         }
     }
 
+    @SuppressWarnings({"unused", "called by generated code"})
+    public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
+        this.annotationImplList = annotationImplList;
+    }
+
+
     private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
 
     private synchronized Map<Class, Annotation> declaredAnnotations() {
         return declaredAnnotations;
+    }
+
+    public <A extends java.lang.annotation.Annotation> A getAnnotation(java.lang.Class<A> annotationType) {
+        for (java.lang.annotation.Annotation annotation : annotationImplList) {
+            if (annotation.annotationType().equals(annotationType)) {
+                return (A) annotation;
+            }
+        }
+
+        return null;
     }
 
     /**
