@@ -45,7 +45,7 @@ public class IntrospectorConstructorInvokerCreator {
 
         }
         newInstanceMethodBuilder.addCode("  default :\n");
-        newInstanceMethodBuilder.addStatement("throw new InvocationTargetException(new java.lang.NoSuchMethodException(\"method:\" + signature + \" not found\"))");
+        newInstanceMethodBuilder.addStatement("throw new InvocationTargetException(new java.lang.NoSuchMethodException(\"constructor:\" + signature + \" not found\"))");
         newInstanceMethodBuilder.addCode("}\n");
 
         return newInstanceMethodBuilder.build();
