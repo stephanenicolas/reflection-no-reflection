@@ -214,7 +214,38 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     private void generateMethod(MethodSpec.Builder loadClassMethodBuilder, Method method) {
         loadClassMethodBuilder.beginControlFlow("");
 
-        //params
+        generateParams(loadClassMethodBuilder, method);
+
+        generateExceptions(loadClassMethodBuilder, method);
+
+        loadClassMethodBuilder.addStatement("$T m = new $T(c,$S,paramTypeTab,Class.forNameSafe($S),exceptionTypeTab, $L)",
+                                            METHOD_TYPE_NAME,
+                                            METHOD_TYPE_NAME,
+                                            method.getName(),
+                                            method.getReturnType().getName(),
+                                            method.getModifiers());
+        loadClassMethodBuilder.addStatement("c.addMethod(m)");
+
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getDeclaredAnnotations());
+        loadClassMethodBuilder.addStatement("m.setIsVarArgs($L)", method.isVarArgs());
+
+        loadClassMethodBuilder.endControlFlow("");
+    }
+
+    private void generateExceptions(MethodSpec.Builder loadClassMethodBuilder, Method method) {
+        if (method.getExceptionTypes().length != 0) {
+            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
+            int indexException = 0;
+            for (Class<?> exceptionClass : method.getExceptionTypes()) {
+                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S)", indexException, exceptionClass.getName());
+                indexException++;
+            }
+        } else {
+            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
+        }
+    }
+
+    private void generateParams(MethodSpec.Builder loadClassMethodBuilder, Method method) {
         if (method.getParameterTypes().length != 0) {
             loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
             int indexParam = 0;
@@ -229,31 +260,6 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         } else {
             loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
         }
-
-        //exceptions
-        if (method.getExceptionTypes().length != 0) {
-            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
-            int indexException = 0;
-            for (Class<?> exceptionClass : method.getExceptionTypes()) {
-                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S)", indexException, exceptionClass.getName());
-                indexException++;
-            }
-        } else {
-            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
-        }
-
-        loadClassMethodBuilder.addStatement("$T m = new $T(c,$S,paramTypeTab,Class.forNameSafe($S),exceptionTypeTab, $L)",
-                                            METHOD_TYPE_NAME,
-                                            METHOD_TYPE_NAME,
-                                            method.getName(),
-                                            method.getReturnType().getName(),
-                                            method.getModifiers());
-        loadClassMethodBuilder.addStatement("c.addMethod(m)");
-
-        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getDeclaredAnnotations());
-        loadClassMethodBuilder.addStatement("m.setIsVarArgs($L)", method.isVarArgs());
-
-        loadClassMethodBuilder.endControlFlow("");
     }
 
     private void generateField(MethodSpec.Builder loadClassMethodBuilder, Field field) {
