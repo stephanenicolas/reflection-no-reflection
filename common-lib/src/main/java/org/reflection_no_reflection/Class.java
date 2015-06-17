@@ -776,7 +776,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         modules.add(module);
     }
 
-    public BaseReflector getReflector() {
+    public BaseReflector<T> getReflector() {
         return reflector;
     }
 

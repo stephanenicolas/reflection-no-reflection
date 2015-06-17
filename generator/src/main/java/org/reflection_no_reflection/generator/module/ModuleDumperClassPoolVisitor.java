@@ -17,7 +17,9 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
+import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
+import org.reflection_no_reflection.Invokable;
 import org.reflection_no_reflection.Method;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
 
@@ -35,6 +37,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final ClassName CLASS_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Class");
     public static final ClassName FIELD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Field");
     public static final ClassName METHOD_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Method");
+    public static final ClassName CONSTRUCTOR_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "CONSTRUCTOR");
     public static final ClassName ANNOTATION_TYPE_NAME = ClassName.get("org.reflection_no_reflection", "Annotation");
     public static final ClassName LIST_TYPE_NAME = ClassName.get("java.util", "List");
     public static final TypeName ARRAY_OF_CLASSES_TYPE_NAME = ArrayTypeName.get(Class.class);
@@ -176,6 +179,10 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             loadClassMethodBuilder.addStatement("$T c = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, clazzName);
             loadClassMethodBuilder.addStatement("classSet.add(c)");
 
+            for (Object constructorObj : clazz.getConstructors()) {
+                generateConstructor(loadClassMethodBuilder, (Constructor) constructorObj);
+            }
+
             for (Field field : clazz.getFields()) {
                 generateField(loadClassMethodBuilder, field);
             }
@@ -232,11 +239,30 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.endControlFlow("");
     }
 
-    private void generateExceptions(MethodSpec.Builder loadClassMethodBuilder, Method method) {
-        if (method.getExceptionTypes().length != 0) {
-            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
+    private void generateConstructor(MethodSpec.Builder loadClassMethodBuilder, Constructor constructor) {
+        loadClassMethodBuilder.beginControlFlow("");
+
+        generateParams(loadClassMethodBuilder, constructor);
+
+        generateExceptions(loadClassMethodBuilder, constructor);
+
+        loadClassMethodBuilder.addStatement("$T m = new $T(c,paramTypeTab,exceptionTypeTab, $L)",
+                                            CONSTRUCTOR_TYPE_NAME,
+                                            CONSTRUCTOR_TYPE_NAME,
+                                            constructor.getModifiers());
+        loadClassMethodBuilder.addStatement("c.addConstructor(m)");
+
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", constructor.getDeclaredAnnotations());
+        loadClassMethodBuilder.addStatement("m.setIsVarArgs($L)", constructor.isVarArgs());
+
+        loadClassMethodBuilder.endControlFlow("");
+    }
+
+    private void generateExceptions(MethodSpec.Builder loadClassMethodBuilder, Invokable invokable) {
+        if (invokable.getExceptionTypes().length != 0) {
+            loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, invokable.getExceptionTypes().length);
             int indexException = 0;
-            for (Class<?> exceptionClass : method.getExceptionTypes()) {
+            for (Class<?> exceptionClass : invokable.getExceptionTypes()) {
                 loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S)", indexException, exceptionClass.getName());
                 indexException++;
             }
@@ -245,11 +271,11 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         }
     }
 
-    private void generateParams(MethodSpec.Builder loadClassMethodBuilder, Method method) {
-        if (method.getParameterTypes().length != 0) {
-            loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getParameterTypes().length);
+    private void generateParams(MethodSpec.Builder loadClassMethodBuilder, Invokable invokable) {
+        if (invokable.getParameterTypes().length != 0) {
+            loadClassMethodBuilder.addStatement("$T[] paramTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, invokable.getParameterTypes().length);
             int indexParam = 0;
-            for (Class<?> paramClass : method.getParameterTypes()) {
+            for (Class<?> paramClass : invokable.getParameterTypes()) {
                 //TODO handle generics T[]
                 //type is null
                 if (paramClass != null) {

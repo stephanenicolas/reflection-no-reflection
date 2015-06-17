@@ -1,5 +1,6 @@
 package org.reflection_no_reflection;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -8,10 +9,7 @@ import java.util.Map;
 import sun.reflect.generics.factory.GenericsFactory;
 import sun.reflect.generics.repository.ConstructorRepository;
 
-/**
- * @author SNI.
- */
-public class Constructor<T> extends GenericDeclaration {
+public class Constructor<T> extends GenericDeclaration implements Invokable {
 
     private Class<T> clazz;
     private int slot;
@@ -36,6 +34,7 @@ public class Constructor<T> extends GenericDeclaration {
     // Modifiers that can be applied to a constructor in source code
     private static final int LANGUAGE_MODIFIERS =
         Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE;
+    private boolean isVarArgs;
 
     // Generics infrastructure
     // Accessor for factory
@@ -376,7 +375,11 @@ public class Constructor<T> extends GenericDeclaration {
      * @since 1.5
      */
     public boolean isVarArgs() {
-        throw new UnsupportedOperationException();
+        return isVarArgs;
+    }
+
+    public void setIsVarArgs(boolean isVarArgs) {
+        this.isVarArgs = isVarArgs;
     }
 
     /**
@@ -459,5 +462,13 @@ public class Constructor<T> extends GenericDeclaration {
      */
     public Annotation[][] getParameterAnnotations() {
         throw new UnsupportedOperationException();
+    }
+
+    public T newInstance(Object... initargs)
+        throws InstantiationException,
+        IllegalAccessException,
+        IllegalArgumentException,
+        InvocationTargetException {
+        return getDeclaringClass().getReflector().newInstance(toString(), initargs);
     }
 }

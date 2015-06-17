@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * @author SNI.
  */
-public class BaseReflector {
+public class BaseReflector<T> {
 
     public void setObjectField(Object instance, String fieldName, Object value) {
         throw new UnsupportedOperationException();
@@ -46,4 +46,9 @@ public class BaseReflector {
     public Object invokeMethod(Object instance, String methodName, String signature, Object...params) throws InvocationTargetException {
         throw new UnsupportedOperationException();
     }
+
+    public T newInstance(String signature, Object...params) throws InvocationTargetException {
+        throw new UnsupportedOperationException();
+    }
+
 }
