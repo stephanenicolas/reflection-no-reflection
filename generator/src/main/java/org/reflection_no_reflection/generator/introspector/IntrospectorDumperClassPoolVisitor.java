@@ -99,7 +99,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         final MethodSpec setCharFieldMethod = setterCreator.createSetCharFieldMethod(aClass);
         final MethodSpec setBooleanFieldMethod = setterCreator.createSetBooleanFieldMethod(aClass);
 
-        final MethodSpec methodInvokerMethod = constructorInvokerCreator.createConstructorInvoker(aClass);
+        final MethodSpec methodInvokerMethod = methodInvokerCreator.createMethodInvoker(aClass);
         final MethodSpec constructorInvokerMethod = constructorInvokerCreator.createConstructorInvoker(aClass);
 
 
