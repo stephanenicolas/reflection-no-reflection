@@ -55,9 +55,6 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
         if (indexOfChevron != -1) {
             name = name.substring(0, indexOfChevron);
         }
-        System.out.println("case for " + name);
-
-        System.out.println("Creating class by name for " + name);
         this.name = name;
         if (isPrimitive(name)) {
             this.isPrimitive = true;

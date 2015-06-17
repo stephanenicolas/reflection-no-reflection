@@ -152,6 +152,6 @@ public class ClassTest {
         final Class stringList = Class.forNameSafe("java.util.List<String>");
 
         //THEN
-        assertThat(stringList.getName(),is("java.util.List<String>"));
+        assertThat(stringList.getName(),is("java.util.List"));
     }
 }

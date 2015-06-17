@@ -246,7 +246,6 @@ public class Processor extends AbstractProcessor {
         Class component = null;
         GenericDeclaration declaration = null;
 
-        System.out.println("Creating class by element for " + typeMirror.toString());
         if (typeMirror instanceof DeclaredType) {
             className = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getQualifiedName().toString();
             if (!((DeclaredType) typeMirror).getTypeArguments().isEmpty()) {
@@ -265,10 +264,8 @@ public class Processor extends AbstractProcessor {
             isInterface = ((com.sun.tools.javac.code.Type) typeMirror).isInterface();
             final int indexOfChevron = className.indexOf('<');
             if (indexOfChevron != -1) {
-                System.out.println("Processing with chevron");
                 className = className.substring(0, indexOfChevron);
             }
-            System.out.println("Processing " + className + " is interface " + isInterface);
             if (level + 1 <= maxLevel) {
                 final List<? extends Element> enclosedElements = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getEnclosedElements();
                 for (Element enclosedElement : enclosedElements) {
@@ -286,7 +283,6 @@ public class Processor extends AbstractProcessor {
         }
 
         result = Class.forNameSafe(className, level);
-        System.out.println("Created class by element for " + typeMirror.toString() + ":" + result);
 
         if (isArray) {
             result.setIsArray(true);

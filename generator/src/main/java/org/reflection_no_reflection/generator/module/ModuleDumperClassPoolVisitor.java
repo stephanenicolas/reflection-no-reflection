@@ -166,7 +166,11 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         for (Class clazz : classList) {
             String clazzName = clazz.getName();
             final String simpleClazzName = clazz.getSimpleName();
-            final String packageName = clazzName.substring(0, clazzName.lastIndexOf('.'));
+            final int endIndex = clazzName.lastIndexOf('.');
+            if (endIndex == -1) {
+                continue;
+            }
+            final String packageName = clazzName.substring(0, endIndex);
 
             loadClassMethodBuilder.beginControlFlow("case $S:", clazzName);
             loadClassMethodBuilder.addStatement("$T c = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, clazzName);
@@ -182,7 +186,6 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
             doGenerateSetReflector(loadClassMethodBuilder, clazz, simpleClazzName, packageName);
             loadClassMethodBuilder.addStatement("c.setModifiers($L)", clazz.getModifiers());
-            System.out.println("Generating " + clazz.getName() + " is interface " + clazz.isInterface());
             loadClassMethodBuilder.addStatement("c.setIsInterface($L)", clazz.isInterface());
             loadClassMethodBuilder.addStatement("return c");
             loadClassMethodBuilder.endControlFlow();
@@ -219,8 +222,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                 //TODO handle generics T[]
                 //type is null
                 if (paramClass != null) {
-                    System.out.println("param " + paramClass);
-                    loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S, true)", indexParam, paramClass.getName());
+                    loadClassMethodBuilder.addStatement("paramTypeTab[$L] = Class.forNameSafe($S)", indexParam, paramClass.getName());
                     indexParam++;
                 }
             }
@@ -233,14 +235,14 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[$L]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME, method.getExceptionTypes().length);
             int indexException = 0;
             for (Class<?> exceptionClass : method.getExceptionTypes()) {
-                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S, true)", indexException, exceptionClass.getName());
+                loadClassMethodBuilder.addStatement("exceptionTypeTab[$L] = Class.forNameSafe($S)", indexException, exceptionClass.getName());
                 indexException++;
             }
         } else {
             loadClassMethodBuilder.addStatement("$T[] exceptionTypeTab = new $T[0]", ARRAY_OF_CLASSES_TYPE_NAME, ARRAY_OF_CLASSES_TYPE_NAME);
         }
 
-        loadClassMethodBuilder.addStatement("$T m = new $T(c,$S,paramTypeTab,Class.forNameSafe($S, true),exceptionTypeTab, $L)",
+        loadClassMethodBuilder.addStatement("$T m = new $T(c,$S,paramTypeTab,Class.forNameSafe($S),exceptionTypeTab, $L)",
                                             METHOD_TYPE_NAME,
                                             METHOD_TYPE_NAME,
                                             method.getName(),
@@ -256,7 +258,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
     private void generateField(MethodSpec.Builder loadClassMethodBuilder, Field field) {
         loadClassMethodBuilder.beginControlFlow("");
-        loadClassMethodBuilder.addStatement("$T f = new $T($S,Class.forNameSafe($S, true),c,$L,null)", FIELD_TYPE_NAME, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), field.getModifiers());
+        loadClassMethodBuilder.addStatement("$T f = new $T($S,Class.forNameSafe($S),c,$L,null)", FIELD_TYPE_NAME, FIELD_TYPE_NAME, field.getName(), field.getType().getName(), field.getModifiers());
         loadClassMethodBuilder.addStatement("c.addField(f)");
 
         final String memberInGenCode = "f";
@@ -270,7 +272,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             loadClassMethodBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, declaredAnnotations.length);
             for (Annotation annotation : declaredAnnotations) {
                 loadClassMethodBuilder.beginControlFlow("");
-                loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, annotation.annotationType().getName());
+                loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotation.annotationType().getName());
                 loadClassMethodBuilder.addStatement("a.setModifiers($L)", annotation.annotationType().getModifiers());
                 loadClassMethodBuilder.addStatement("classSet.add(a)");
                 loadClassMethodBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));

@@ -42,7 +42,7 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
     @Override
     public <T> void visit(Class<T> clazz) {
         //TODO add all protected java & android packages
-        if (!clazz.getName().startsWith("java")) {
+        if (!clazz.getName().startsWith("java") && clazz.getName().indexOf('.') != -1) {
             classList.add(clazz);
         }
     }

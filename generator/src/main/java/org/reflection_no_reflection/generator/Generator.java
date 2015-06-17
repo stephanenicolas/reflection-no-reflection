@@ -43,7 +43,7 @@ public class Generator extends AbstractProcessor {
 
         if (annotations.isEmpty() || roundEnv.processingOver()) {
             //module creation
-            HashSet<Class> annotatedClassSet = new HashSet<>(processor.getAnnotatedClassSet());
+            Set<Class> annotatedClassSet = Class.getClassPool();
             ModuleDumperClassPoolVisitor moduleDumper = new ModuleDumperClassPoolVisitor();
             moduleDumper.setTargetPackageName(targetPackageName);
             moduleDumper.getMapAnnotationTypeToClassContainingAnnotation().putAll(processor.getMapAnnotationTypeToClassContainingAnnotation());
@@ -92,7 +92,7 @@ public class Generator extends AbstractProcessor {
         }
     }
 
-    private JavaFile createRnRModuleJavaFile(HashSet<Class> annotatedClassSet, ModuleDumperClassPoolVisitor dumper) {
+    private JavaFile createRnRModuleJavaFile(Set<Class> annotatedClassSet, ModuleDumperClassPoolVisitor dumper) {
         ClassPoolVisitStrategy visitor = new ClassPoolVisitStrategy();
         visitor.visit(annotatedClassSet, dumper);
         return dumper.getJavaFile();
