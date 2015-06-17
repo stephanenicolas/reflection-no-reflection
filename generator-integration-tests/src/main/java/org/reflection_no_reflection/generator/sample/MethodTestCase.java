@@ -38,8 +38,6 @@ public class MethodTestCase {
     //all primitives return types & params
     //static, final, abstract
     //generics param and return types (wildcard, intersection and upperbounds)
-    //exceptions
-    //arrays param and return types
     //private
     //generics methods
 }
