@@ -90,7 +90,7 @@ public class Constructor<T> extends GenericDeclaration implements Invokable {
      * class.
      */
     public String getName() {
-        return getDeclaringClass().getName();
+        return getDeclaringClass().getSimpleName();
     }
 
     /**
@@ -483,8 +483,6 @@ public class Constructor<T> extends GenericDeclaration implements Invokable {
 
     public T newInstance(Object... initargs)
         throws InstantiationException,
-        IllegalAccessException,
-        IllegalArgumentException,
         InvocationTargetException {
         return getDeclaringClass().getReflector().newInstance(toString(), initargs);
     }

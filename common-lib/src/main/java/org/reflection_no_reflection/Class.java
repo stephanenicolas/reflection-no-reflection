@@ -37,7 +37,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
     private Class<?>[] classes;
     private List<Field> fields = new ArrayList<>();
     private List<Method> methods = new ArrayList<>();
-    private List<Constructor<?>> constructors = new ArrayList<>();
+    private List<Constructor<T>> constructors = new ArrayList<>();
     private List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
     private GenericDeclaration genericInfo;
     private Constructor<?> enclosingConstructor;
@@ -1241,7 +1241,7 @@ public class Class<T> extends GenericDeclaration implements java.io.Serializable
      * </ul>
      * @since JDK1.1
      */
-    public List<Constructor<?>> getConstructors() throws SecurityException {
+    public List<Constructor<T>> getConstructors() throws SecurityException {
         return constructors;
     }
 
