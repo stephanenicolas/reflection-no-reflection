@@ -67,8 +67,8 @@ public class ConstructorTest {
         final List<Constructor<ConstructorTestCase>> constructors = classFoo.getConstructors();
         final Constructor<ConstructorTestCase> constructor = constructors.get(0);
         assertThat(constructor.getName(), is("ConstructorTestCase"));
-        //ConstructorTestCase methodTestCase = constructor.newInstance();
-        //assertThat(methodTestCase.a, is(3));
+        ConstructorTestCase methodTestCase = constructor.newInstance();
+        assertThat(methodTestCase.a, is(3));
     }
 
 }
