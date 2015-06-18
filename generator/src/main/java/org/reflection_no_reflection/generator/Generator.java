@@ -32,7 +32,9 @@ public class Generator extends AbstractProcessor {
         this.processingEnv = processingEnv;
         //comma separated list of injected classes
         processor.init(processingEnv);
-        processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(javax.inject.Inject.class.getName())));
+        processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(javax.inject.Inject.class.getName(),
+                                                                        SuppressWarnings.class.getName())));
+        processor.setMaxLevel(2);
         System.out.println("RNR Generator created.");
     }
 

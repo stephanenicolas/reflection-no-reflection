@@ -1,6 +1,8 @@
 package org.reflection_no_reflection.generator.annotation;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -65,21 +67,62 @@ public class AnnotationCreatorClassPoolVisitor implements ClassPoolVisitor {
         return javaFiles;
     }
 
-    private JavaFile buildAnnotationImpl(Class<? extends Annotation> aClass) {
-        String aClassName = aClass.getName();
+    private JavaFile buildAnnotationImpl(Class<? extends Annotation> annotationClass) {
+        String aClassName = annotationClass.getName();
         MethodSpec annotationTypeMethod = MethodSpec.methodBuilder("annotationType")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .returns(ClassName.get(java.lang.Class.class))
-            .addStatement("return $L.class",aClassName)
+            .addStatement("return $L.class", aClassName)
             .build();
 
-        //TODO add other methods define by the annotations
-        TypeSpec annotationImplType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Impl")
+        TypeSpec.Builder annotationImplType = TypeSpec.classBuilder(annotationClass.getSimpleName() + "$$Impl")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addSuperinterface(util.getClassName(aClass))
-            .addMethod(annotationTypeMethod)
+            .addSuperinterface(util.getClassName(annotationClass))
+            .addMethod(annotationTypeMethod);
+
+        System.out.println("annotation methods " + annotationClass.getMethods().size());
+        System.out.println("annotation fields " + annotationClass.getFields().length);
+        System.out.println("annotation " + annotationClass.toString());
+
+        for (Method method : annotationClass.getMethods()) {
+            TypeName type;
+            if (method.getReturnType().isArray()) {
+                type = ArrayTypeName.get(method.getReturnType().getComponentType());
+            } else {
+                type = TypeName.get(method.getReturnType());
+            }
+            FieldSpec field = FieldSpec.builder(type, method.getName(), Modifier.PRIVATE).build();
+            annotationImplType.addField(field);
+
+            MethodSpec setterMethod = createSetterMethod(type, method.getName());
+            annotationImplType.addMethod(setterMethod);
+            MethodSpec getterMethod = createGetterMethod(type, method.getName());
+            annotationImplType.addMethod(getterMethod);
+        }
+
+        return JavaFile.builder(targetPackageName, annotationImplType.build()).build();
+    }
+
+    private MethodSpec createSetterMethod(TypeName type, String fieldName) {
+        return createPrefixedMethod("set", fieldName)
+            .addParameter(type, fieldName)
             .build();
-        return JavaFile.builder(targetPackageName, annotationImplType).build();
+    }
+
+    private MethodSpec createGetterMethod(TypeName type, String fieldName) {
+        return createPrefixedMethod("get", fieldName)
+            .returns(type)
+            .build();
+    }
+
+    private MethodSpec.Builder createPrefixedMethod(String prefix, String fieldName) {
+        final String capitalizedFieldName = createCapitalizedName(fieldName);
+        String methodName = prefix + capitalizedFieldName;
+        return MethodSpec.methodBuilder(methodName);
+    }
+
+    private String createCapitalizedName(String fieldName) {
+        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
     public void setTargetPackageName(String targetPackageName) {

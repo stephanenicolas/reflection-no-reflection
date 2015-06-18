@@ -212,7 +212,8 @@ public class Processor extends AbstractProcessor {
         final List<Annotation> annotations = new ArrayList<>();
         for (AnnotationMirror annotationMirror : annotatedElement.getAnnotationMirrors()) {
             final Map<Method, Object> mapMethodToValue = new HashMap<>();
-            final Class<?> annotationClass = Class.forNameSafe(annotationMirror.getAnnotationType().toString(), level);
+
+            final Class<?> annotationClass = createClass(annotationMirror.getAnnotationType(), level);
             annotationClass.setModifiers(annotationClass.getModifiers() | Class.ANNOTATION);
             annotationClasses.add(annotationClass);
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
