@@ -36,7 +36,8 @@ public class ClassTest {
         //WHEN
 
         //THEN
-        assertThat(Class.getClassPool().size(), is(1));
+        assertThat(Class.getClassPool().size() >= 1, is(true));
+        assertThat(Class.getClassPool().contains(stringClass), is(true));
     }
 
     @Test
@@ -55,7 +56,8 @@ public class ClassTest {
     public void classForNameShouldFailIfClassDoesNotExist() throws Exception {
         //GIVEN
         //WHEN
-        final Class stringClass = Class.forName("java.lang.String");
+        Class.forName("foo.bar.Qurtz");
+
         //THEN
     }
 

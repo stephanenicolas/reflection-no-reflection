@@ -87,7 +87,9 @@ public class AnnotationCreatorClassPoolVisitor implements ClassPoolVisitor {
         for (Method method : annotationClass.getMethods()) {
             TypeName type;
             if (method.getReturnType().isArray()) {
-                type = ArrayTypeName.get(method.getReturnType().getComponentType());
+                //important to use the component here as there is no method get(TypeName)
+                //we fail to be detected as an array (see ArrayTypeName.get implementation)
+                type = ArrayTypeName.of(util.getClassName(method.getReturnType().getComponentType()));
             } else {
                 type = TypeName.get(method.getReturnType());
             }
@@ -105,13 +107,17 @@ public class AnnotationCreatorClassPoolVisitor implements ClassPoolVisitor {
 
     private MethodSpec createSetterMethod(TypeName type, String fieldName) {
         return createPrefixedMethod("set", fieldName)
+            .addModifiers(Modifier.PUBLIC)
             .addParameter(type, fieldName)
+            .addStatement("this.$L = $L", fieldName, fieldName)
             .build();
     }
 
     private MethodSpec createGetterMethod(TypeName type, String fieldName) {
-        return createPrefixedMethod("get", fieldName)
+        return MethodSpec.methodBuilder(fieldName)
+            .addModifiers(Modifier.PUBLIC)
             .returns(type)
+            .addStatement("return $L", fieldName)
             .build();
     }
 
