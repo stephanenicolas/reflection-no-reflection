@@ -25,11 +25,28 @@ public class IntrospectorUtil {
         } else {
             //for primitives
             switch (className) {
+                case "short" :
+                    return TypeName.get(short.class);
+                case "byte" :
+                    return TypeName.get(byte.class);
                 case "int" :
                     return TypeName.get(int.class);
+                case "long" :
+                    return TypeName.get(long.class);
+                case "float" :
+                    return TypeName.get(float.class);
+                case "double" :
+                    return TypeName.get(double.class);
+                case "boolean" :
+                    return TypeName.get(boolean.class);
+                case "char" :
+                    return TypeName.get(char.class);
             }
-            return null;
+            throw new RuntimeException("Impossible to get typename for " + className);
         }
     }
 
+    public String createCapitalizedName(String fieldName) {
+        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+    }
 }

@@ -122,13 +122,9 @@ public class AnnotationCreatorClassPoolVisitor implements ClassPoolVisitor {
     }
 
     private MethodSpec.Builder createPrefixedMethod(String prefix, String fieldName) {
-        final String capitalizedFieldName = createCapitalizedName(fieldName);
+        final String capitalizedFieldName = util.createCapitalizedName(fieldName);
         String methodName = prefix + capitalizedFieldName;
         return MethodSpec.methodBuilder(methodName);
-    }
-
-    private String createCapitalizedName(String fieldName) {
-        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
     public void setTargetPackageName(String targetPackageName) {

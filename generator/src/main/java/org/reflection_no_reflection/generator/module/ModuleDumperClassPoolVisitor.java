@@ -21,6 +21,7 @@ import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.Invokable;
 import org.reflection_no_reflection.Method;
+import org.reflection_no_reflection.generator.introspector.IntrospectorUtil;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
 
 /**
@@ -44,6 +45,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final ClassName ARRAYLIST_TYPE_NAME = ClassName.get("java.util", "ArrayList");
 
     private String targetPackageName;
+    private IntrospectorUtil util = new IntrospectorUtil();
 
     public ModuleDumperClassPoolVisitor() {
 
@@ -307,7 +309,24 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                 loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotation.annotationType().getName());
                 loadClassMethodBuilder.addStatement("a.setModifiers($L)", annotation.annotationType().getModifiers());
                 loadClassMethodBuilder.addStatement("classSet.add(a)");
-                loadClassMethodBuilder.addStatement("annotationImplTab.add(new $T())", ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl"));
+                final ClassName annotationImplClassName = ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl");
+                loadClassMethodBuilder.addStatement("$T aImpl = new $T()", annotationImplClassName, annotationImplClassName);
+                for (Method method : annotation.getMethods()) {
+                    try {
+                        final Object value = annotation.getValue(method.getName());
+                        if (method.getReturnType().getName().equals("java.lang.String")) {
+                            loadClassMethodBuilder.addStatement("aImpl.set$L($S)", util.createCapitalizedName(method.getName()), value);
+                        } else if (method.getReturnType().getName().equals("java.lang.String[]")) {
+                            loadClassMethodBuilder.addStatement("aImpl.set$L(new String[] {$S})", util.createCapitalizedName(method.getName()), value);
+                        } else {
+                            loadClassMethodBuilder.addStatement("aImpl.set$L($L)", util.createCapitalizedName(method.getName()), value);
+                        }
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                loadClassMethodBuilder.addStatement("annotationImplTab.add(aImpl)");
                 loadClassMethodBuilder.endControlFlow();
             }
             loadClassMethodBuilder.addStatement(memberInGenCode + ".setAnnotationImplList(annotationImplTab)");
