@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import sun.reflect.generics.repository.MethodRepository;
 
-public class Method extends GenericDeclaration implements Invokable {
+public class Method extends Member implements GenericDeclaration, Invokable {
     private Class clazz;
     private int slot;
     // This is guaranteed to be interned by the VM in the 1.4
@@ -558,4 +558,5 @@ public class Method extends GenericDeclaration implements Invokable {
     public Annotation[][] getParameterAnnotations() {
         throw new UnsupportedOperationException();
     }
+
 }

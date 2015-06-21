@@ -9,7 +9,7 @@ import java.util.List;
  * can contain extra methods if required.
  * Subclass will provide their own implementations of the various field methods.
  */
-public class Field {
+public class Field extends Member {
 
     private String name;
     private final Class<?> type;
@@ -51,7 +51,7 @@ public class Field {
         return null;
     }
 
-    public Annotation[] getDeclaredAnnotations() {
+    public Annotation[] getAnnotations() {
         if (annotationList == null) {
             return new Annotation[0];
         }

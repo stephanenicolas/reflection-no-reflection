@@ -28,6 +28,7 @@ import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.GenericDeclaration;
+import org.reflection_no_reflection.GenericDeclarationImpl;
 import org.reflection_no_reflection.Method;
 import org.reflection_no_reflection.TypeVariable;
 import org.reflection_no_reflection.TypeVariableImpl;
@@ -245,12 +246,12 @@ public class Processor extends AbstractProcessor {
         boolean isArray = false;
         boolean isInterface = false;
         Class component = null;
-        GenericDeclaration declaration = null;
+        GenericDeclarationImpl declaration = null;
 
         if (typeMirror instanceof DeclaredType) {
             className = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getQualifiedName().toString();
             if (!((DeclaredType) typeMirror).getTypeArguments().isEmpty()) {
-                declaration = new GenericDeclaration();
+                declaration = new GenericDeclarationImpl();
                 TypeVariable[] typesVariables = new TypeVariable[((DeclaredType) typeMirror).getTypeArguments().size()];
                 int index = 0;
                 for (TypeMirror mirror : ((DeclaredType) typeMirror).getTypeArguments()) {

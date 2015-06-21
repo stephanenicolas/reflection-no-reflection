@@ -33,7 +33,7 @@ public class AnnotationTest {
         final Field field = fields[0];
         assertThat(field.getName(), is("a"));
         assertThat(field.getType().getName(), is("java.lang.String"));
-        //fails assertThat(field.getDeclaredAnnotations().length, is(1));
+        //fails assertThat(field.getAnnotations().length, is(1));
         //TODO solve which annotation to return RnR or runtime reflect
         assertThat(field.getAnnotation(SuppressWarnings.class), notNullValue());
         assertThat(field.getAnnotation(SuppressWarnings.class).value()[0], is("unused"));

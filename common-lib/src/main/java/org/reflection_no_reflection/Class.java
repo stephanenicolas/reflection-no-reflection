@@ -12,10 +12,7 @@ import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
 import sun.reflect.annotation.AnnotationType;
 
-/**
- * @author SNI.
- */
-public class Class<T> extends GenericDeclaration implements java.io.Serializable,
+public class Class<T> implements GenericDeclaration, java.io.Serializable,
     java.lang.reflect.Type {
 
     public static final int ANNOTATION = 0x00002000;

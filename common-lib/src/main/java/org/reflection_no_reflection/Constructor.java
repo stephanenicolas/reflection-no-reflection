@@ -9,7 +9,7 @@ import java.util.Map;
 import sun.reflect.generics.factory.GenericsFactory;
 import sun.reflect.generics.repository.ConstructorRepository;
 
-public class Constructor<T> extends GenericDeclaration implements Invokable {
+public class Constructor<T> implements GenericDeclaration, Invokable {
 
     private Class<T> clazz;
     private int slot;

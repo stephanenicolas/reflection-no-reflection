@@ -296,7 +296,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.addStatement("c.addField(f)");
 
         final String memberInGenCode = "f";
-        final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
+        final Annotation[] declaredAnnotations = field.getAnnotations();
         doGenerateAnnotationsForMember(loadClassMethodBuilder, memberInGenCode, declaredAnnotations);
         loadClassMethodBuilder.endControlFlow();
     }

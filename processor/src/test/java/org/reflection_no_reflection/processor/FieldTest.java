@@ -36,7 +36,7 @@ public class FieldTest extends AbstractRnRTest {
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getDeclaredAnnotations();
+        final Annotation[] annotations = aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
@@ -69,7 +69,7 @@ public class FieldTest extends AbstractRnRTest {
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getDeclaredAnnotations();
+        final Annotation[] annotations = aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class suppressWarningsAnnotationClass = Class.forName("java.lang.SuppressWarnings");

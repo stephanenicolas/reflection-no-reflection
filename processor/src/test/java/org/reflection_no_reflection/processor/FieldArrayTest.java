@@ -2,7 +2,6 @@ package org.reflection_no_reflection.processor;
 
 import java.lang.reflect.Modifier;
 import java.util.Set;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
@@ -39,7 +38,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         assertThat(aField.getType().getComponentType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getDeclaredAnnotations();
+        final Annotation[] annotations = aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
@@ -73,7 +72,7 @@ public class FieldArrayTest extends AbstractRnRTest {
         assertThat(aField.getType().getComponentType(), is((Class) Class.forName("int")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getDeclaredAnnotations();
+        final Annotation[] annotations = aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");

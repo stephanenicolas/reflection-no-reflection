@@ -21,7 +21,7 @@ public class ClassPoolVisitStrategy {
             classPoolVisitor.visit(aClass);
 
             for (Field field : aClass.getFields()) {
-                for (Annotation annotation : field.getDeclaredAnnotations()) {
+                for (Annotation annotation : field.getAnnotations()) {
                     visitAnnotation(annotation, classPoolVisitor);
                 }
 
