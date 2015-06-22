@@ -296,7 +296,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.addStatement("c.addField(f)");
 
         final String memberInGenCode = "f";
-        final Annotation[] declaredAnnotations = field.getAnnotations();
+        final Annotation[] declaredAnnotations = (Annotation[]) field.getAnnotations();
         doGenerateAnnotationsForMember(loadClassMethodBuilder, memberInGenCode, declaredAnnotations);
         loadClassMethodBuilder.endControlFlow();
     }
@@ -306,10 +306,10 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             loadClassMethodBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, declaredAnnotations.length);
             for (Annotation annotation : declaredAnnotations) {
                 loadClassMethodBuilder.beginControlFlow("");
-                loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotation.annotationType().getName());
-                loadClassMethodBuilder.addStatement("a.setModifiers($L)", annotation.annotationType().getModifiers());
+                loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotation.rnrAnnotationType().getName());
+                loadClassMethodBuilder.addStatement("a.setModifiers($L)", annotation.rnrAnnotationType().getModifiers());
                 loadClassMethodBuilder.addStatement("classSet.add(a)");
-                final ClassName annotationImplClassName = ClassName.get(targetPackageName, annotation.annotationType().getSimpleName() + "$$Impl");
+                final ClassName annotationImplClassName = ClassName.get(targetPackageName, annotation.rnrAnnotationType().getSimpleName() + "$$Impl");
                 loadClassMethodBuilder.addStatement("$T aImpl = new $T()", annotationImplClassName, annotationImplClassName);
                 for (Method method : annotation.getMethods()) {
                     try {

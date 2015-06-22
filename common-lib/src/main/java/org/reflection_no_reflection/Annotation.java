@@ -9,7 +9,7 @@ import java.util.Map;
  * Base class of all the annotation classes inside the RNR framework.
  * @author SNI
  */
-public class Annotation {
+public class Annotation implements java.lang.annotation.Annotation {
 
     /** The class name of this annotation type. */
     private Class<? extends Annotation> annotationType;
@@ -58,8 +58,11 @@ public class Annotation {
         return result;
     }
 
-    public Class<? extends Annotation> annotationType() {
+    public Class<? extends Annotation> rnrAnnotationType() {
         return annotationType;
     }
 
+    public java.lang.Class<? extends Annotation> annotationType() {
+        throw new RuntimeException("This method cannot be called on an RNR annotation during annotation processing. You may want to invoke rnrAnnotationType().");
+    }
 }

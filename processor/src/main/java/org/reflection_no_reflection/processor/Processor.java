@@ -27,7 +27,6 @@ import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
-import org.reflection_no_reflection.GenericDeclaration;
 import org.reflection_no_reflection.GenericDeclarationImpl;
 import org.reflection_no_reflection.Method;
 import org.reflection_no_reflection.TypeVariable;
@@ -111,7 +110,7 @@ public class Processor extends AbstractProcessor {
         int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
         final Class<?> enclosingClass = Class.forNameSafe(declaringClassName, level + 1);
         if (level == 0) {
-            final Class<? extends Annotation> annotationType = annotations.get(0).annotationType();
+            final Class<? extends Annotation> annotationType = annotations.get(0).rnrAnnotationType();
             Set<Class<?>> classes = mapAnnotationTypeToClassContainingAnnotation.get(annotationType);
             if (classes == null) {
                 classes = new HashSet<>();

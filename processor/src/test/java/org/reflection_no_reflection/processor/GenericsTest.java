@@ -44,11 +44,11 @@ public class GenericsTest extends AbstractRnRTest {
 
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getAnnotations();
+        final Annotation[] annotations = (Annotation[]) aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
-        assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
+        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) aField.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 }

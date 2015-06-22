@@ -487,11 +487,11 @@ public class Method extends Member implements GenericDeclaration, Invokable {
         return null;
     }
 
-    public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
+    public <A extends Annotation> A getRnrAnnotation(Class<A> annotationType) {
         return (A) declaredAnnotations.get(annotationType);
     }
 
-    public Annotation[] getAnnotations() {
+    public Annotation[] getRnrAnnotations() {
         final Collection<Annotation> annotations = declaredAnnotations.values();
         return annotations.toArray(new Annotation[annotations.size()]);
     }
@@ -508,7 +508,7 @@ public class Method extends Member implements GenericDeclaration, Invokable {
     public void setDeclaredAnnotations(List<Annotation> annotations) {
         declaredAnnotations.clear();
         for (Annotation annotation : annotations) {
-            declaredAnnotations.put(annotation.annotationType(), annotation);
+            declaredAnnotations.put(annotation.rnrAnnotationType(), annotation);
         }
     }
 
@@ -519,6 +519,13 @@ public class Method extends Member implements GenericDeclaration, Invokable {
     @SuppressWarnings({"unused", "called by generated code"})
     public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
         this.annotationImplList = annotationImplList;
+    }
+
+    public java.lang.annotation.Annotation[] getAnnotations() {
+        if (annotationImplList == null) {
+            return new java.lang.annotation.Annotation[0];
+        }
+        return annotationImplList.toArray(new java.lang.annotation.Annotation[annotationImplList.size()]); //not implemented
     }
 
     /**
@@ -555,7 +562,7 @@ public class Method extends Member implements GenericDeclaration, Invokable {
      * Method object
      * @since 1.5
      */
-    public Annotation[][] getParameterAnnotations() {
+    public java.lang.annotation.Annotation[][] getParameterAnnotations() {
         throw new UnsupportedOperationException();
     }
 

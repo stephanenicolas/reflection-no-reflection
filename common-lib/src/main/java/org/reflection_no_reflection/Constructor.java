@@ -9,7 +9,7 @@ import java.util.Map;
 import sun.reflect.generics.factory.GenericsFactory;
 import sun.reflect.generics.repository.ConstructorRepository;
 
-public class Constructor<T> implements GenericDeclaration, Invokable {
+public class Constructor<T> extends Member implements GenericDeclaration, Invokable {
 
     private Class<T> clazz;
     private int slot;
@@ -415,12 +415,19 @@ public class Constructor<T> implements GenericDeclaration, Invokable {
      * @throws NullPointerException {@inheritDoc}
      * @since 1.5
      */
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+    public <T extends Annotation> T getRnrAnnotation(Class<T> annotationClass) {
         if (annotationClass == null) {
             throw new NullPointerException();
         }
 
         return (T) declaredAnnotations().get(annotationClass);
+    }
+
+    public java.lang.annotation.Annotation[] getAnnotations() {
+        if (annotationImplList == null) {
+            return new java.lang.annotation.Annotation[0];
+        }
+        return annotationImplList.toArray(new java.lang.annotation.Annotation[annotationImplList.size()]); //not implemented
     }
 
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
@@ -435,7 +442,7 @@ public class Constructor<T> implements GenericDeclaration, Invokable {
     public void setDeclaredAnnotations(List<Annotation> annotations) {
         declaredAnnotations.clear();
         for (Annotation annotation : annotations) {
-            declaredAnnotations.put(annotation.annotationType(), annotation);
+            declaredAnnotations.put(annotation.rnrAnnotationType(), annotation);
         }
     }
 
@@ -477,7 +484,7 @@ public class Constructor<T> implements GenericDeclaration, Invokable {
      * Constructor object
      * @since 1.5
      */
-    public Annotation[][] getParameterAnnotations() {
+    public java.lang.annotation.Annotation[][] getParameterAnnotations() {
         throw new UnsupportedOperationException();
     }
 

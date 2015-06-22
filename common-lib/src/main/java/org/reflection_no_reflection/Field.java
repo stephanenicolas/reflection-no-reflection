@@ -31,31 +31,36 @@ public class Field extends Member {
         this.annotationImplList = annotationImplList;
     }
 
-    public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
-        for (Annotation annotation : annotationList) {
-            if (annotation.annotationType().equals(annotationType)) {
-                return (A) annotation;
+    public <A extends java.lang.annotation.Annotation> A getAnnotation(Class<A> annotationType) {
+        //processor annotations
+        if (annotationList != null) {
+            for (Annotation annotation : annotationList) {
+                if (annotation.rnrAnnotationType().getName().equals(annotationType.getName())) {
+                    return (A) annotation;
+                }
+            }
+        }
+
+        //generator annotations
+        if( annotationImplList!= null) {
+            for (java.lang.annotation.Annotation annotation : annotationImplList) {
+                if (annotation.annotationType().getName().equals(annotationType.getName())) {
+                    return (A) annotation;
+                }
             }
         }
 
         return null;
     }
 
-    public <A extends java.lang.annotation.Annotation> A getAnnotation(java.lang.Class<A> annotationType) {
-        for (java.lang.annotation.Annotation annotation : annotationImplList) {
-            if (annotation.annotationType().equals(annotationType)) {
-                return (A) annotation;
-            }
+    public java.lang.annotation.Annotation[] getAnnotations() {
+        if (annotationList == null && annotationImplList == null) {
+            return new java.lang.annotation.Annotation[0];
+        } else if (annotationList!=null ) {
+            return annotationList.toArray(new Annotation[annotationList.size()]);
+        } else {
+            return annotationImplList.toArray(new java.lang.annotation.Annotation[annotationImplList.size()]); //not implemented
         }
-
-        return null;
-    }
-
-    public Annotation[] getAnnotations() {
-        if (annotationList == null) {
-            return new Annotation[0];
-        }
-        return annotationList.toArray(new Annotation[annotationList.size()]); //not implemented
     }
 
     public Class<?> getDeclaringClass() {

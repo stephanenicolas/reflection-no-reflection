@@ -36,12 +36,12 @@ public class FieldTest extends AbstractRnRTest {
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getAnnotations();
+        final Annotation[] annotations = (Annotation[]) aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].annotationType(), is(deprecatedAnnotationClass));
-        assertThat(aField.getAnnotation(deprecatedAnnotationClass).annotationType(), is(deprecatedAnnotationClass));
+        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) aField.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 
     @Test
@@ -69,15 +69,15 @@ public class FieldTest extends AbstractRnRTest {
         assertThat(aField.getType(), is((Class) Class.forName("java.lang.String")));
         assertThat(aField.getModifiers(), is(Modifier.PRIVATE));
 
-        final Annotation[] annotations = aField.getAnnotations();
+        final Annotation[] annotations = (Annotation[]) aField.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class suppressWarningsAnnotationClass = Class.forName("java.lang.SuppressWarnings");
-        assertThat(annotations[0].annotationType(), is(suppressWarningsAnnotationClass));
-        assertThat(aField.getAnnotation(suppressWarningsAnnotationClass).annotationType(), is(suppressWarningsAnnotationClass));
-        assertThat(aField.getAnnotation(suppressWarningsAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
+        assertThat(annotations[0].rnrAnnotationType(), is(suppressWarningsAnnotationClass));
+        assertThat(((Annotation) aField.getAnnotation(suppressWarningsAnnotationClass)).rnrAnnotationType(), is(suppressWarningsAnnotationClass));
+        assertThat(((Annotation) aField.getAnnotation(suppressWarningsAnnotationClass)).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
 
-        final Object value = aField.getAnnotation(suppressWarningsAnnotationClass).getValue("value");
+        final Object value = ((Annotation) aField.getAnnotation(suppressWarningsAnnotationClass)).getValue("value");
         assertThat((String) value, is("foo"));
     }
 }

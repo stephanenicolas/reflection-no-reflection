@@ -62,7 +62,7 @@ public class JavaDumperClassPoolVisitor implements ClassPoolVisitor {
     public void visit(Annotation annotation) {
         buffer.append(INDENT);
         buffer.append("@");
-        buffer.append(annotation.annotationType().getName());
+        buffer.append(annotation.rnrAnnotationType().getName());
         if (!annotation.getMethods().isEmpty()) {
             buffer.append("(");
         }

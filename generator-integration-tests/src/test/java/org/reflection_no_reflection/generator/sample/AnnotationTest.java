@@ -2,6 +2,7 @@ package org.reflection_no_reflection.generator.sample;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.runtime.Module;
@@ -33,9 +34,9 @@ public class AnnotationTest {
         final Field field = fields[0];
         assertThat(field.getName(), is("a"));
         assertThat(field.getType().getName(), is("java.lang.String"));
-        //fails assertThat(field.getAnnotations().length, is(1));
+        //fails assertThat(field.RnrAnnotations().length, is(1));
         //TODO solve which annotation to return RnR or runtime reflect
-        assertThat(field.getAnnotation(SuppressWarnings.class), notNullValue());
-        assertThat(field.getAnnotation(SuppressWarnings.class).value()[0], is("unused"));
+        assertThat(field.getAnnotation((Class<Annotation>)Class.forName("java.lang.SuppressWarnings")), notNullValue());
+        assertThat(field.getAnnotation((Class<SuppressWarnings>)Class.forName("java.lang.SuppressWarnings")).value()[0],  is("unused"));
     }
 }

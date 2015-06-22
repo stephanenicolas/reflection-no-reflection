@@ -1817,13 +1817,13 @@ public class Class<T> implements GenericDeclaration, java.io.Serializable,
      * @throws NullPointerException {@inheritDoc}
      * @since 1.5
      */
-    public <A extends org.reflection_no_reflection.Annotation> A getAnnotation(Class<A> annotationClass) {
+    public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
         if (annotationClass == null) {
             throw new NullPointerException();
         }
 
         for (org.reflection_no_reflection.Annotation annotation : annotationList) {
-            if (annotation.annotationType().equals(annotationClass)) {
+            if (annotation.rnrAnnotationType().equals(annotationClass)) {
                 return (A) annotation;
             }
         }
