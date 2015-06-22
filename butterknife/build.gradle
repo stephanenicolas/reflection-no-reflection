@@ -1,0 +1,20 @@
+apply plugin: 'java'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+
+dependencies {
+    compile project(':common-lib')
+    compile project(':processor')
+    compile 'javax.inject:javax.inject:1'
+}
+
+compileJava {
+    //enable incremental compilation
+    options.compilerArgs = ["-processor", "org.reflection_no_reflection.processor.Processor"]
+}

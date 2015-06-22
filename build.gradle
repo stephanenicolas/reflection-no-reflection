@@ -5,6 +5,7 @@ buildscript {
   }
   dependencies {
     classpath 'org.ajoberstar:gradle-git:0.13.0-milestone.1'
+    classpath 'com.android.tools.build:gradle:1.0.1'
   }
 }
 
@@ -33,4 +34,3 @@ allprojects {
 wrapper {
   gradleVersion = '2.2'
 }
-

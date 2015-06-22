@@ -33,3 +33,4 @@ doc-files/
 *.iml
 *.ipr
 *.iws
+.DS_Store

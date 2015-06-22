@@ -3,6 +3,9 @@ include "processor"
 include "processor-sample"
 include "generator"
 include "generator-integration-tests"
+include "butterknife"
+include "butterknifesample"
+
 //if (!hasProperty('boostrap')) {
 //  include "sample"
 //}
