@@ -70,6 +70,7 @@ public abstract class Member {
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
     /**
+     * TODO what should this really return ?
      * @since 1.5
      */
     public java.lang.annotation.Annotation[] getDeclaredAnnotations() {
