@@ -26,6 +26,8 @@ public class Method extends Member implements GenericDeclaration, Invokable {
     // generic info repository; lazily initialized
     private transient MethodRepository genericInfo;
     private byte[] annotations;
+    //TODO parameter annotations. Create an invokable member class
+    //it should manage params and exceptions. Inherited by constructor and methods.
     private byte[] parameterAnnotations;
     private byte[] annotationDefault;
 

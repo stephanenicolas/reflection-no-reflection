@@ -12,7 +12,7 @@ import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
 import sun.reflect.annotation.AnnotationType;
 
-public class Class<T> implements GenericDeclaration, java.io.Serializable,
+public class Class<T> extends Member implements GenericDeclaration, java.io.Serializable,
     java.lang.reflect.Type {
 
     public static final int ANNOTATION = 0x00002000;
@@ -35,7 +35,6 @@ public class Class<T> implements GenericDeclaration, java.io.Serializable,
     private List<Field> fields = new ArrayList<>();
     private List<Method> methods = new ArrayList<>();
     private List<Constructor<T>> constructors = new ArrayList<>();
-    private List<org.reflection_no_reflection.Annotation> annotationList = new ArrayList<>();
     private GenericDeclaration genericInfo;
     private Constructor<?> enclosingConstructor;
     private int level;
@@ -1811,74 +1810,6 @@ public class Class<T> implements GenericDeclaration, java.io.Serializable,
         } else {
             throw new ClassCastException(this.toString());
         }
-    }
-
-    /**
-     * @throws NullPointerException {@inheritDoc}
-     * @since 1.5
-     */
-    public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
-        if (annotationClass == null) {
-            throw new NullPointerException();
-        }
-
-        for (org.reflection_no_reflection.Annotation annotation : annotationList) {
-            if (annotation.rnrAnnotationType().equals(annotationClass)) {
-                return (A) annotation;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @throws NullPointerException {@inheritDoc}
-     * @since 1.5
-     */
-    public boolean isAnnotationPresent(
-        Class<? extends org.reflection_no_reflection.Annotation> annotationClass) {
-        if (annotationClass == null) {
-            throw new NullPointerException();
-        }
-
-        return getAnnotation(annotationClass) != null;
-    }
-
-    private static Annotation[] EMPTY_ANNOTATIONS_ARRAY = new Annotation[0];
-
-    public <T extends Annotation> T getAnnotation(java.lang.Class<T> annotationClass) {
-        //TODO only works at runtime, doesn't make sense at compile time.
-        return null;
-    }
-
-    /**
-     * @since 1.5
-     */
-    public Annotation[] getAnnotations() {
-        return annotationList.toArray(EMPTY_ANNOTATIONS_ARRAY);
-    }
-
-    public void setAnnotations(List<org.reflection_no_reflection.Annotation> annotations) {
-        this.annotationList = annotations;
-    }
-
-    /**
-     * @since 1.5
-     */
-    public Annotation[] getDeclaredAnnotations() {
-        throw new UnsupportedOperationException();
-    }
-
-    // Annotation types cache their internal (AnnotationType) form
-
-    private AnnotationType annotationType;
-
-    void setAnnotationType(AnnotationType type) {
-        annotationType = type;
-    }
-
-    AnnotationType getAnnotationType() {
-        return annotationType;
     }
 
     @Override

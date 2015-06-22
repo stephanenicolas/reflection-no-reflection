@@ -47,17 +47,17 @@ public class ClassTest extends AbstractRnRTest {
         assertThat(annotatedClasses.contains(Class.forName("test.Foo")), is(true));
         final Class deprecatedAnnotationClass = Class.forNameSafe("java.lang.Deprecated");
         assertThat(Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass), notNullValue());
-        assertThat(Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass).rnrAnnotationType().isAnnotation(), is(true));
+        assertThat(((Annotation) Class.forName("test.Foo").getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType().isAnnotation(), is(true));
 
-        final Annotation[] annotations = clazz.getAnnotations();
+        final java.lang.annotation.Annotation[] annotations = clazz.getAnnotations();
         assertThat(annotations.length, is(2));
 
         final Class suppressWarningsAnnotationClass = Class.forName("java.lang.SuppressWarnings");
-        assertThat(clazz.getAnnotation(suppressWarningsAnnotationClass).rnrAnnotationType(), is(suppressWarningsAnnotationClass));
-        assertThat(clazz.getAnnotation(suppressWarningsAnnotationClass).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
-        assertThat(clazz.getAnnotation(suppressWarningsAnnotationClass).rnrAnnotationType().isAnnotation(), is(true));
+        assertThat(((Annotation) clazz.getAnnotation(suppressWarningsAnnotationClass)).rnrAnnotationType(), is(suppressWarningsAnnotationClass));
+        assertThat(((Annotation) clazz.getAnnotation(suppressWarningsAnnotationClass)).getMethod("value").getReturnType(), is((Class) Class.forName("java.lang.String[]")));
+        assertThat(((Annotation) clazz.getAnnotation(suppressWarningsAnnotationClass)).rnrAnnotationType().isAnnotation(), is(true));
 
-        final Object value = clazz.getAnnotation(suppressWarningsAnnotationClass).getValue("value");
+        final Object value = ((Annotation) clazz.getAnnotation(suppressWarningsAnnotationClass)).getValue("value");
         assertThat((String) value, is("foo"));
     }
 }

@@ -94,7 +94,7 @@ public class Processor extends AbstractProcessor {
         Class newClass = createClass(classElement.asType(), level);
         annotatedClassSet.add(newClass);
         final List<Annotation> annotations = extractAnnotations(classElement, level);
-        newClass.setAnnotations(annotations);
+        newClass.setRnRAnnotationList(annotations);
     }
 
     private void addFieldToAnnotationDatabase(Element fieldElement, int level) {

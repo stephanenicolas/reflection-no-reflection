@@ -21,6 +21,8 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
     // generic info repository; lazily initialized
     private ConstructorRepository genericInfo;
     private byte[] annotations;
+    //TODO parameter annotations. Create an invokable member class
+    //it should manage params and exceptions. Inherited by constructor and methods.
     private byte[] parameterAnnotations;
 
     // For non-public members or members in package-private classes,
