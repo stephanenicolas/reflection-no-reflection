@@ -1,6 +1,7 @@
 package org.reflection_no_reflection;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class Member {
 
@@ -66,4 +67,13 @@ public abstract class Member {
         return false; //not implemented
     }
 
+    private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
+
+    /**
+     * @since 1.5
+     */
+    public java.lang.annotation.Annotation[] getDeclaredAnnotations() {
+        //TODO catch what the difference should be
+        return getAnnotations();
+    }
 }

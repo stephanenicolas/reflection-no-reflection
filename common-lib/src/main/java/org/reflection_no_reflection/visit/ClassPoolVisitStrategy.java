@@ -29,7 +29,7 @@ public class ClassPoolVisitStrategy {
             }
 
             for (Object method : aClass.getMethods()) {
-                for (Annotation annotation : ((Method) method).getDeclaredAnnotations()) {
+                for (java.lang.annotation.Annotation annotation : ((Method) method).getAnnotations()) {
                     visitAnnotation(annotation, classPoolVisitor);
                 }
                 classPoolVisitor.visit((Method) method);
@@ -48,13 +48,14 @@ public class ClassPoolVisitStrategy {
         return classList;
     }
 
-    private void visitAnnotation(Annotation annotation, ClassPoolVisitor classPoolVisitor) {
-        List<Method> methods = annotation.getMethods();
-        classPoolVisitor.visit(annotation);
+    private void visitAnnotation(java.lang.annotation.Annotation annotation, ClassPoolVisitor classPoolVisitor) {
+        Annotation rnrAnnotation = (Annotation) annotation;
+        List<Method> methods = rnrAnnotation.getMethods();
+        classPoolVisitor.visit(rnrAnnotation);
         for (int i = 0; i < methods.size(); i++) {
             Method method = methods.get(i);
-            classPoolVisitor.visitAnnotationMethod(annotation, method);
+            classPoolVisitor.visitAnnotationMethod(rnrAnnotation, method);
         }
-        classPoolVisitor.endVisit(annotation);
+        classPoolVisitor.endVisit(rnrAnnotation);
     }
 }

@@ -7,6 +7,26 @@ import java.util.Map;
 
 /**
  * Base class of all the annotation classes inside the RNR framework.
+ * This class is a keystone of RNR. It has a little twist and we aim to document it here.
+ *
+ * The only thing to remember is that: at processing-time (when you use RNR to write an annotation processor),
+ * the annotations you manipulation are instances of the present class and they will fault on #annotationType,
+ * you probably wanna call #rnrAnnotationType.
+ *
+
+ * Thoughts: normally annotations have an annotationType method that returns a Class. But in RNR, they
+ * should return RNR classes. At processing time, true classes don't exist and we would not be able
+ * to manipulation annotations if we only had this API. We thus added the rnrAnnotationType method.
+ *
+ * Deeper thoughts: At runtime, we will need to provide true implementations
+ * of annotations (for instance to answer the getAnnotation(Class A) method). True annotations means to implement
+ * the java.lang.annoation.Annotation interface (yes, it is an interface and yes, you can implement it).
+ * This will be achieved via the AnnotationImpl class.
+ * The processing-time and runtime annotation APIs cannot be reconciliated. One must return a true class for runtime
+ * and the other must return a RNR class.
+ *
+ * We have tried many patterns to make this clear. But actually, adding this little method rnrAnnotationType for
+ * annotation used at processing-time only is the minimum-disturbing API we have found. Yeah, this is a brain-knot lib. :)
  * @author SNI
  */
 public class Annotation implements java.lang.annotation.Annotation {

@@ -22,7 +22,6 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
     private ConstructorRepository genericInfo;
     private byte[] annotations;
     private byte[] parameterAnnotations;
-    private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
 
     // For non-public members or members in package-private classes,
     // it is necessary to perform somewhat expensive security checks.
@@ -409,27 +408,6 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
 
     byte[] getRawParameterAnnotations() {
         return parameterAnnotations;
-    }
-
-    private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
-
-    /**
-     * @since 1.5
-     */
-    public Annotation[] getDeclaredAnnotations() {
-        return declaredAnnotations().values().toArray(EMPTY_ANNOTATION_ARRAY);
-    }
-
-    public void setDeclaredAnnotations(List<Annotation> annotations) {
-        declaredAnnotations.clear();
-        for (Annotation annotation : annotations) {
-            declaredAnnotations.put(annotation.rnrAnnotationType(), annotation);
-        }
-    }
-
-
-    private synchronized Map<Class, Annotation> declaredAnnotations() {
-        return declaredAnnotations;
     }
 
     /**
