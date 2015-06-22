@@ -235,7 +235,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                                             method.getModifiers());
         loadClassMethodBuilder.addStatement("c.addMethod(m)");
 
-        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getDeclaredAnnotations());
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, "m", method.getAnnotations());
         loadClassMethodBuilder.addStatement("m.setIsVarArgs($L)", method.isVarArgs());
 
         loadClassMethodBuilder.endControlFlow("");
@@ -254,7 +254,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
                                             constructor.getModifiers());
         loadClassMethodBuilder.addStatement("c.addConstructor(co)");
 
-        doGenerateAnnotationsForMember(loadClassMethodBuilder, "co", constructor.getDeclaredAnnotations());
+        doGenerateAnnotationsForMember(loadClassMethodBuilder, "co", constructor.getAnnotations());
         loadClassMethodBuilder.addStatement("co.setIsVarArgs($L)", constructor.isVarArgs());
 
         loadClassMethodBuilder.endControlFlow("");
@@ -296,24 +296,25 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
         loadClassMethodBuilder.addStatement("c.addField(f)");
 
         final String memberInGenCode = "f";
-        final Annotation[] declaredAnnotations = (Annotation[]) field.getAnnotations();
+        final java.lang.annotation.Annotation[] declaredAnnotations = field.getAnnotations();
         doGenerateAnnotationsForMember(loadClassMethodBuilder, memberInGenCode, declaredAnnotations);
         loadClassMethodBuilder.endControlFlow();
     }
 
-    private void doGenerateAnnotationsForMember(MethodSpec.Builder loadClassMethodBuilder, String memberInGenCode, Annotation[] declaredAnnotations) {
+    private void doGenerateAnnotationsForMember(MethodSpec.Builder loadClassMethodBuilder, String memberInGenCode, java.lang.annotation.Annotation[] declaredAnnotations) {
         if (declaredAnnotations.length != 0) {
             loadClassMethodBuilder.addStatement("$T annotationImplTab = new $T($L)", LIST_TYPE_NAME, ARRAYLIST_TYPE_NAME, declaredAnnotations.length);
-            for (Annotation annotation : declaredAnnotations) {
+            for (java.lang.annotation.Annotation annotation : declaredAnnotations) {
+                Annotation rnrAnnotation = (Annotation) annotation;
                 loadClassMethodBuilder.beginControlFlow("");
-                loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S)", CLASS_TYPE_NAME, annotation.rnrAnnotationType().getName());
-                loadClassMethodBuilder.addStatement("a.setModifiers($L)", annotation.rnrAnnotationType().getModifiers());
+                loadClassMethodBuilder.addStatement("$T a = Class.forNameSafe($S)", CLASS_TYPE_NAME, rnrAnnotation.rnrAnnotationType().getName());
+                loadClassMethodBuilder.addStatement("a.setModifiers($L)", rnrAnnotation.rnrAnnotationType().getModifiers());
                 loadClassMethodBuilder.addStatement("classSet.add(a)");
-                final ClassName annotationImplClassName = ClassName.get(targetPackageName, annotation.rnrAnnotationType().getSimpleName() + "$$Impl");
+                final ClassName annotationImplClassName = ClassName.get(targetPackageName, rnrAnnotation.rnrAnnotationType().getSimpleName() + "$$Impl");
                 loadClassMethodBuilder.addStatement("$T aImpl = new $T()", annotationImplClassName, annotationImplClassName);
-                for (Method method : annotation.getMethods()) {
+                for (Method method : rnrAnnotation.getMethods()) {
                     try {
-                        final Object value = annotation.getValue(method.getName());
+                        final Object value = rnrAnnotation.getValue(method.getName());
                         if (method.getReturnType().getName().equals("java.lang.String")) {
                             loadClassMethodBuilder.addStatement("aImpl.set$L($S)", util.createCapitalizedName(method.getName()), value);
                         } else if (method.getReturnType().getName().equals("java.lang.String[]")) {

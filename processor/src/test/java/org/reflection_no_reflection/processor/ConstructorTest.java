@@ -30,17 +30,17 @@ public class ConstructorTest extends AbstractRnRTest {
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getConstructors().size(), is(1));
 
-        final Constructor Constructor = (Constructor) aClass.getConstructors().get(0);
+        final Constructor constructor = (Constructor) aClass.getConstructors().get(0);
         final Constructor expected = new Constructor(aClass, new Class[0], new Class[0], Modifier.PROTECTED);
-        assertThat(Constructor, is(expected));
-        assertThat(Constructor.getModifiers(), is(Modifier.PROTECTED));
+        assertThat(constructor, is(expected));
+        assertThat(constructor.getModifiers(), is(Modifier.PROTECTED));
 
-        final Annotation[] annotations = Constructor.getDeclaredAnnotations();
+        final java.lang.annotation.Annotation[] annotations = constructor.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
-        assertThat(Constructor.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) annotations[0]).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)constructor.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 
     @Test
@@ -62,23 +62,23 @@ public class ConstructorTest extends AbstractRnRTest {
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getConstructors().size(), is(1));
 
-        final Constructor Constructor = (Constructor) aClass.getConstructors().get(0);
+        final Constructor constructor = (Constructor) aClass.getConstructors().get(0);
         final Constructor expected = new Constructor(aClass, new Class[] {expectedParamType}, new Class[0], Modifier.PROTECTED);
-        assertThat(Constructor, is(expected));
-        assertThat(Constructor.getModifiers(), is(Modifier.PROTECTED));
+        assertThat(constructor, is(expected));
+        assertThat(constructor.getModifiers(), is(Modifier.PROTECTED));
 
-        final Annotation[] annotations = Constructor.getDeclaredAnnotations();
+        final java.lang.annotation.Annotation[] annotations = constructor.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
-        assertThat(Constructor.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) annotations[0]).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)constructor.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
 
-        final Class<?>[] paramTypes = Constructor.getParameterTypes();
+        final Class<?>[] paramTypes = constructor.getParameterTypes();
         assertThat(paramTypes.length, is(1));
         assertThat(paramTypes[0], is(expectedParamType));
 
-        assertThat(Constructor.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)constructor.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 
     @Test
@@ -100,22 +100,22 @@ public class ConstructorTest extends AbstractRnRTest {
         final Class aClass = Class.forName("test.Foo");
         assertThat(aClass.getConstructors().size(), is(1));
 
-        final Constructor Constructor = (Constructor) aClass.getConstructors().get(0);
+        final Constructor constructor = (Constructor) aClass.getConstructors().get(0);
         final Constructor expected = new Constructor(aClass, new Class[0], new Class[] {expectedExceptionType}, Modifier.PROTECTED);
-        assertThat(Constructor, is(expected));
-        assertThat(Constructor.getModifiers(), is(Modifier.PROTECTED));
+        assertThat(constructor, is(expected));
+        assertThat(constructor.getModifiers(), is(Modifier.PROTECTED));
 
-        final Annotation[] annotations = Constructor.getDeclaredAnnotations();
+        final java.lang.annotation.Annotation[] annotations = constructor.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
-        assertThat(Constructor.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) annotations[0]).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)constructor.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
 
-        final Class<?>[] exceptionTypes = Constructor.getExceptionTypes();
+        final Class<?>[] exceptionTypes = constructor.getExceptionTypes();
         assertThat(exceptionTypes.length, is(1));
         assertThat(exceptionTypes[0], is(expectedExceptionType));
 
-        assertThat(Constructor.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)constructor.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 }

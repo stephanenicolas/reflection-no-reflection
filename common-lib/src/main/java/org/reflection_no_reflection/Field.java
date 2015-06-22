@@ -15,53 +15,15 @@ public class Field extends Member {
     private final Class<?> type;
     private Class<?> enclosingClass;
     private int modifiers;
-    private final List<Annotation> annotationList;
-    private List<java.lang.annotation.Annotation> annotationImplList;
 
     public Field(String name, Class<?> type, Class<?> enclosingClass, int modifiers, List<Annotation> annotationList) {
         this.name = name;
         this.type = type;
         this.enclosingClass = enclosingClass;
         this.modifiers = modifiers;
-        this.annotationList = annotationList;
+        setRnRAnnotationList(annotationList);
     }
 
-    @SuppressWarnings({"unused", "called by generated code"})
-    public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
-        this.annotationImplList = annotationImplList;
-    }
-
-    public <A extends java.lang.annotation.Annotation> A getAnnotation(Class<A> annotationType) {
-        //processor annotations
-        if (annotationList != null) {
-            for (Annotation annotation : annotationList) {
-                if (annotation.rnrAnnotationType().getName().equals(annotationType.getName())) {
-                    return (A) annotation;
-                }
-            }
-        }
-
-        //generator annotations
-        if( annotationImplList!= null) {
-            for (java.lang.annotation.Annotation annotation : annotationImplList) {
-                if (annotation.annotationType().getName().equals(annotationType.getName())) {
-                    return (A) annotation;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public java.lang.annotation.Annotation[] getAnnotations() {
-        if (annotationList == null && annotationImplList == null) {
-            return new java.lang.annotation.Annotation[0];
-        } else if (annotationList!=null ) {
-            return annotationList.toArray(new Annotation[annotationList.size()]);
-        } else {
-            return annotationImplList.toArray(new java.lang.annotation.Annotation[annotationImplList.size()]); //not implemented
-        }
-    }
 
     public Class<?> getDeclaringClass() {
         return enclosingClass;
@@ -85,10 +47,6 @@ public class Field extends Member {
 
     public int hashCode() {
         return 0; //not implemented
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
-        return false; //not implemented
     }
 
     public boolean isEnumConstant() {

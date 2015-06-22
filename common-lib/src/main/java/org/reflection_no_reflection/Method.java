@@ -29,7 +29,6 @@ public class Method extends Member implements GenericDeclaration, Invokable {
     private byte[] parameterAnnotations;
     private byte[] annotationDefault;
     private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
-    private List<java.lang.annotation.Annotation> annotationImplList;
 
     // Modifiers that can be applied to a method in source code
     private static final int LANGUAGE_MODIFIERS =
@@ -477,25 +476,6 @@ public class Method extends Member implements GenericDeclaration, Invokable {
         throw new UnsupportedOperationException();
     }
 
-    public <A extends java.lang.annotation.Annotation> A getAnnotation(java.lang.Class<A> annotationType) {
-        for (java.lang.annotation.Annotation annotation : annotationImplList) {
-            if (annotation.annotationType().equals(annotationType)) {
-                return (A) annotation;
-            }
-        }
-
-        return null;
-    }
-
-    public <A extends Annotation> A getRnrAnnotation(Class<A> annotationType) {
-        return (A) declaredAnnotations.get(annotationType);
-    }
-
-    public Annotation[] getRnrAnnotations() {
-        final Collection<Annotation> annotations = declaredAnnotations.values();
-        return annotations.toArray(new Annotation[annotations.size()]);
-    }
-
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
     /**
@@ -514,18 +494,6 @@ public class Method extends Member implements GenericDeclaration, Invokable {
 
     private synchronized Map<Class, Annotation> declaredAnnotations() {
         return declaredAnnotations;
-    }
-
-    @SuppressWarnings({"unused", "called by generated code"})
-    public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
-        this.annotationImplList = annotationImplList;
-    }
-
-    public java.lang.annotation.Annotation[] getAnnotations() {
-        if (annotationImplList == null) {
-            return new java.lang.annotation.Annotation[0];
-        }
-        return annotationImplList.toArray(new java.lang.annotation.Annotation[annotationImplList.size()]); //not implemented
     }
 
     /**

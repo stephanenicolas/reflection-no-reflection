@@ -178,7 +178,7 @@ public class Processor extends AbstractProcessor {
 
         final List<Annotation> annotations = extractAnnotations(methodElement, level);
 
-        constructor.setDeclaredAnnotations(annotations);
+        constructor.setRnRAnnotationList(annotations);
 
         classContainingMethod.addConstructor(constructor);
         annotatedClassSet.add(classContainingMethod);
@@ -201,7 +201,7 @@ public class Processor extends AbstractProcessor {
 
         final List<Annotation> annotations = extractAnnotations(methodElement, level);
 
-        method.setDeclaredAnnotations(annotations);
+        method.setRnRAnnotationList(annotations);
         method.setIsVarArgs(methodElement.isVarArgs());
 
         declaringClass.addMethod(method);

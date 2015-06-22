@@ -22,7 +22,7 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
     private ConstructorRepository genericInfo;
     private byte[] annotations;
     private byte[] parameterAnnotations;
-    private List<java.lang.annotation.Annotation> annotationImplList;
+    private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
 
     // For non-public members or members in package-private classes,
     // it is necessary to perform somewhat expensive security checks.
@@ -411,25 +411,6 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
         return parameterAnnotations;
     }
 
-    /**
-     * @throws NullPointerException {@inheritDoc}
-     * @since 1.5
-     */
-    public <T extends Annotation> T getRnrAnnotation(Class<T> annotationClass) {
-        if (annotationClass == null) {
-            throw new NullPointerException();
-        }
-
-        return (T) declaredAnnotations().get(annotationClass);
-    }
-
-    public java.lang.annotation.Annotation[] getAnnotations() {
-        if (annotationImplList == null) {
-            return new java.lang.annotation.Annotation[0];
-        }
-        return annotationImplList.toArray(new java.lang.annotation.Annotation[annotationImplList.size()]); //not implemented
-    }
-
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
     /**
@@ -446,26 +427,9 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
         }
     }
 
-    @SuppressWarnings({"unused", "called by generated code"})
-    public void setAnnotationImplList(List<java.lang.annotation.Annotation> annotationImplList) {
-        this.annotationImplList = annotationImplList;
-    }
-
-
-    private Map<Class, Annotation> declaredAnnotations = new HashMap<>();
 
     private synchronized Map<Class, Annotation> declaredAnnotations() {
         return declaredAnnotations;
-    }
-
-    public <A extends java.lang.annotation.Annotation> A getAnnotation(java.lang.Class<A> annotationType) {
-        for (java.lang.annotation.Annotation annotation : annotationImplList) {
-            if (annotation.annotationType().equals(annotationType)) {
-                return (A) annotation;
-            }
-        }
-
-        return null;
     }
 
     /**

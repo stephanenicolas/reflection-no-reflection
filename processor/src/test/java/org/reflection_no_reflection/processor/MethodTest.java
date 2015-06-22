@@ -34,12 +34,12 @@ public class MethodTest extends AbstractRnRTest {
         assertThat(method, is(expected));
         assertThat(method.getModifiers(), is(Modifier.PROTECTED));
 
-        final Annotation[] annotations = method.getDeclaredAnnotations();
+        final java.lang.annotation.Annotation[] annotations = method.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
-        assertThat(method.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) annotations[0]).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)method.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 
     @Test
@@ -66,18 +66,18 @@ public class MethodTest extends AbstractRnRTest {
         assertThat(method, is(expected));
         assertThat(method.getModifiers(), is(Modifier.PROTECTED));
 
-        final Annotation[] annotations = method.getDeclaredAnnotations();
+        final java.lang.annotation.Annotation[] annotations = method.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
-        assertThat(method.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) annotations[0]).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)method.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
 
         final Class<?>[] paramTypes = method.getParameterTypes();
         assertThat(paramTypes.length, is(1));
         assertThat(paramTypes[0], is(expectedParamType));
 
-        assertThat(method.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)method.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 
     @Test
@@ -104,17 +104,17 @@ public class MethodTest extends AbstractRnRTest {
         assertThat(method, is(expected));
         assertThat(method.getModifiers(), is(Modifier.PROTECTED));
 
-        final Annotation[] annotations = method.getDeclaredAnnotations();
+        final java.lang.annotation.Annotation[] annotations = method.getAnnotations();
         assertThat(annotations.length, is(1));
 
         final Class deprecatedAnnotationClass = Class.forName("java.lang.Deprecated");
-        assertThat(annotations[0].rnrAnnotationType(), is(deprecatedAnnotationClass));
-        assertThat(method.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation) annotations[0]).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)method.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
 
         final Class<?>[] exceptionTypes = method.getExceptionTypes();
         assertThat(exceptionTypes.length, is(1));
         assertThat(exceptionTypes[0], is(expectedExceptionType));
 
-        assertThat(method.getRnrAnnotation(deprecatedAnnotationClass).rnrAnnotationType(), is(deprecatedAnnotationClass));
+        assertThat(((Annotation)method.getAnnotation(deprecatedAnnotationClass)).rnrAnnotationType(), is(deprecatedAnnotationClass));
     }
 }
