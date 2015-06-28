@@ -19,7 +19,7 @@ public class ClassTest extends AbstractRnRTest {
                        "public class Foo {}" //
         );
 
-        configureProcessor("java.lang.Deprecated");
+        setTargetAnnotations("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();
@@ -38,7 +38,7 @@ public class ClassTest extends AbstractRnRTest {
                        "public class Foo {}" //
         );
 
-        configureProcessor("java.lang.Deprecated");
+        setTargetAnnotations("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();
@@ -59,5 +59,48 @@ public class ClassTest extends AbstractRnRTest {
 
         final Object value = ((Annotation) clazz.getAnnotation(suppressWarningsAnnotationClass)).getValue("value");
         assertThat((String) value, is("foo"));
+    }
+
+    @Test
+    public void superClassIsDefined() throws ClassNotFoundException, NoSuchMethodException {
+        javaSourceCode("test.Foo", //
+                       "package test;", //
+                       "@SuppressWarnings(\"foo\")", //
+                       "@Deprecated", //
+                       "class Bar {}", //
+                       "@Deprecated", //
+                       "public class Foo extends Bar {}" //
+        );
+
+        setTargetAnnotations("java.lang.Deprecated");
+        setMaxLevel(1);
+        assertJavaSourceCompileWithoutError();
+
+        final Class clazzFoo = Class.forName("test.Foo");
+        final Class clazzBar = Class.forName("test.Bar");
+        assertThat(clazzFoo.getSuperclass(), notNullValue());
+        assertThat(clazzFoo.getSuperclass(), is(clazzBar));
+    }
+
+    @Test
+    public void superInterfaceIsDefined() throws ClassNotFoundException, NoSuchMethodException {
+        javaSourceCode("test.Foo", //
+                       "package test;", //
+                       "@SuppressWarnings(\"foo\")", //
+                       "@Deprecated", //
+                       "public class Foo implements Bar {}", //
+                       "@Deprecated", //
+                       "interface Bar {}" //
+        );
+
+        setTargetAnnotations("java.lang.Deprecated");
+        setMaxLevel(1);
+        assertJavaSourceCompileWithoutError();
+
+        final Class clazzFoo = Class.forName("test.Foo");
+        final Class clazzBar = Class.forName("test.Bar");
+        assertThat(clazzFoo.getInterfaces(), notNullValue());
+        assertThat(clazzFoo.getInterfaces().length, is(1));
+        assertThat(clazzFoo.getInterfaces()[0], is(clazzBar));
     }
 }

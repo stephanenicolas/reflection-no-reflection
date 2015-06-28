@@ -156,4 +156,43 @@ public class ClassTest {
         //THEN
         assertThat(stringList.getName(),is("java.util.List"));
     }
+
+    @Test
+    public void isInstanceOfWorksForDirectInstances() {
+        //GIVEN
+        //WHEN
+        final Class string = Class.forNameSafe("java.lang.String");
+
+        //THEN
+        assertThat(string.isInstance("foo"),is(true));
+    }
+
+    @Test
+    public void isInstanceOfWorksForSubClasses() {
+        //GIVEN
+
+
+        //WHEN
+        final Class fooClass = Class.forNameSafe("org.reflection_no_reflection.generator.sample.Foo");
+        final Class barClass = Class.forNameSafe("org.reflection_no_reflection.generator.sample.Bar");
+
+        //THEN
+        Foo obj = new Foo();
+        assertThat(fooClass.isInstance(obj),is(true));
+        assertThat(barClass.isInstance(obj),is(true));
+    }
+
+    @Test
+    public void isInstanceOfWorksForClassesThatImplementInterface() {
+        //GIVEN
+        //WHEN
+        final Class fooClass = Class.forNameSafe("org.reflection_no_reflection.generator.sample.Foo");
+        final Class qurtzClass = Class.forNameSafe("org.reflection_no_reflection.generator.sample.Qurtz");
+
+        //THEN
+        Foo obj = new Foo();
+        assertThat(fooClass.isInstance(obj),is(true));
+        assertThat(qurtzClass.isInstance(obj),is(true));
+    }
+
 }

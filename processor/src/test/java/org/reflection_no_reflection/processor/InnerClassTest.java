@@ -20,7 +20,7 @@ public class InnerClassTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor("java.lang.Deprecated");
+        setTargetAnnotations("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();
@@ -40,7 +40,7 @@ public class InnerClassTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor("java.lang.Deprecated");
+        setTargetAnnotations("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();
@@ -60,7 +60,7 @@ public class InnerClassTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor("java.lang.Deprecated");
+        setTargetAnnotations("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();

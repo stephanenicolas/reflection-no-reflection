@@ -10,7 +10,6 @@ import org.reflection_no_reflection.runtime.BaseReflector;
 import org.reflection_no_reflection.runtime.Module;
 import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
-import sun.reflect.annotation.AnnotationType;
 
 public class Class<T> extends Member implements GenericDeclaration, java.io.Serializable,
     java.lang.reflect.Type {
@@ -68,7 +67,7 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
     }
 
     private boolean isPrimitive(String name) {
-        switch(name) {
+        switch (name) {
             case "byte":
             case "short":
             case "int":
@@ -133,7 +132,7 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
         throws ClassNotFoundException {
         Class result = lookupClass(className, false);
 
-        if (result!= null) {
+        if (result != null) {
             return result;
         }
         throw new ClassNotFoundException(className);
@@ -146,7 +145,7 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
     public static Class<?> forNameSafe(String className, boolean skipModules) {
         Class result = lookupClass(className, skipModules);
 
-        if (result!= null) {
+        if (result != null) {
             return result;
         }
 
@@ -174,7 +173,8 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
         return aClass;
     }
 
-    private static Class lookupClass(String className, boolean skipModules) {Class result = null;
+    private static Class lookupClass(String className, boolean skipModules) {
+        Class result = null;
         for (Class aClass : CLASS_POOL) {
             if (aClass.getName().equals(className)) {
                 result = aClass;
@@ -182,7 +182,7 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
             }
         }
 
-        if (result!= null || skipModules) {
+        if (result != null || skipModules) {
             return result;
         }
 
@@ -295,7 +295,24 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
      * @since JDK1.1
      */
     public boolean isAssignableFrom(Class<?> cls) {
-        throw new UnsupportedOperationException();
+        if (cls == null) {
+            return false;
+        }
+
+        if (cls == this) {
+            return true;
+        }
+        if (isAssignableFrom(cls.getSuperclass())) {
+            return true;
+        }
+        if (cls.getInterfaces()!=null) {
+            for (Class<?> superInterface : cls.getInterfaces()) {
+                if (isAssignableFrom(superInterface)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -476,7 +493,7 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
         return superclass;
     }
 
-    public void setSuperclass(Class<? super T> superclass) {
+    public void setSuperclass(Class superclass) {
         this.superclass = superclass;
     }
 
@@ -1782,6 +1799,21 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
         // don't do the former.
         return (this.getModifiers() & ENUM) != 0 &&
             this.getSuperclass().equals(java.lang.Enum.class);
+    }
+
+    public boolean isInstance(Object obj) {
+        return isAssignableFrom(Class.forNameSafe(obj.getClass().getName()));
+    }
+
+    public T cast(Object obj) {
+        if (obj != null && !isInstance(obj)) {
+            throw new ClassCastException(cannotCastMsg(obj));
+        }
+        return (T) obj;
+    }
+
+    private String cannotCastMsg(Object obj) {
+        return "Cannot cast " + obj.getClass().getName() + " to " + getName();
     }
 
     /**

@@ -20,7 +20,7 @@ public class MethodTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor(new String[] {"java.lang.Deprecated"});
+        setTargetAnnotations(new String[] {"java.lang.Deprecated"});
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();
@@ -51,7 +51,7 @@ public class MethodTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor(new String[] {"java.lang.Deprecated"});
+        setTargetAnnotations(new String[] {"java.lang.Deprecated"});
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();
@@ -89,7 +89,7 @@ public class MethodTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor(new String[] {"java.lang.Deprecated"});
+        setTargetAnnotations(new String[] {"java.lang.Deprecated"});
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();

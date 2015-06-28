@@ -29,8 +29,12 @@ public class AbstractRnRTest {
         javaSourceCode = JavaFileObjects.forSourceString(fullyQualifiedName, Joiner.on('\n').join(source));
     }
 
-    protected void configureProcessor(String... annotations) {
+    protected void setTargetAnnotations(String... annotations) {
         ((Processor)processor).setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(annotations)));
+    }
+
+    protected void setMaxLevel(int maxLevel) {
+        ((Processor)processor).setMaxLevel(maxLevel);
     }
 
     protected Iterable<? extends javax.annotation.processing.Processor> rnrProcessors() {

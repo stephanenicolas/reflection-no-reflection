@@ -24,7 +24,7 @@ public class GenericsTest extends AbstractRnRTest {
                        "}" //
         );
 
-        configureProcessor(new String[] {"java.lang.Deprecated"});
+        setTargetAnnotations(new String[] {"java.lang.Deprecated"});
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();

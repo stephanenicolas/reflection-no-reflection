@@ -245,15 +245,18 @@ public class Processor extends AbstractProcessor {
         boolean isArray = false;
         boolean isInterface = false;
         Class component = null;
+        Class superClass = null;
         GenericDeclarationImpl declaration = null;
+        Class[] superInterfaces = null;
 
         if (typeMirror instanceof DeclaredType) {
-            className = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getQualifiedName().toString();
-            if (!((DeclaredType) typeMirror).getTypeArguments().isEmpty()) {
+            DeclaredType declaredType = (DeclaredType) typeMirror;
+            className = ((TypeElement) declaredType.asElement()).getQualifiedName().toString();
+            if (!declaredType.getTypeArguments().isEmpty()) {
                 declaration = new GenericDeclarationImpl();
-                TypeVariable[] typesVariables = new TypeVariable[((DeclaredType) typeMirror).getTypeArguments().size()];
+                TypeVariable[] typesVariables = new TypeVariable[declaredType.getTypeArguments().size()];
                 int index = 0;
-                for (TypeMirror mirror : ((DeclaredType) typeMirror).getTypeArguments()) {
+                for (TypeMirror mirror : declaredType.getTypeArguments()) {
                     TypeVariableImpl typeVariableImpl = new TypeVariableImpl();
                     typesVariables[index] = typeVariableImpl;
                     typeVariableImpl.setName(mirror.toString());
@@ -267,8 +270,20 @@ public class Processor extends AbstractProcessor {
             if (indexOfChevron != -1) {
                 className = className.substring(0, indexOfChevron);
             }
+            TypeElement typeElement = (TypeElement) declaredType.asElement();
             if (level + 1 <= maxLevel) {
-                final List<? extends Element> enclosedElements = ((TypeElement) ((DeclaredType) typeMirror).asElement()).getEnclosedElements();
+                TypeMirror superclass = typeElement.getSuperclass();
+                superClass = createClass(superclass, level + 1);
+            }
+            if (level + 1 <= maxLevel) {
+                superInterfaces = new Class[typeElement.getInterfaces().size()];
+                int indexInterface = 0;
+                for (TypeMirror superInterface : typeElement.getInterfaces()) {
+                    superInterfaces[indexInterface++] = createClass(superInterface, level +1);
+                }
+            }
+            if (level + 1 <= maxLevel) {
+                final List<? extends Element> enclosedElements = ((TypeElement) declaredType.asElement()).getEnclosedElements();
                 for (Element enclosedElement : enclosedElements) {
                     mapElementToReflection(enclosedElement, level + 1);
                 }
@@ -284,6 +299,14 @@ public class Processor extends AbstractProcessor {
         }
 
         result = Class.forNameSafe(className, level);
+
+        if (superClass!=null) {
+            result.setSuperclass(superClass);
+        }
+
+        if (superInterfaces!=null) {
+            result.setInterfaces(superInterfaces);
+        }
 
         if (isArray) {
             result.setIsArray(true);

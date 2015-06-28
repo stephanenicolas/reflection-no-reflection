@@ -181,6 +181,20 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
             loadClassMethodBuilder.addStatement("$T c = Class.forNameSafe($S, true)", CLASS_TYPE_NAME, clazzName);
             loadClassMethodBuilder.addStatement("classSet.add(c)");
 
+
+            if(clazz.getSuperclass() != null) {
+                loadClassMethodBuilder.addStatement("c.setSuperclass(Class.forNameSafe($S))", clazz.getSuperclass().getName());
+            }
+
+            if(clazz.getInterfaces()!=null) {
+                loadClassMethodBuilder.addStatement("Class[] interfaces = new Class[$L]", clazz.getInterfaces().length);
+                loadClassMethodBuilder.addStatement("int indexInterface = 0");
+                for (Class interfaceClass : clazz.getInterfaces()) {
+                    loadClassMethodBuilder.addStatement("interfaces[indexInterface++] = Class.forNameSafe($S)", interfaceClass.getName());
+                }
+                loadClassMethodBuilder.addStatement("c.setInterfaces(interfaces)");
+            }
+
             for (Object constructorObj : clazz.getConstructors()) {
                 generateConstructor(loadClassMethodBuilder, (Constructor) constructorObj);
             }

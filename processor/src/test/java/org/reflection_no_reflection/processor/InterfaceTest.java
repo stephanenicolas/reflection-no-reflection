@@ -17,7 +17,7 @@ public class InterfaceTest extends AbstractRnRTest {
                        "public interface Foo {}" //
         );
 
-        configureProcessor("java.lang.Deprecated");
+        setTargetAnnotations("java.lang.Deprecated");
         assertJavaSourceCompileWithoutError();
 
         final Set<Class> annotatedClasses = getProcessedClasses();

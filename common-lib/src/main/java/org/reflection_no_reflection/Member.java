@@ -1,9 +1,10 @@
 package org.reflection_no_reflection;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Member {
+public abstract class Member implements AnnotatedElement {
 
     protected Member() {}
 
@@ -64,6 +65,10 @@ public abstract class Member {
     }
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
+        return false; //not implemented
+    }
+
+    public boolean isAnnotationPresent(java.lang.Class<? extends java.lang.annotation.Annotation> annotationClass) {
         return false; //not implemented
     }
 
