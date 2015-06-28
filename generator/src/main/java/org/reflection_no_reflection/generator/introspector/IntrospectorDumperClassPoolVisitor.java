@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.lang.model.element.Modifier;
 import org.reflection_no_reflection.Annotation;
 import org.reflection_no_reflection.Class;
@@ -38,13 +39,43 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
     public static final TypeName CHAR_TYPE_NAME = TypeName.get(char.class);
     public static final TypeName BOOLEAN_TYPE_NAME = TypeName.get(boolean.class);
     public static final ClassName STRING_TYPE_NAME = ClassName.get("java.lang", "String");
+    private List<Pattern> includes;
+    private List<Pattern> excludes;
 
     @Override
     public <T> void visit(Class<T> clazz) {
         //TODO add all protected java & android packages
-        if (!clazz.getName().startsWith("java") && clazz.getName().indexOf('.') != -1) {
+        String className = clazz.getName();
+        boolean shouldIncludeClass = filter(className);
+        System.out.println("Introspector for class:" + className + "=" + shouldIncludeClass);
+        if (shouldIncludeClass) {
             classList.add(clazz);
         }
+    }
+
+    public boolean filter(String className) {
+        if (className.indexOf('.') == -1) {
+            return false;
+        }
+
+        boolean inIncludes = false;
+        for (Pattern include : includes) {
+            if (include.matcher(className).find()) {
+                inIncludes = true;
+                break;
+            }
+        }
+
+        if (!inIncludes) {
+            return false;
+        }
+
+        for (Pattern exclude : excludes) {
+            if (exclude.matcher(className).find()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override public void visit(Field field) {
@@ -102,7 +133,6 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         final MethodSpec methodInvokerMethod = methodInvokerCreator.createMethodInvoker(aClass);
         final MethodSpec constructorInvokerMethod = constructorInvokerCreator.createConstructorInvoker(aClass);
 
-
         TypeSpec.Builder reflectorType = TypeSpec.classBuilder(aClass.getSimpleName() + "$$Reflector")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .superclass(BASE_REFLECTOR_TYPE_NAME);
@@ -126,5 +156,13 @@ public class IntrospectorDumperClassPoolVisitor implements ClassPoolVisitor {
         if (methodSpec != null) {
             reflectorType.addMethod(methodSpec);
         }
+    }
+
+    public void setIncludes(List<Pattern> includes) {
+        this.includes = includes;
+    }
+
+    public void setExcludes(List<Pattern> excludes) {
+        this.excludes = excludes;
     }
 }

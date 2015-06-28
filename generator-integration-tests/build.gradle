@@ -25,7 +25,10 @@ compileJava {
   doFirst {
     options.compilerArgs = [
         '-AtargetAnnotatedClasses=javax.inject.Inject,java.lang.SuppressWarnings',
-        '-AmaxLevel=1'
+        '-AmaxLevel=1',
+        '-AtargetPackageName=org.reflection_no_reflection.generator.sample.gen',
+        '-Aintrospector.includes=.*',
+        '-Aintrospector.excludes=java\\..*,javax.inject.Inject'
     ]
   }
 }

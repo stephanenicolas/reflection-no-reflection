@@ -21,6 +21,7 @@ import org.reflection_no_reflection.Constructor;
 import org.reflection_no_reflection.Field;
 import org.reflection_no_reflection.Invokable;
 import org.reflection_no_reflection.Method;
+import org.reflection_no_reflection.generator.introspector.IntrospectorDumperClassPoolVisitor;
 import org.reflection_no_reflection.generator.introspector.IntrospectorUtil;
 import org.reflection_no_reflection.visit.ClassPoolVisitor;
 
@@ -46,8 +47,10 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
 
     private String targetPackageName;
     private IntrospectorUtil util = new IntrospectorUtil();
+    private IntrospectorDumperClassPoolVisitor introspectorDumperClassPoolVisitor;
 
-    public ModuleDumperClassPoolVisitor() {
+    public ModuleDumperClassPoolVisitor(IntrospectorDumperClassPoolVisitor introspectorDumperClassPoolVisitor) {
+        this.introspectorDumperClassPoolVisitor = introspectorDumperClassPoolVisitor;
 
         //build class list
         ClassName setTypeName = ClassName.get("java.util", "Set");
@@ -224,7 +227,7 @@ public class ModuleDumperClassPoolVisitor implements ClassPoolVisitor {
     private void doGenerateSetReflector(MethodSpec.Builder loadClassMethodBuilder, Class clazz, String simpleClazzName, String packageName) {//TODO add all protected java & android packages
         //TODO the test should be done at the introspector level, there is a dependency
         //TODO avoid dependency: introduce 3rd party
-        if (!clazz.getName().startsWith("java")) {
+        if (introspectorDumperClassPoolVisitor.filter(clazz.getName())) {
             TypeName reflectorTypeName = createReflectorTypeName(packageName, simpleClazzName);
             loadClassMethodBuilder.addStatement("c.setReflector(new $T())", reflectorTypeName);
         }

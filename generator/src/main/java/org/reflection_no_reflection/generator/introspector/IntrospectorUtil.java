@@ -5,9 +5,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.reflection_no_reflection.*;
 
-/**
- * @author SNI.
- */
 public class IntrospectorUtil {
 
     public TypeName getClassName(org.reflection_no_reflection.Class<?> clazz) {

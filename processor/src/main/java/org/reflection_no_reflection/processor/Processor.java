@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -41,14 +42,13 @@ import org.reflection_no_reflection.TypeVariableImpl;
  */
 @SupportedOptions({"targetAnnotatedClasses"})
 public class Processor extends AbstractProcessor {
-
-    private Set<String> targetAnnotatedClasses = new HashSet<>();
-
     /** Contains all classes that contain annotations. */
     private HashSet<Class> annotatedClassSet = new HashSet<>();
     /** Maps annotation type to classes that contain this annotation. */
     private Map<Class<? extends Annotation>, Set<Class<?>>> mapAnnotationTypeToClassContainingAnnotation = new HashMap<>();
 
+    //annotation processing options
+    private Set<String> targetAnnotatedClasses = new HashSet<>();
     private int maxLevel = 0;
     private Set<Class> annotationClasses = new HashSet<>();
 
@@ -421,4 +421,5 @@ public class Processor extends AbstractProcessor {
     public Map<Class<? extends Annotation>, Set<Class<?>>> getMapAnnotationTypeToClassContainingAnnotation() {
         return mapAnnotationTypeToClassContainingAnnotation;
     }
+
 }
