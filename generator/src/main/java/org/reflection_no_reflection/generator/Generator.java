@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import org.reflection_no_reflection.Annotation;
@@ -21,6 +22,7 @@ import org.reflection_no_reflection.visit.ClassPoolVisitStrategy;
 /**
  * An annotation processor sample that demonstrates how to use the RNR annotation processor.
  */
+@SupportedOptions({"targetAnnotatedClasses", "maxLevel"})
 public class Generator extends AbstractProcessor {
 
     private final String targetPackageName = "org.reflection_no_reflection.generator.sample.gen";
@@ -31,10 +33,19 @@ public class Generator extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
         //comma separated list of injected classes
+        String annotatedClassesString = processingEnv.getOptions().get("targetAnnotatedClasses");
+        if (annotatedClassesString != null) {
+            processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(annotatedClassesString.split(","))));
+        }
+
+        String maxLevelString = processingEnv.getOptions().get("maxLevel");
+        if (maxLevelString != null) {
+            processor.setMaxLevel(Integer.parseInt(maxLevelString));
+        }
+
+        Class.clearAllClasses();
+
         processor.init(processingEnv);
-        processor.setTargetAnnotatedClasses(new HashSet<>(Arrays.asList(javax.inject.Inject.class.getName(),
-                                                                        SuppressWarnings.class.getName())));
-        processor.setMaxLevel(1);
         System.out.println("RNR Generator created.");
     }
 

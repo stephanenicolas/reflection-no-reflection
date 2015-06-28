@@ -153,6 +153,9 @@ public class Method extends Member implements GenericDeclaration, Invokable {
         }
     }
 
+    public void setAccessible(boolean accessible) {
+        //nothing to do
+    }
     /**
      * Returns an array of {@code Class} objects that represent the formal
      * parameter types, in declaration order, of the method

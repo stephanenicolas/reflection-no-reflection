@@ -41,6 +41,6 @@ public class ProcessorTest {
     }
 
     private int convert(Modifier... modifier) {
-        return processor.convertModifiersFromAnnnotationProcessing(new HashSet(Arrays.asList(modifier)));
+        return processor.convertModifiersFromAnnotationProcessing(new HashSet(Arrays.asList(modifier)));
     }
 }

@@ -107,7 +107,7 @@ public class Processor extends AbstractProcessor {
         TypeElement declaringClassElement = (TypeElement) fieldElement.getEnclosingElement();
         String declaringClassName = declaringClassElement.getQualifiedName().toString();
         final List<Annotation> annotations = extractAnnotations(fieldElement, level);
-        int modifiersInt = convertModifiersFromAnnnotationProcessing(modifiers);
+        int modifiersInt = convertModifiersFromAnnotationProcessing(modifiers);
         final Class<?> enclosingClass = Class.forNameSafe(declaringClassName, level + 1);
         if (level == 0) {
             final Class<? extends Annotation> annotationType = annotations.get(0).rnrAnnotationType();
@@ -174,7 +174,7 @@ public class Processor extends AbstractProcessor {
         final Constructor constructor = new Constructor(classContainingMethod,
                                                         paramTypes,
                                                         exceptionTypes,
-                                                        convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
+                                                        convertModifiersFromAnnotationProcessing(methodElement.getModifiers()));
 
         final List<Annotation> annotations = extractAnnotations(methodElement, level);
 
@@ -197,7 +197,7 @@ public class Processor extends AbstractProcessor {
                                          paramTypes,
                                          Class.forNameSafe(returnTypeName, level),
                                          exceptionTypes,
-                                         convertModifiersFromAnnnotationProcessing(methodElement.getModifiers()));
+                                         convertModifiersFromAnnotationProcessing(methodElement.getModifiers()));
 
         final List<Annotation> annotations = extractAnnotations(methodElement, level);
 
@@ -327,7 +327,7 @@ public class Processor extends AbstractProcessor {
         return result;
     }
 
-    /*Visible for testing*/ int convertModifiersFromAnnnotationProcessing(Set<Modifier> modifiers) {
+    /*Visible for testing*/ int convertModifiersFromAnnotationProcessing(Set<Modifier> modifiers) {
         int result = 0;
         for (Modifier modifier : modifiers) {
             switch (modifier) {

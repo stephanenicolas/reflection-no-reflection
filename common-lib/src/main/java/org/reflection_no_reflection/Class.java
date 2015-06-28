@@ -1,5 +1,6 @@
 package org.reflection_no_reflection;
 
+import java.io.InputStream;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -1866,5 +1867,9 @@ public class Class<T> extends Member implements GenericDeclaration, java.io.Seri
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public InputStream getResourceAsStream(String resourceName) {
+        return null;
     }
 }

@@ -384,6 +384,10 @@ public class Constructor<T> extends Member implements GenericDeclaration, Invoka
         this.isVarArgs = isVarArgs;
     }
 
+    public void setAccessible(boolean accessible) {
+        //do nothing
+    }
+
     /**
      * Returns {@code true} if this constructor is a synthetic
      * constructor; returns {@code false} otherwise.

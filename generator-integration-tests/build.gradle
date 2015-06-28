@@ -21,3 +21,12 @@ tasks.withType(JavaCompile) {
   targetCompatibility = "1.7"
 }
 
+compileJava {
+  doFirst {
+    options.compilerArgs = [
+        '-AtargetAnnotatedClasses=javax.inject.Inject,java.lang.SuppressWarnings',
+        '-AmaxLevel=1'
+    ]
+  }
+}
+

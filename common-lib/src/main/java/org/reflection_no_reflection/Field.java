@@ -85,6 +85,10 @@ public class Field extends Member {
         return enclosingClass.equals(field.enclosingClass);
     }
 
+    public void setAccessible(boolean accessible) {
+        //do nothing
+    }
+
     public void set(Object instance, Object value) {
         enclosingClass.getReflector().setObjectField(instance, getName(), value);
     }
